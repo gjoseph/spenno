@@ -26,7 +26,6 @@ export const TabbedPanels: React.FC<{
       </Box>
       {props.children.map((tp, idx) => (
         <TabPanelContent currentTab={tab} index={idx}>
-          <p>child #{idx}</p>
           {tp.props.children}
         </TabPanelContent>
       ))}
