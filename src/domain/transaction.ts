@@ -67,7 +67,11 @@ export { sum };
 
 const sum = (acc: Big, curr: Transaction) => acc.plus(curr.amount);
 
-// === Filters
+// === Transactions Filters
+export { isUncategorised };
+const isUncategorised = (t: Transaction) => t.category === UNCATEGORISED;
+
+// === RawRecords Filters
 export { isDebit, isCredit, inTime, between };
 
 type AmountCompareArgs = { min?: number; max?: number; eq?: number };

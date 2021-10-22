@@ -13,6 +13,7 @@ import {
   inTime,
   isCredit,
   isDebit,
+  isUncategorised,
   RawRecord,
   sum,
   Transaction,
@@ -72,9 +73,7 @@ class StuffDoer {
       `Total: processed ${processed.length} records from ${this.txFilePaths.length} files`
     );
 
-    const uncategorisedRecords = processed.filter(
-      (r) => r.category === UNCATEGORISED
-    );
+    const uncategorisedRecords = processed.filter(isUncategorised);
 
     const mostCommonUncategorised = uncategorisedRecords
       .reduce(...countBy((r: Transaction) => r.desc))

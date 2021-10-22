@@ -3,7 +3,13 @@ import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
-import { isCredit, isDebit, sum, Transaction } from "../domain/transaction";
+import {
+  isCredit,
+  isDebit,
+  isUncategorised,
+  sum,
+  Transaction,
+} from "../domain/transaction";
 import { groupBy } from "../util/reducers";
 import { zer0 } from "../util/util";
 import { Chart } from "./Chart";
@@ -114,10 +120,16 @@ export const MainAppScreen: React.FC<{
           <Paper sx={{ p: 2, pt: 0, display: "flex", flexDirection: "column" }}>
             {/*TODO: tabs to switch different views (raw, per file, ... or even aggregations? */}
             <TabbedPanels>
-              <TabPanel label="Transactions">
+              <TabPanel label="All Transactions">
                 <TransactionTable
                   accounts={props.accounts}
                   transactions={props.transactions}
+                />
+              </TabPanel>
+              <TabPanel label="Uncategorised transactions">
+                <TransactionTable
+                  accounts={props.accounts}
+                  transactions={props.transactions.filter(isUncategorised)}
                 />
               </TabPanel>
               <TabPanel label="Raw records">Item Two</TabPanel>
