@@ -14,7 +14,6 @@ import { ConsoleLogger, Logger } from "../util/log";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
-import { Temp } from "./Temp";
 
 export default function App() {
   return (
@@ -49,10 +48,49 @@ const reloadTransactions = (
 };
 const AppContent = () => {
   const log = useMemo(() => new ConsoleLogger(), []);
-  // TODO accounts
-  const accounts = useMemo(() => new Bank.Accounts(Temp.Temp_Accounts), []);
-  // TODO rules
-  const rules = Temp.Temp_Rules;
+
+  const [accounts, setAccounts] = useState<Bank.Accounts>(
+    () => new Bank.Accounts([])
+  );
+  const [accountsLoaded, setAccountsLoaded] = useState<boolean>(false);
+  const [accountsError, setAccountsError] = useState<boolean>(false);
+  useEffect(() => {
+    fetch(process.env.PUBLIC_URL + "/accounts.yml")
+      .then((res) => res.text())
+      .then(
+        (result) => {
+          setAccounts(new Bank.AccountsLoader(log).loadYaml(result));
+          setAccountsLoaded(true);
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          setAccountsError(error);
+          setAccountsLoaded(true);
+        }
+      );
+  }, [log]);
+  const [rules, setRules] = useState<Rules.Rule[]>(() => []);
+  const [rulesLoaded, setRulesLoaded] = useState<boolean>(false);
+  const [rulesError, setRulesError] = useState<boolean>(false);
+  useEffect(() => {
+    fetch(process.env.PUBLIC_URL + "/rules.yml")
+      .then((res) => res.text())
+      .then(
+        (result) => {
+          setRules(new Rules.RulesLoader(log).loadYaml(result));
+          setRulesLoaded(true);
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          setRulesError(error);
+          setRulesLoaded(true);
+        }
+      );
+  }, [log]);
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -76,6 +114,15 @@ const AppContent = () => {
       >
         {/*mt, aka margin-top brings our container below TopBar -- used to have value 4 _and_ an empty Toolbar instead, wtf!?*/}
         <Container maxWidth="lg" sx={{ mt: 11, mb: 4 }}>
+          <p>
+            {accountsLoaded || "loading"}
+            {accounts.accounts.length} accounts [button to reload]{" "}
+            {accountsError}
+          </p>
+          <p>
+            {rulesLoaded || "loading"}
+            {rules.length} rules [button to reload] {rulesError}
+          </p>
           <MainAppScreen
             files={files}
             setFiles={setFiles}

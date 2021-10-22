@@ -24,7 +24,11 @@ export namespace Rules {
     loadFile(filePath: string): Rule[] {
       this.log.info(`Loading ${filePath}`);
       const fileContents = fs.readFileSync(filePath, "utf8");
-      const doc = yaml.load(fileContents);
+      return this.loadYaml(fileContents);
+    }
+
+    loadYaml(yamlContent: string): Rule[] {
+      const doc = yaml.load(yamlContent);
       if (!Array.isArray(doc)) {
         throw new Error("Rules yaml should be an array");
       } else {

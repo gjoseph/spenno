@@ -23,12 +23,14 @@ export namespace Bank {
   export class AccountsLoader {
     constructor(readonly log: Logger) {}
 
-    /**
-     */
     loadFile(filePath: string): Accounts {
       this.log.info(`Loading ${filePath}`);
       const fileContents = fs.readFileSync(filePath, "utf8");
-      const doc = yaml.load(fileContents);
+      return this.loadYaml(fileContents);
+    }
+
+    loadYaml(yamlContent: string): Accounts {
+      const doc = yaml.load(yamlContent);
       if (!Array.isArray(doc)) {
         throw new Error("Accounts yaml should be an array");
       } else {
