@@ -3,13 +3,18 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme } from "@mui/material/styles";
-import { useEffect, useMemo, useState } from "react";
 import * as React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
 import { TransactionsProcessor } from "../domain/processor";
 import { Rules } from "../domain/rules";
-import { Transaction, TransactionsLoader } from "../domain/transaction";
+import {
+  DateRange,
+  isBetween,
+  Transaction,
+  TransactionsLoader,
+} from "../domain/transaction";
 import { ConsoleLogger, Logger } from "../util/log";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
@@ -93,11 +98,20 @@ const AppContent = () => {
   }, [log]);
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
+  const [dateRange, setDateRange] = useState<DateRange>(() => [null, null]);
+
+  // is transaction state, or is it just a variable ...
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  // this feels like we should understand memos instead...
   useEffect(() => {
-    setTransactions(reloadTransactions(files, rules, accounts, log));
-  }, [files, rules, accounts, log]);
+    // it might be more efficient to apply the date filter on raw records instead
+    setTransactions(
+      reloadTransactions(files, rules, accounts, log).filter(
+        isBetween(dateRange)
+      )
+    );
+  }, [files, rules, accounts, dateRange, log]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -123,11 +137,16 @@ const AppContent = () => {
             {rulesLoaded || "loading"}
             {rules.length} rules [button to reload] {rulesError}
           </p>
+          <p>from {dateRange[0]?.toDate().toString()}</p>
+          <p>to {dateRange[1]?.toDate().toString()}</p>
           <MainAppScreen
             files={files}
             setFiles={setFiles}
             transactions={transactions}
             accounts={accounts}
+            // how to make passing filters around less verbose?
+            dateRange={dateRange}
+            setDateRange={setDateRange}
           />
           <Copyright />
         </Container>

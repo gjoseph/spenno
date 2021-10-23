@@ -67,9 +67,18 @@ export { sum };
 
 const sum = (acc: Big, curr: Transaction) => acc.plus(curr.amount);
 
+// === Filtering stuff that probably needs to move away
+export type DateRange = [moment.Moment | null, moment.Moment | null];
+
 // === Transactions Filters
-export { isUncategorised };
+export { isUncategorised, isBetween };
 const isUncategorised = (t: Transaction) => t.category === UNCATEGORISED;
+
+// redundant with between filter which applies to RawRecords and is more targetted at the cli
+const isBetween = (dateRange: DateRange) =>
+  chainable<Transaction>((t) => {
+    return t.date.isBetween(dateRange[0], dateRange[1], "day", "[]");
+  });
 
 // === RawRecords Filters
 export { isDebit, isCredit, inTime, between };
@@ -109,13 +118,13 @@ const inTime = (value: number, unit: unitOfTime.All) =>
  * @param to yyyy-mm-dd
  */
 const between = (from: string, to: string) =>
-  chainable<RawRecord>((t) => {
+  chainable<RawRecord>((r) => {
     const a = mustBeValid(from);
     const b = mustBeValid(to);
     if (a.isAfter(b)) {
       throw new Error(`${from} is after ${to}`);
     }
-    return t.date.isBetween(a, b, "day", "[]");
+    return r.date.isBetween(a, b, "day", "[]");
   });
 
 const mustBeValid = (s: string) => {

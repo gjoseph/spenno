@@ -4,6 +4,7 @@ import * as React from "react";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
 import {
+  DateRange,
   isCredit,
   isDebit,
   isUncategorised,
@@ -17,6 +18,7 @@ import { FileDrop } from "./FileDrop";
 import { FileList } from "./FileList";
 import { TabPanel, TabbedPanels } from "./layout/TabbedPanels";
 import { TransactionTable } from "./TransactionTable";
+import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
 
 export const MainAppScreen: React.FC<{
   files: TransactionsFile[];
@@ -25,6 +27,9 @@ export const MainAppScreen: React.FC<{
   ) => void;
   transactions: Transaction[];
   accounts: Bank.Accounts;
+
+  dateRange: DateRange;
+  setDateRange: (func: (prev: DateRange) => DateRange) => void;
 }> = (props) => {
   const addFile = (f: TransactionsFile) => {
     props.setFiles((prevValue) => {
@@ -75,7 +80,6 @@ export const MainAppScreen: React.FC<{
               height: 240,
             }}
           >
-            Filters go here
             {/*
               * time filters (radio-year, time-span, a few  predefined "since", a few predefined "last period")
               * category filters (dropdown with checkbox, search, "all")
@@ -88,6 +92,10 @@ export const MainAppScreen: React.FC<{
               * 2 pie charts (one spend one income) or bar charts (which should support positive and negative on same chart)
               * merge credit and debit (e.g health could have both)
             */}
+            <PresetTimeframePicker
+              dateRange={props.dateRange}
+              setDateRange={props.setDateRange}
+            />
           </Paper>
         </Grid>
         <Grid item xs={12} md={4} lg={3}>
