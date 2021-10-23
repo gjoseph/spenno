@@ -42,15 +42,18 @@ const reloadTransactions = (
 ): Transaction[] => {
   const transactionsLoader = new TransactionsLoader(accounts, log);
   const transactionsProcessor = new TransactionsProcessor(rules, log);
-  const processed = files.flatMap((f) => {
-    const rawRecords = transactionsLoader.loadRawRecords(f);
-    return transactionsProcessor.applyRules(rawRecords);
-  });
+  const processed = files
+    .filter((f) => f.enabled)
+    .flatMap((f) => {
+      const rawRecords = transactionsLoader.loadRawRecords(f);
+      return transactionsProcessor.applyRules(rawRecords);
+    });
   log.info(
     `Total: processed ${processed.length} records from ${files.length} files`
   );
   return processed;
 };
+
 const AppContent = () => {
   const log = useMemo(() => new ConsoleLogger(), []);
 
