@@ -17,10 +17,7 @@ const FileLabel: React.FC<{ file: TransactionsFile }> = ({ file }) => {
     <React.Fragment>
       {file.filePath}{" "}
       <Typography variant="caption" display="inline" gutterBottom>
-        (
-        {file.rawRecords
-          ? `${file.rawRecords.length} records`
-          : "not parsed yet!?"}
+        ({file.rawRecords ? `${file.rawRecords.length} records` : "parsing ..."}
         )
       </Typography>
     </React.Fragment>
