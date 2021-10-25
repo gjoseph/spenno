@@ -19,6 +19,7 @@ import { ConsoleLogger, Logger } from "../util/log";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
+import { SimpleProgressIndicator } from "./util-comps/Progress";
 
 export default function App() {
   return (
@@ -56,6 +57,8 @@ const reloadTransactions = (
 
 const AppContent = () => {
   const log = useMemo(() => new ConsoleLogger(), []);
+
+  const [calculating, setCalculating] = useState(true);
 
   const [accounts, setAccounts] = useState<Bank.Accounts>(
     () => new Bank.Accounts([])
@@ -108,12 +111,15 @@ const AppContent = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   // this feels like we should understand memos instead...
   useEffect(() => {
+    setCalculating((old) => true);
     // it might be more efficient to apply the date filter on raw records instead
-    setTransactions(
-      reloadTransactions(files, rules, accounts, log).filter(
+    setTransactions((prevState: Transaction[]) => {
+      const result = reloadTransactions(files, rules, accounts, log).filter(
         isBetween(dateRange)
-      )
-    );
+      );
+      setCalculating((old) => false);
+      return result;
+    });
   }, [files, rules, accounts, dateRange, log]);
 
   return (
@@ -131,6 +137,7 @@ const AppContent = () => {
       >
         {/*mt, aka margin-top brings our container below TopBar -- used to have value 4 _and_ an empty Toolbar instead, wtf!?*/}
         <Container maxWidth="lg" sx={{ mt: 11, mb: 4 }}>
+          <SimpleProgressIndicator inProgress={calculating} />
           <p>
             {accountsLoaded || "loading"}
             {accounts.accounts.length} accounts [button to reload]{" "}
