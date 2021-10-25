@@ -20,6 +20,8 @@ import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { SimpleProgressIndicator } from "./util-comps/Progress";
+import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
+import * as CalculatorWorker from "../worker/transaction-filter-worker";
 
 export default function App() {
   return (
@@ -113,12 +115,17 @@ const AppContent = () => {
   useEffect(() => {
     setCalculating((old) => true);
     // it might be more efficient to apply the date filter on raw records instead
-    setTransactions((prevState: Transaction[]) => {
-      const result = reloadTransactions(files, rules, accounts, log).filter(
-        isBetween(dateRange)
-      );
+    // setTransactions((prevState: Transaction[]) => {
+    //   const result = reloadTransactions(files, rules, accounts, log).filter(
+    //     isBetween(dateRange)
+    //   );
+    //   setCalculating((old) => false);
+    //   return result;
+    // });
+    const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
+    calcWorker.expensive(5000).then((count: number) => {
+      console.log(`Ran ${count} loops`);
       setCalculating((old) => false);
-      return result;
     });
   }, [files, rules, accounts, dateRange, log]);
 
