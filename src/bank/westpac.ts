@@ -28,16 +28,16 @@ export namespace Westpac {
           // No idea what these are ... (some sort of transactionID would be nice...)
           this.log.warn("WE FOUND A SERIAL: " + a.Serial);
         }
-        return new RawRecord(
-          this.accounts.getAccount(a["Bank Account"]),
-          moment(a.Date, "D/M/YYYY"),
-          desc,
-          signedAmount(
+        return {
+          account: this.accounts.getAccount(a["Bank Account"]),
+          date: moment(a.Date, "D/M/YYYY"),
+          desc: desc,
+          amount: signedAmount(
             Number.parseFloat(a["Debit Amount"]),
             Number.parseFloat(a["Credit Amount"]),
             () => `for this line: ${a.toString()}`
-          )
-        );
+          ),
+        };
       });
 
       const westpacCategories = Array.from(

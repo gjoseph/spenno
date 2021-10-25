@@ -4,8 +4,9 @@ import * as yaml from "js-yaml";
 import { Logger } from "../util/log";
 
 export namespace Bank {
-  export class Account {
-    constructor(readonly name: string, readonly id: string) {}
+  export interface Account {
+    readonly name: string;
+    readonly id: string;
   }
 
   export class Accounts {
@@ -35,7 +36,7 @@ export namespace Bank {
         throw new Error("Accounts yaml should be an array");
       } else {
         const accounts = Array.from(doc).map((yamlElement) => {
-          return new Account(yamlElement["name"], String(yamlElement["id"]));
+          return { name: yamlElement["name"], id: String(yamlElement["id"]) };
         });
         return new Accounts(accounts);
       }

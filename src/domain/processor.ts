@@ -9,14 +9,14 @@ export class TransactionsProcessor {
     const processed: Transaction[] = rawRecords.map((raw) => {
       const rule = this.getRuleFor(this.rules, raw);
       const category = rule ? rule.category : UNCATEGORISED;
-      return new Transaction(
-        raw.account,
-        raw.date,
-        raw.desc,
-        raw.amount,
-        rule ? rule.merchant : null,
-        category
-      );
+      return {
+        account: raw.account,
+        date: raw.date,
+        desc: raw.desc,
+        amount: raw.amount,
+        merchant: rule ? rule.merchant : null,
+        category: category,
+      };
     });
     return processed;
   }
