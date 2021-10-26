@@ -8,6 +8,35 @@ export interface Logger {
   warn(message: string): void;
 }
 
+type LogLevel = "debug" | "info" | "warn";
+
+export interface LogEntry {
+  level: LogLevel;
+  message: string;
+}
+
+export class ArrayLogger implements Logger {
+  readonly logEntries: LogEntry[] = [];
+  constructor(readonly debugMode: boolean) {}
+  debug(message: string, ...stuff: any[]): void {
+    if (this.debugMode) {
+      this.add("debug", [message, ...stuff].join(" "));
+    }
+  }
+
+  info(message: string): void {
+    this.add("info", message);
+  }
+
+  warn(message: string): void {
+    this.add("warn", message);
+  }
+
+  private add(level: LogLevel, message: string) {
+    this.logEntries.push({ level, message });
+  }
+}
+
 export class ConsoleLogger implements Logger {
   debug(message: string, ...stuff: any[]): void {
     console.debug(message, ...stuff);

@@ -5,23 +5,19 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
+import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
-import { TransactionsProcessor } from "../domain/processor";
 import { Rules } from "../domain/rules";
-import {
-  DateRange,
-  isBetween,
-  Transaction,
-  TransactionsLoader,
-} from "../domain/transaction";
-import { ConsoleLogger, Logger } from "../util/log";
+import { DateRange, Transaction } from "../domain/transaction";
+import { ConsoleLogger } from "../util/log";
+import { WorkResult } from "../worker/transaction-filter-worker";
+import * as CalculatorWorker from "../worker/transaction-filter-worker";
+import { fromTransferrable, transferrableDateRange } from "../worker/transfer";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { SimpleProgressIndicator } from "./util-comps/Progress";
-import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
-import * as CalculatorWorker from "../worker/transaction-filter-worker";
 
 export default function App() {
   return (
@@ -36,26 +32,6 @@ const grayForTheme = (theme: Theme) =>
   theme.palette.mode === "light"
     ? theme.palette.grey[100]
     : theme.palette.grey[900];
-
-const reloadTransactions = (
-  files: TransactionsFile[],
-  rules: Rules.Rule[],
-  accounts: Bank.Accounts,
-  log: Logger
-): Transaction[] => {
-  const transactionsLoader = new TransactionsLoader(accounts, log);
-  const transactionsProcessor = new TransactionsProcessor(rules, log);
-  const processed = files
-    .filter((f) => f.enabled)
-    .flatMap((f) => {
-      const rawRecords = transactionsLoader.loadRawRecords(f);
-      return transactionsProcessor.applyRules(rawRecords);
-    });
-  log.info(
-    `Total: processed ${processed.length} records from ${files.length} files`
-  );
-  return processed;
-};
 
 const AppContent = () => {
   const log = useMemo(() => new ConsoleLogger(), []);
@@ -114,19 +90,19 @@ const AppContent = () => {
   // this feels like we should understand memos instead...
   useEffect(() => {
     setCalculating((old) => true);
-    // it might be more efficient to apply the date filter on raw records instead
-    // setTransactions((prevState: Transaction[]) => {
-    //   const result = reloadTransactions(files, rules, accounts, log).filter(
-    //     isBetween(dateRange)
-    //   );
-    //   setCalculating((old) => false);
-    //   return result;
-    // });
+    // TODO should calcWorker be moved out of useEffect?
     const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
-    calcWorker.expensive(5000).then((count: number) => {
-      console.log(`Ran ${count} loops`);
-      setCalculating((old) => false);
-    });
+    const txDateRange = transferrableDateRange(dateRange);
+    calcWorker
+      .reloadTransactions(files, rules, accounts.accounts, txDateRange) // TODO why does intellij think the "dateRange" param is called "files" !?
+      .then((res: WorkResult) => {
+        setTransactions((old) => {
+          const newTxs = res.transactions.map(fromTransferrable);
+          consoleLogger.debug("Loaded", newTxs.length, "transactions");
+          return newTxs;
+        });
+        setCalculating((old) => false);
+      });
   }, [files, rules, accounts, dateRange, log]);
 
   return (
