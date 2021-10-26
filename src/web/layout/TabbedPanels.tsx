@@ -20,12 +20,12 @@ export const TabbedPanels: React.FC<{
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tab} onChange={handleTabChange}>
           {props.children.map((tp, idx) => (
-            <Tab label={tp.props.label} value={idx} />
+            <Tab label={tp.props.label} value={idx} key={"tab-" + idx} />
           ))}
         </Tabs>
       </Box>
       {props.children.map((tp, idx) => (
-        <TabPanelContent currentTab={tab} index={idx}>
+        <TabPanelContent currentTab={tab} index={idx} key={"tab-panel-" + idx}>
           {tp.props.children}
         </TabPanelContent>
       ))}
