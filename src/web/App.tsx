@@ -36,7 +36,7 @@ const grayForTheme = (theme: Theme) =>
 const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
 
 const AppContent = () => {
-  const log = useMemo(() => new ConsoleLogger(), []);
+  const consoleLogger = useMemo(() => new ConsoleLogger(), []);
 
   const [calculating, setCalculating] = useState(true);
 
@@ -50,7 +50,7 @@ const AppContent = () => {
       .then((res) => res.text())
       .then(
         (result) => {
-          setAccounts(new Bank.AccountsLoader(log).loadYaml(result));
+          setAccounts(new Bank.AccountsLoader(consoleLogger).loadYaml(result));
           setAccountsLoaded(true);
         },
         // Note: it's important to handle errors here
@@ -61,7 +61,7 @@ const AppContent = () => {
           setAccountsLoaded(true);
         }
       );
-  }, [log]);
+  }, [consoleLogger]);
   const [rules, setRules] = useState<Rules.Rule[]>(() => []);
   const [rulesLoaded, setRulesLoaded] = useState<boolean>(false);
   const [rulesError, setRulesError] = useState<boolean>(false);
@@ -70,7 +70,7 @@ const AppContent = () => {
       .then((res) => res.text())
       .then(
         (result) => {
-          setRules(new Rules.RulesLoader(log).loadYaml(result));
+          setRules(new Rules.RulesLoader(consoleLogger).loadYaml(result));
           setRulesLoaded(true);
         },
         // Note: it's important to handle errors here
@@ -81,7 +81,7 @@ const AppContent = () => {
           setRulesLoaded(true);
         }
       );
-  }, [log]);
+  }, [consoleLogger]);
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
@@ -103,7 +103,7 @@ const AppContent = () => {
         });
         setCalculating((old) => false);
       });
-  }, [files, rules, accounts, dateRange, log]);
+  }, [files, rules, accounts, dateRange, consoleLogger]);
 
   return (
     <Box sx={{ display: "flex" }}>
