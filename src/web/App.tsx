@@ -33,6 +33,8 @@ const grayForTheme = (theme: Theme) =>
     ? theme.palette.grey[100]
     : theme.palette.grey[900];
 
+const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
+
 const AppContent = () => {
   const log = useMemo(() => new ConsoleLogger(), []);
 
@@ -90,8 +92,6 @@ const AppContent = () => {
   // this feels like we should understand memos instead...
   useEffect(() => {
     setCalculating((old) => true);
-    // TODO should calcWorker be moved out of useEffect?
-    const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
     const txDateRange = transferrableDateRange(dateRange);
     calcWorker
       .reloadTransactions(files, rules, accounts.accounts, txDateRange) // TODO why does intellij think the "dateRange" param is called "files" !?
