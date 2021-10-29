@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import App from "./App";
+import { TopBar } from "./Nav";
 
 test("renders title", () => {
-  render(<App />);
+  render(<TopBar />);
   const text = screen.getByText(/mullah/i);
   expect(text).toBeInTheDocument();
 });

@@ -123,14 +123,14 @@ test("is debit with max&min value", () => {
 });
 
 test("filters can be chained with AND", () => {
-  const testTx = new Transaction(
-    { id: "1", name: "test account" },
-    moment("2018-10-12"),
-    "test record",
-    new Big(-80),
-    "Vain Dohr",
-    "some/cat"
-  );
+  const testTx: Transaction = {
+    account: { id: "1", name: "test account" },
+    date: moment("2018-10-12"),
+    desc: "test record",
+    amount: new Big(-80),
+    merchant: "Vain Dohr",
+    category: "some/cat",
+  };
   expect(isDebit({ min: 20, max: 100 }).and(inTime(2018, "year"))(testTx)).toBe(
     true
   );
@@ -148,14 +148,14 @@ test("filters can be chained with AND", () => {
   );
 });
 test("filters can be chained with OR", () => {
-  const testTx = new Transaction(
-    { id: "1", name: "test account" },
-    moment("2018-10-12"),
-    "test record",
-    new Big(-80),
-    "Vain Dohr",
-    "some/cat"
-  );
+  const testTx: Transaction = {
+    account: { id: "1", name: "test account" },
+    date: moment("2018-10-12"),
+    desc: "test record",
+    amount: new Big(-80),
+    merchant: "Vain Dohr",
+    category: "some/cat",
+  };
   expect(isDebit({ min: 20, max: 100 }).or(inTime(2018, "year"))(testTx)).toBe(
     true // both true
   );
@@ -183,24 +183,24 @@ test("filters can be chained with OR", () => {
   );
 });
 
-const withAmount = (n: number) => {
-  return new Transaction(
-    { id: "1", name: "test account" },
-    moment(),
-    "test record",
-    new Big(n),
-    "Vain Dohr",
-    "some/cat"
-  );
+const withAmount = (n: number): Transaction => {
+  return {
+    account: { id: "1", name: "test account" },
+    date: moment(),
+    desc: "test record",
+    amount: new Big(n),
+    merchant: "Vain Dohr",
+    category: "some/cat",
+  };
 };
 
-const withDate = (m: moment.Moment) => {
-  return new Transaction(
-    { id: "1", name: "test account" },
-    m,
-    "test record",
-    new Big(123),
-    "Vain Dohr",
-    "some/cat"
-  );
+const withDate = (m: moment.Moment): Transaction => {
+  return {
+    account: { id: "1", name: "test account" },
+    date: m,
+    desc: "test record",
+    amount: new Big(123),
+    merchant: "Vain Dohr",
+    category: "some/cat",
+  };
 };

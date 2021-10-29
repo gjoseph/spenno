@@ -30,29 +30,24 @@ export class TransactionsLoader {
   }
 }
 
-export class RawRecord {
-  constructor(
-    readonly account: Bank.Account,
-    readonly date: moment.Moment,
-    readonly desc: string,
-    readonly amount: Big // negative for a debit, positive for a credit
-  ) {}
+export interface RawRecord {
+  readonly account: Bank.Account;
+  readonly date: moment.Moment;
+  readonly desc: string;
+  readonly amount: Big; // negative for a debit, positive for a credit
 }
 
 export type Category = string;
 export const UNCATEGORISED: Category = "UNKNOWN";
 
-export class Transaction extends RawRecord {
-  constructor(
-    readonly account: Bank.Account,
-    readonly date: moment.Moment,
-    readonly desc: string,
-    readonly amount: Big, // negative for a debit, positive for a credit
-    readonly merchant: string | null,
-    readonly category: Category
-  ) {
-    super(account, date, desc, amount);
-  }
+// extends RawRecord mostly so we can use same comparators/filters
+export interface Transaction extends RawRecord {
+  readonly account: Bank.Account;
+  readonly date: moment.Moment;
+  readonly desc: string;
+  readonly amount: Big; // negative for a debit, positive for a credit
+  readonly merchant: string | null;
+  readonly category: Category;
 }
 
 // === Sorters
@@ -67,9 +62,18 @@ export { sum };
 
 const sum = (acc: Big, curr: Transaction) => acc.plus(curr.amount);
 
+// === Filtering stuff that probably needs to move away
+export type DateRange = [moment.Moment | null, moment.Moment | null];
+
 // === Transactions Filters
-export { isUncategorised };
+export { isUncategorised, isBetween };
 const isUncategorised = (t: Transaction) => t.category === UNCATEGORISED;
+
+// redundant with between filter which applies to RawRecords and is more targetted at the cli
+const isBetween = (dateRange: DateRange) =>
+  chainable<Transaction>((t) => {
+    return t.date.isBetween(dateRange[0], dateRange[1], "day", "[]");
+  });
 
 // === RawRecords Filters
 export { isDebit, isCredit, inTime, between };
@@ -109,13 +113,13 @@ const inTime = (value: number, unit: unitOfTime.All) =>
  * @param to yyyy-mm-dd
  */
 const between = (from: string, to: string) =>
-  chainable<RawRecord>((t) => {
+  chainable<RawRecord>((r) => {
     const a = mustBeValid(from);
     const b = mustBeValid(to);
     if (a.isAfter(b)) {
       throw new Error(`${from} is after ${to}`);
     }
-    return t.date.isBetween(a, b, "day", "[]");
+    return r.date.isBetween(a, b, "day", "[]");
   });
 
 const mustBeValid = (s: string) => {

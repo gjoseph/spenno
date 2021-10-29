@@ -5,19 +5,16 @@ import { TransactionsFile } from "../domain/file";
 export type AddFile = (f: TransactionsFile) => void;
 const onDropDelegateToAddFile =
   (addFile: AddFile) => (acceptedFiles: File[]) => {
-    console.log(
+    console.debug(
       "onDrop#acceptedFiles:",
       acceptedFiles.map((f) => f.name)
     );
     acceptedFiles.forEach((file: File) => {
       const reader = new FileReader();
-      console.log("file.name:", file.name);
-      console.log("file.type:", file.type);
-      reader.onabort = () => console.log(file.name, "reading was aborted");
-      reader.onerror = () => console.log(file.name, "reading has failed");
+      reader.onabort = () => console.warn(file.name, "reading was aborted");
+      reader.onerror = () => console.warn(file.name, "reading has failed");
       reader.onload = () => {
         const binaryStr = reader.result as string;
-        console.log(binaryStr);
         addFile(new TransactionsFile(file.name, "westpac.csv", binaryStr));
       };
       reader.readAsText(file);
