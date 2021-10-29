@@ -10,10 +10,17 @@
   // Wait 2 days after a release to create PR/branches
   stabilityDays: 2,
   prCreation: "not-pending",
-  prHourlyLimit: 0,
+  // default is documented to be 0, but empirically it seems to be ~30 ?
   prConcurrentLimit: 0,
+  // default is documented to be 0, but empirically it seems to be 2 ?
+  prHourlyLimit: 0,
+  labels: [
+    "renovate-{{updateType}}",
+    "renovate-{{depType}}",
+    "renovate-{{datasource}}",
+  ],
   packageRules: [
-    // Auto-merge patch updates (repo still requires an approval, so we could potentially do this for all updates
+    // Auto-merge patch updates
     {
       updateTypes: ["patch"],
       automerge: true,
