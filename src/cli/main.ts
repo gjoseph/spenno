@@ -4,26 +4,24 @@ import fs from "fs";
 import * as yargs from "yargs";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
+import { RawRecordFilters } from "../domain/filters";
 import { TransactionsProcessor } from "../domain/processor";
 import { Rules } from "../domain/rules";
 import {
   byAmountAsc,
   byAmountDesc,
   Category,
-  inTime,
-  isCredit,
-  isDebit,
   isUncategorised,
   RawRecord,
   sum,
   Transaction,
   TransactionsLoader,
-  UNCATEGORISED,
 } from "../domain/transaction";
 import { Logger, TermLogger } from "../util/log";
 import { countBy, groupBy } from "../util/reducers";
 import { percentOf, zer0 } from "../util/util";
 import Rule = Rules.Rule;
+import RuleDesc = Rules.RuleDesc;
 
 function _doStuff(args: Args) {
   const stuffDoer = new StuffDoer(args);
@@ -44,7 +42,7 @@ class StuffDoer {
     this.txFilePaths = args.files;
   }
 
-  loadRules(): Rule[] {
+  loadRules(): RuleDesc[] {
     return this.rulesFilePath.flatMap((f) =>
       new Rules.RulesLoader(this.log).loadFile(f)
     );
@@ -65,7 +63,10 @@ class StuffDoer {
     this.log.debug("Loaded accounts:", accounts);
 
     const transactionsLoader = new TransactionsLoader(accounts, this.log);
-    const transactionsProcessor = new TransactionsProcessor(rules, this.log);
+    const transactionsProcessor = new TransactionsProcessor(
+      rules.map(Rules.toRule),
+      this.log
+    );
     const processed = this.txFilePaths.flatMap((f) =>
       this.loadTransactions(f, transactionsLoader, transactionsProcessor)
     );
@@ -73,6 +74,7 @@ class StuffDoer {
       `Total: processed ${processed.length} records from ${this.txFilePaths.length} files`
     );
 
+    const { isDebit, isCredit, inTime, between } = RawRecordFilters;
     const uncategorisedRecords = processed.filter(isUncategorised);
 
     const mostCommonUncategorised = uncategorisedRecords
@@ -168,8 +170,10 @@ class StuffDoer {
   }
 
   private totalsForCategory(records: Transaction[], category: Category) {
-    const debit = records.filter(isDebit()).reduce(sum, zer0);
-    const credit = records.filter(isCredit()).reduce(sum, zer0);
+    const debit = records.filter(RawRecordFilters.isDebit()).reduce(sum, zer0);
+    const credit = records
+      .filter(RawRecordFilters.isCredit())
+      .reduce(sum, zer0);
     const total = records.reduce(sum, zer0);
     if (!total.eq(credit.plus(debit))) {
       throw new Error("WTF");
