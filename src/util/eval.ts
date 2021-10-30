@@ -21,5 +21,14 @@ export const evalAsFunction = <I, O>(code: string): Fun<I, O> => {
   const { isDebit, isCredit, inTime, between } = RawRecordFilters;
 
   // TODO how do we ensure it has the right types?
-  return eval(code); // eslint-disable-line no-eval
+  try {
+    return eval(code); // eslint-disable-line no-eval
+  } catch (e: any) {
+    // TODO still not sure what e exactly is ...
+    // console.log("typeof e", typeof e)
+    // console.log("Object.keys(e): ", Object.keys(e))
+    throw new Error(
+      `Could not evaluate rule additionalCheck \`${code}\`: ${e.message}`
+    );
+  }
 };
