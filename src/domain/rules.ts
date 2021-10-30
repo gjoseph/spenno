@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as yaml from "js-yaml";
-import { evalTSFunction } from "../util/eval";
+import { evalAsFunction } from "../util/eval";
 import { Logger } from "../util/log";
 import { Category, RawRecord } from "./transaction";
 
@@ -41,7 +41,7 @@ export namespace Rules {
   };
 
   function evalRule(additionalCheck: AdditionalCheckTS): AdditionalCheck {
-    return evalTSFunction<RawRecord, boolean>(additionalCheck);
+    return evalAsFunction<RawRecord, boolean>(additionalCheck);
   }
 
   export class RulesLoader {
