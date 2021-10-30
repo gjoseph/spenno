@@ -14,8 +14,9 @@ export const evalTSFunction = <I, O>(code: string): Fun<I, O> => {
 
   // TODO Surely, there is a nicer way to expose functions to eval()
   // (and isolate it from whatever else is available here)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isDebit, isCredit, inTime, between } = RawRecordFilters;
 
   // TODO how do we ensure it has the right types?
-  return eval(js);
+  return eval(js); // eslint-disable-line no-eval
 };
