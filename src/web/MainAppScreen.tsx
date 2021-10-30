@@ -5,12 +5,11 @@ import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
 import {
   DateRange,
-  isCredit,
-  isDebit,
   isUncategorised,
   sum,
   Transaction,
 } from "../domain/transaction";
+import { RawRecordFilters } from "../domain/filters";
 import { groupBy } from "../util/reducers";
 import { zer0 } from "../util/util";
 import { Chart } from "./Chart";
@@ -62,10 +61,10 @@ export const MainAppScreen: React.FC<{
   }
 
   const creditsByCategory = totalByCategoryFor(
-    props.transactions.filter(isCredit())
+    props.transactions.filter(RawRecordFilters.isCredit())
   );
   const debitsByCategory = totalByCategoryFor(
-    props.transactions.filter(isDebit())
+    props.transactions.filter(RawRecordFilters.isDebit())
   );
 
   return (

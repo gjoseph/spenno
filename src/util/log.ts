@@ -83,3 +83,11 @@ export class TermLogger implements Logger {
     return Math.floor(Math.random() * 255);
   };
 }
+
+export class SilentLogger implements Logger {
+  debug(message: string, ...stuff: any[]): void {}
+
+  info(message: string): void {}
+
+  warn(message: string): void {}
+}

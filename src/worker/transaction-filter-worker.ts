@@ -26,12 +26,13 @@ export interface WorkResult {
 
 export const reloadTransactions = (
   files: TransactionsFile[],
-  rules: Rules.Rule[],
+  ruleDescs: Rules.RuleDesc[],
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[],
   dateRange: TransferrableDateRange
 ): WorkResult => {
   const log = new ArrayLogger(false);
+  const rules = ruleDescs.map(Rules.toRule);
   const transactionsLoader = new TransactionsLoader(
     new Bank.Accounts(accounts),
     log

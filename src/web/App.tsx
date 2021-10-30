@@ -62,7 +62,7 @@ const AppContent = () => {
         }
       );
   }, [consoleLogger]);
-  const [rules, setRules] = useState<Rules.Rule[]>(() => []);
+  const [rules, setRules] = useState<Rules.RuleDesc[]>(() => []);
   const [rulesLoaded, setRulesLoaded] = useState<boolean>(false);
   const [rulesError, setRulesError] = useState<boolean>(false);
   useEffect(() => {

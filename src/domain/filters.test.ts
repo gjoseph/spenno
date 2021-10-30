@@ -1,6 +1,9 @@
-import { between, inTime, isCredit, isDebit, Transaction } from "./transaction";
+import { RawRecord, Transaction } from "./transaction";
 import Big from "big.js";
 import moment from "moment";
+import { RawRecordFilters } from "./filters";
+
+const { inTime, between, isCredit, isDebit } = RawRecordFilters;
 
 test("inTimePeriod", () => {
   const r = withDate(moment("2020-11-21 20:16:30"));
@@ -183,24 +186,23 @@ test("filters can be chained with OR", () => {
   );
 });
 
-const withAmount = (n: number): Transaction => {
+const account = { id: "1", name: "test account" };
+const desc = "test record";
+
+const withAmount = (n: number): RawRecord => {
   return {
-    account: { id: "1", name: "test account" },
+    account,
+    desc,
     date: moment(),
-    desc: "test record",
     amount: new Big(n),
-    merchant: "Vain Dohr",
-    category: "some/cat",
   };
 };
 
-const withDate = (m: moment.Moment): Transaction => {
+const withDate = (m: moment.Moment): RawRecord => {
   return {
-    account: { id: "1", name: "test account" },
+    account,
+    desc,
     date: m,
-    desc: "test record",
     amount: new Big(123),
-    merchant: "Vain Dohr",
-    category: "some/cat",
   };
 };
