@@ -1,9 +1,10 @@
 import Big from "big.js";
 import moment from "moment";
 import { Westpac } from "../bank/westpac";
-import { Logger } from "../util/log";
-import { Bank } from "./accounts";
 import { chainable } from "../util/chainable";
+import { Logger } from "../util/log";
+import { DateRange, isInRange } from "../util/time-util";
+import { Bank } from "./accounts";
 import { TransactionsFile } from "./file";
 
 export class TransactionsLoader {
@@ -60,9 +61,6 @@ export { sum };
 
 const sum = (acc: Big, curr: Transaction) => acc.plus(curr.amount);
 
-// === Filtering stuff that probably needs to move away
-export type DateRange = [moment.Moment | null, moment.Moment | null];
-
 // === Transactions Filters
 export { isUncategorised, isBetween };
 const isUncategorised = (t: Transaction) => t.category === UNCATEGORISED;
@@ -70,5 +68,5 @@ const isUncategorised = (t: Transaction) => t.category === UNCATEGORISED;
 // redundant with between filter which applies to RawRecords and is more targetted at the rules
 const isBetween = (dateRange: DateRange) =>
   chainable<Transaction>((t) => {
-    return t.date.isBetween(dateRange[0], dateRange[1], "day", "[]");
+    return isInRange(t.date, dateRange);
   });

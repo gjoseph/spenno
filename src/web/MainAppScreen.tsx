@@ -4,12 +4,7 @@ import * as React from "react";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
 import { RawRecordFilters } from "../domain/filters";
-import {
-  DateRange,
-  isUncategorised,
-  sum,
-  Transaction,
-} from "../domain/transaction";
+import { isUncategorised, sum, Transaction } from "../domain/transaction";
 import { groupBy } from "../util/reducers";
 import { zer0 } from "../util/util";
 import { Chart } from "./Chart";
@@ -18,6 +13,7 @@ import { FileList } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
 import { TransactionFilters } from "./TransactionFilters";
 import { TransactionTable } from "./TransactionTable";
+import { DateRange } from "../util/time-util";
 
 export const MainAppScreen: React.FC<{
   files: TransactionsFile[];

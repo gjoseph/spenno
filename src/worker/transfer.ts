@@ -1,7 +1,8 @@
 import Big from "big.js";
 import { Bank } from "../domain/accounts";
-import { Category, DateRange, Transaction } from "../domain/transaction";
+import { Category, Transaction } from "../domain/transaction";
 import moment from "moment";
+import { DateRange } from "../util/time-util";
 
 /**
  * The current interface of Transaction holds Big.js and Moment.js fields, which
@@ -38,22 +39,16 @@ export const fromTransferrable = (t: TransferrableTransaction): Transaction => {
   };
 };
 
-// See transaction#DateRange
+// See time-util#DateRange
 // TODO get rid of moment
-export type TransferrableDateRange = [string | null, string | null];
+export type TransferrableDateRange = [string, string];
 export const transferrableDateRange: (
   dateRange: DateRange
 ) => TransferrableDateRange = (dateRange: DateRange) => {
-  return [
-    dateRange[0]?.toISOString() || null,
-    dateRange[1]?.toISOString() || null,
-  ];
+  return [dateRange[0]?.toISOString(), dateRange[1]?.toISOString()];
 };
 export const transferredDateRange: (
   dateRange: TransferrableDateRange
 ) => DateRange = (dateRange: TransferrableDateRange) => {
-  return [
-    dateRange[0] ? moment(dateRange[0]) : null,
-    dateRange[1] ? moment(dateRange[1]) : null,
-  ];
+  return [moment(dateRange[0]), moment(dateRange[1])];
 };

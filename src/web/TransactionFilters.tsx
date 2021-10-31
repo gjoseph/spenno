@@ -1,6 +1,6 @@
 import * as React from "react";
-import { DateRange } from "../domain/transaction";
 import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
+import { DateRange } from "../util/time-util";
 
 interface TransactionFiltersProps {
   dateRange: DateRange;

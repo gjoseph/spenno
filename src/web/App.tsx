@@ -9,7 +9,7 @@ import createCalculatorWorker from "workerize-loader!../worker/transaction-filte
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
 import { Rules } from "../domain/rules";
-import { DateRange, Transaction } from "../domain/transaction";
+import { Transaction } from "../domain/transaction";
 import { ConsoleLogger } from "../util/log";
 import { WorkResult } from "../worker/transaction-filter-worker";
 import * as CalculatorWorker from "../worker/transaction-filter-worker";
@@ -17,6 +17,7 @@ import { fromTransferrable, transferrableDateRange } from "../worker/transfer";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
+import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { SimpleProgressIndicator } from "./util-comps/Progress";
 import { useFetch } from "./util/hook-fetch";
 
@@ -60,7 +61,7 @@ const AppContent = () => {
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
-  const [dateRange, setDateRange] = useState<DateRange>(() => [null, null]);
+  const [dateRange, setDateRange] = useState<DateRange>(() => MAX_DATE_RANGE);
 
   // is transaction state, or is it just a variable ...
   const [transactions, setTransactions] = useState<Transaction[]>([]);
