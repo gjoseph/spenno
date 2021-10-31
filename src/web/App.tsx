@@ -18,6 +18,7 @@ import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { SimpleProgressIndicator } from "./util-comps/Progress";
+import { useFetch } from "./util/hook-fetch";
 
 export default function App() {
   return (
@@ -35,53 +36,27 @@ const grayForTheme = (theme: Theme) =>
 
 const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
 
+const reloadAccounts = (result: string) =>
+  new Bank.AccountsLoader(new ConsoleLogger()).loadYaml(result);
+
+const reloadRules = (result: string) =>
+  new Rules.RulesLoader(new ConsoleLogger()).loadYaml(result);
+
 const AppContent = () => {
   const consoleLogger = useMemo(() => new ConsoleLogger(), []);
 
   const [calculating, setCalculating] = useState(true);
 
-  const [accounts, setAccounts] = useState<Bank.Accounts>(
-    () => new Bank.Accounts([])
+  const [accounts, accountsLoaded, accountsError] = useFetch<Bank.Accounts>(
+    "/accounts.yml",
+    () => new Bank.Accounts([]),
+    reloadAccounts
   );
-  const [accountsLoaded, setAccountsLoaded] = useState<boolean>(false);
-  const [accountsError, setAccountsError] = useState<boolean>(false);
-  useEffect(() => {
-    fetch(process.env.PUBLIC_URL + "/accounts.yml")
-      .then((res) => res.text())
-      .then(
-        (result) => {
-          setAccounts(new Bank.AccountsLoader(consoleLogger).loadYaml(result));
-          setAccountsLoaded(true);
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          setAccountsError(error);
-          setAccountsLoaded(true);
-        }
-      );
-  }, [consoleLogger]);
-  const [rules, setRules] = useState<Rules.RuleDesc[]>(() => []);
-  const [rulesLoaded, setRulesLoaded] = useState<boolean>(false);
-  const [rulesError, setRulesError] = useState<boolean>(false);
-  useEffect(() => {
-    fetch(process.env.PUBLIC_URL + "/rules.yml")
-      .then((res) => res.text())
-      .then(
-        (result) => {
-          setRules(new Rules.RulesLoader(consoleLogger).loadYaml(result));
-          setRulesLoaded(true);
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          setRulesError(error);
-          setRulesLoaded(true);
-        }
-      );
-  }, [consoleLogger]);
+  const [rules, rulesLoaded, rulesError] = useFetch<Rules.RuleDesc[]>(
+    "/rules.yml",
+    () => [],
+    reloadRules
+  );
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
