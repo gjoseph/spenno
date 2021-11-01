@@ -3,21 +3,21 @@ import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
+import { RawRecordFilters } from "../domain/filters";
 import {
   DateRange,
   isUncategorised,
   sum,
   Transaction,
 } from "../domain/transaction";
-import { RawRecordFilters } from "../domain/filters";
 import { groupBy } from "../util/reducers";
 import { zer0 } from "../util/util";
 import { Chart } from "./Chart";
 import { FileDrop } from "./FileDrop";
 import { FileList } from "./FileList";
-import { TabPanel, TabbedPanels } from "./layout/TabbedPanels";
+import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
+import { TransactionFilters } from "./TransactionFilters";
 import { TransactionTable } from "./TransactionTable";
-import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
 
 export const MainAppScreen: React.FC<{
   files: TransactionsFile[];
@@ -79,19 +79,7 @@ export const MainAppScreen: React.FC<{
               height: 240,
             }}
           >
-            {/*
-              * time filters (radio-year, time-span, a few  predefined "since", a few predefined "last period")
-              * category filters (dropdown with checkbox, search, "all")
-              * category depth (maybe pie charts can do this automatically with surrounding pies, see e.g https://recharts.org/en-US/examples/TwoLevelPieChart)
-              * amount filters
-              - split by: same criteria, generate multiple graphs
-              - group by: in each graph, which criteria generates a different pie piece
-              * time series graphs?
-            Other toggles
-              * 2 pie charts (one spend one income) or bar charts (which should support positive and negative on same chart)
-              * merge credit and debit (e.g health could have both)
-            */}
-            <PresetTimeframePicker
+            <TransactionFilters
               dateRange={props.dateRange}
               setDateRange={props.setDateRange}
             />
