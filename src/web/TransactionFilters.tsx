@@ -1,15 +1,14 @@
 import * as React from "react";
-import { Category } from "../domain/category";
-import { DateRange } from "../util/time-util";
-import { CategorySelect } from "./util-comps/CategorySelect";
-import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
+import {
+  CategorySelect,
+  CategorySelectProps,
+} from "./util-comps/CategorySelect";
+import {
+  PresetTimeframePicker,
+  PresetTimeframePickerProps,
+} from "./util-comps/PresetTimeframePicker";
 
-interface TransactionFiltersProps {
-  dateRange: DateRange;
-  setDateRange: (func: (prev: DateRange) => DateRange) => void;
-
-  allCategories: Category[];
-}
+type TransactionFiltersProps = PresetTimeframePickerProps & CategorySelectProps;
 
 /**
  * time filters (radio-year, time-span, a few  predefined "since", a few predefined "last period")
@@ -23,14 +22,16 @@ interface TransactionFiltersProps {
  * 2 pie charts (one spend one income) or bar charts (which should support positive and negative on same chart)
  * merge credit and debit (e.g health could have both)
  */
-export const TransactionFilters = (props: TransactionFiltersProps) => {
+export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
+  dateRange,
+  setDateRange,
+  allCategories,
+  setCategories,
+}) => {
   return (
     <React.Fragment>
-      <PresetTimeframePicker
-        dateRange={props.dateRange}
-        setDateRange={props.setDateRange}
-      />
-      <CategorySelect allCategories={props.allCategories} />
+      <PresetTimeframePicker {...{ dateRange, setDateRange }} />
+      <CategorySelect {...{ allCategories, setCategories }} />
     </React.Fragment>
   );
 };

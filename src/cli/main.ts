@@ -75,7 +75,7 @@ class StuffDoer {
     );
 
     const { isDebit, isCredit, inTime, between } = RawRecordFilters;
-    const uncategorisedRecords = processed.filter(isUncategorised);
+    const uncategorisedRecords = processed.filter(isUncategorised());
 
     const mostCommonUncategorised = uncategorisedRecords
       .reduce(...countBy((r: Transaction) => r.desc))

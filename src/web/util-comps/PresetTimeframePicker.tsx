@@ -12,7 +12,7 @@ import {
 // Exact date to now
 // Exact date range
 
-type PresetTimeframePickerProps = {
+export type PresetTimeframePickerProps = {
   dateRange: DateRange;
   setDateRange: (func: (prev: DateRange) => DateRange) => void;
 };

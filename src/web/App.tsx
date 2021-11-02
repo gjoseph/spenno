@@ -7,6 +7,7 @@ import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Bank } from "../domain/accounts";
+import { Category } from "../domain/category";
 import { TransactionsFile } from "../domain/file";
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
@@ -67,6 +68,7 @@ const AppContent = () => {
     // remove dupes
     return Array.from(new Set(allCats)).sort();
   }, [rules]);
+  const [categories, setCategories] = useState<Category[]>(() => []);
 
   // is transaction state, or is it just a variable ...
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -75,7 +77,13 @@ const AppContent = () => {
     setCalculating((old) => true);
     const txDateRange = transferrableDateRange(dateRange);
     calcWorker
-      .reloadTransactions(files, rules, accounts.accounts, txDateRange) // TODO why does intellij think the "dateRange" param is called "files" !?
+      .reloadTransactions(
+        files,
+        rules,
+        accounts.accounts,
+        txDateRange,
+        categories
+      ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: WorkResult) => {
         setTransactions((old) => {
           const newTxs = res.transactions.map(fromTransferrable);
@@ -84,7 +92,7 @@ const AppContent = () => {
         });
         setCalculating((old) => false);
       });
-  }, [files, rules, accounts, dateRange, consoleLogger]);
+  }, [files, rules, accounts, dateRange, categories, consoleLogger]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -122,6 +130,7 @@ const AppContent = () => {
             dateRange={dateRange}
             setDateRange={setDateRange}
             allCategories={allCategories}
+            setCategories={setCategories}
           />
           <Copyright />
         </Container>

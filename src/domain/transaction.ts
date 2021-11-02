@@ -60,11 +60,22 @@ export { sum };
 const sum = (acc: Big, curr: Transaction) => acc.plus(curr.amount);
 
 // === Transactions Filters
-export { isUncategorised, isBetween };
-const isUncategorised = (t: Transaction) => t.category === UNCATEGORISED;
+export { isUncategorised, isInCategories, isBetween };
+const isUncategorised = () => {
+  return chainable<Transaction>((t) => {
+    return t.category === UNCATEGORISED;
+  });
+};
+
+const isInCategories = (categories: Category[]) => {
+  return chainable<Transaction>((t) => {
+    return categories.includes(t.category);
+  });
+};
 
 // redundant with between filter which applies to RawRecords and is more targetted at the rules
-const isBetween = (dateRange: DateRange) =>
-  chainable<Transaction>((t) => {
+const isBetween = (dateRange: DateRange) => {
+  return chainable<Transaction>((t) => {
     return isInRange(t.date, dateRange);
   });
+};

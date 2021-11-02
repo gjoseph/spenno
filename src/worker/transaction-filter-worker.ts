@@ -7,10 +7,16 @@
 // This isn't exactly a complex function, but needs to be isolated for workerize-loader to do its thing.
 
 import { Bank } from "../domain/accounts";
+import { Category } from "../domain/category";
 import { TransactionsFile } from "../domain/file";
 import { TransactionsProcessor } from "../domain/processor";
 import { Rules } from "../domain/rules";
-import { isBetween, TransactionsLoader } from "../domain/transaction";
+import {
+  isBetween,
+  isInCategories,
+  isUncategorised,
+  TransactionsLoader,
+} from "../domain/transaction";
 import { ArrayLogger, LogEntry } from "../util/log";
 import {
   toTransferrable,
@@ -29,7 +35,8 @@ export const reloadTransactions = (
   ruleDescs: Rules.RuleDesc[],
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[],
-  dateRange: TransferrableDateRange
+  dateRange: TransferrableDateRange,
+  categories: Category[]
 ): WorkResult => {
   const log = new ArrayLogger(false);
   const rules = ruleDescs.map(Rules.toRule);
@@ -38,14 +45,20 @@ export const reloadTransactions = (
     log
   );
   const transactionsProcessor = new TransactionsProcessor(rules, log);
+
+  // TODO it might be more efficient to apply the date filter on raw records instead
+  let txFilter = isBetween(transferredDateRange(dateRange));
+  if (categories.length > 0) {
+    txFilter = txFilter.and(isInCategories(categories));
+  }
+
   const transactions = files
     .filter((f) => f.enabled)
     .flatMap((f) => {
       const rawRecords = transactionsLoader.loadRawRecords(f);
       return transactionsProcessor.applyRules(rawRecords);
     })
-    // TODO it might be more efficient to apply the date filter on raw records instead
-    .filter(isBetween(transferredDateRange(dateRange)))
+    .filter(txFilter)
     .map(toTransferrable);
   log.info(
     `Total: processed ${transactions.length} records from ${files.length} files`

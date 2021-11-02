@@ -28,6 +28,7 @@ export const MainAppScreen: React.FC<{
   setDateRange: (func: (prev: DateRange) => DateRange) => void;
 
   allCategories: Category[];
+  setCategories: (func: (prev: Category[]) => Category[]) => void;
 }> = (props) => {
   const addFile = (f: TransactionsFile) => {
     props.setFiles((prevValue) => {
@@ -82,6 +83,7 @@ export const MainAppScreen: React.FC<{
               dateRange={props.dateRange}
               setDateRange={props.setDateRange}
               allCategories={props.allCategories}
+              setCategories={props.setCategories}
             />
           </Paper>
         </Grid>
@@ -124,7 +126,7 @@ export const MainAppScreen: React.FC<{
               <TabPanel label="Uncategorised transactions">
                 <TransactionTable
                   accounts={props.accounts}
-                  transactions={props.transactions.filter(isUncategorised)}
+                  transactions={props.transactions.filter(isUncategorised())}
                 />
               </TabPanel>
               <TabPanel label="Raw records">Item Two</TabPanel>

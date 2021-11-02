@@ -54,9 +54,14 @@ const renderTags = (
   ));
 };
 
-export const CategorySelect: React.FC<{ allCategories: Category[] }> = (
-  props
-) => {
+export interface CategorySelectProps {
+  allCategories: Category[];
+  setCategories: (func: (prev: Category[]) => Category[]) => void;
+}
+export const CategorySelect: React.FC<CategorySelectProps> = (props) => {
+  const onChange = (_: React.SyntheticEvent, newValue: Category[]) => {
+    props.setCategories((prev) => newValue);
+  };
   return (
     <Autocomplete
       multiple
@@ -66,6 +71,7 @@ export const CategorySelect: React.FC<{ allCategories: Category[] }> = (
       renderOption={renderOption}
       renderInput={renderInput}
       renderTags={renderTags}
+      onChange={onChange}
     />
   );
 };
