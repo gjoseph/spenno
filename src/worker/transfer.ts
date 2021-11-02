@@ -1,6 +1,7 @@
 import Big from "big.js";
 import { Bank } from "../domain/accounts";
-import { Category, Transaction } from "../domain/transaction";
+import { Category } from "../domain/category";
+import { Transaction } from "../domain/transaction";
 import moment from "moment";
 import { DateRange } from "../util/time-util";
 

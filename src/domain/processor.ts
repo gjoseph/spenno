@@ -1,6 +1,7 @@
 import { Logger } from "../util/log";
+import { UNCATEGORISED } from "./category";
 import { Rules } from "./rules";
-import { RawRecord, Transaction, UNCATEGORISED } from "./transaction";
+import { RawRecord, Transaction } from "./transaction";
 
 export class TransactionsProcessor {
   constructor(readonly rules: Rules.Rule[], readonly log: Logger) {}

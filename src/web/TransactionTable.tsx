@@ -8,7 +8,8 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { Bank } from "../domain/accounts";
-import { Category, Transaction } from "../domain/transaction";
+import { Category } from "../domain/category";
+import { Transaction } from "../domain/transaction";
 
 function preventDefault(event: React.MouseEvent) {
   event.preventDefault();

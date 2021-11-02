@@ -2,7 +2,8 @@ import * as fs from "fs";
 import * as yaml from "js-yaml";
 import { evalAsFunction } from "../util/eval";
 import { Logger } from "../util/log";
-import { Category, RawRecord } from "./transaction";
+import { Category } from "./category";
+import { RawRecord } from "./transaction";
 
 export namespace Rules {
   type AdditionalCheck = (transaction: RawRecord) => boolean;

@@ -5,6 +5,7 @@ import { chainable } from "../util/chainable";
 import { Logger } from "../util/log";
 import { DateRange, isInRange } from "../util/time-util";
 import { Bank } from "./accounts";
+import { Category, UNCATEGORISED } from "./category";
 import { TransactionsFile } from "./file";
 
 export class TransactionsLoader {
@@ -35,9 +36,6 @@ export interface RawRecord {
   readonly desc: string;
   readonly amount: Big; // negative for a debit, positive for a credit
 }
-
-export type Category = string;
-export const UNCATEGORISED: Category = "UNKNOWN";
 
 // extends RawRecord mostly so we can use same comparators/filters
 export interface Transaction extends RawRecord {

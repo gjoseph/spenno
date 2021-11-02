@@ -3,6 +3,7 @@
 import fs from "fs";
 import * as yargs from "yargs";
 import { Bank } from "../domain/accounts";
+import { Category } from "../domain/category";
 import { TransactionsFile } from "../domain/file";
 import { RawRecordFilters } from "../domain/filters";
 import { TransactionsProcessor } from "../domain/processor";
@@ -10,7 +11,6 @@ import { Rules } from "../domain/rules";
 import {
   byAmountAsc,
   byAmountDesc,
-  Category,
   isUncategorised,
   RawRecord,
   sum,
