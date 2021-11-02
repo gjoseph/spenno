@@ -62,6 +62,11 @@ const AppContent = () => {
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
   const [dateRange, setDateRange] = useState<DateRange>(() => MAX_DATE_RANGE);
+  const allCategories = useMemo(() => {
+    const allCats = rules.map((r) => r.category);
+    // remove dupes
+    return Array.from(new Set(allCats)).sort();
+  }, [rules]);
 
   // is transaction state, or is it just a variable ...
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -116,6 +121,7 @@ const AppContent = () => {
             // how to make passing filters around less verbose?
             dateRange={dateRange}
             setDateRange={setDateRange}
+            allCategories={allCategories}
           />
           <Copyright />
         </Container>

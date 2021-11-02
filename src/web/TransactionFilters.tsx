@@ -1,10 +1,14 @@
 import * as React from "react";
-import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
+import { Category } from "../domain/category";
 import { DateRange } from "../util/time-util";
+import { CategorySelect } from "./util-comps/CategorySelect";
+import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
 
 interface TransactionFiltersProps {
   dateRange: DateRange;
   setDateRange: (func: (prev: DateRange) => DateRange) => void;
+
+  allCategories: Category[];
 }
 
 /**
@@ -21,9 +25,12 @@ interface TransactionFiltersProps {
  */
 export const TransactionFilters = (props: TransactionFiltersProps) => {
   return (
-    <PresetTimeframePicker
-      dateRange={props.dateRange}
-      setDateRange={props.setDateRange}
-    />
+    <React.Fragment>
+      <PresetTimeframePicker
+        dateRange={props.dateRange}
+        setDateRange={props.setDateRange}
+      />
+      <CategorySelect allCategories={props.allCategories} />
+    </React.Fragment>
   );
 };

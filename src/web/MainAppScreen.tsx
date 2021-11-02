@@ -2,6 +2,7 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
+import { Category } from "../domain/category";
 import { TransactionsFile } from "../domain/file";
 import { RawRecordFilters } from "../domain/filters";
 import { isUncategorised, sum, Transaction } from "../domain/transaction";
@@ -25,6 +26,8 @@ export const MainAppScreen: React.FC<{
 
   dateRange: DateRange;
   setDateRange: (func: (prev: DateRange) => DateRange) => void;
+
+  allCategories: Category[];
 }> = (props) => {
   const addFile = (f: TransactionsFile) => {
     props.setFiles((prevValue) => {
@@ -78,6 +81,7 @@ export const MainAppScreen: React.FC<{
             <TransactionFilters
               dateRange={props.dateRange}
               setDateRange={props.setDateRange}
+              allCategories={props.allCategories}
             />
           </Paper>
         </Grid>
