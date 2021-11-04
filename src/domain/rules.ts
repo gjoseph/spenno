@@ -27,6 +27,12 @@ export namespace Rules {
     readonly additionalCheck?: AdditionalCheck;
   }
 
+  export const extractCategories = (rules: RuleDesc[]) => {
+    const allCats = rules.map((r) => r.category);
+    // remove dupes
+    return Array.from(new Set(allCats)).sort();
+  };
+
   // For transactions and dateRange, we're doing this conversion in worker/transfer, but i'm not sure this'll scale
   // ... and maybe there's a better solution than hand-rolling conversion methods out there
   export const toRule: (r: RuleDesc) => Rule = (r: RuleDesc) => {

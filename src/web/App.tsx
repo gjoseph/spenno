@@ -36,17 +36,17 @@ const grayForTheme = (theme: Theme) =>
     ? theme.palette.grey[100]
     : theme.palette.grey[900];
 
+const consoleLogger = new ConsoleLogger();
+
 const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
 
 const reloadAccounts = (result: string) =>
-  new Bank.AccountsLoader(new ConsoleLogger()).loadYaml(result);
+  new Bank.AccountsLoader(consoleLogger).loadYaml(result);
 
 const reloadRules = (result: string) =>
-  new Rules.RulesLoader(new ConsoleLogger()).loadYaml(result);
+  new Rules.RulesLoader(consoleLogger).loadYaml(result);
 
 const AppContent = () => {
-  const consoleLogger = useMemo(() => new ConsoleLogger(), []);
-
   const [calculating, setCalculating] = useState(true);
 
   const [accounts, accountsLoaded, accountsError] = useFetch<Bank.Accounts>(
@@ -59,20 +59,17 @@ const AppContent = () => {
     () => [],
     reloadRules
   );
+  const allCategories = useMemo(() => Rules.extractCategories(rules), [rules]);
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
   const [dateRange, setDateRange] = useState<DateRange>(() => MAX_DATE_RANGE);
-  const allCategories = useMemo(() => {
-    const allCats = rules.map((r) => r.category);
-    // remove dupes
-    return Array.from(new Set(allCats)).sort();
-  }, [rules]);
   const [categories, setCategories] = useState<Category[]>(() => []);
 
-  // is transaction state, or is it just a variable ...
+  // The filtered transactions to render
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  // this feels like we should understand memos instead...
+
+  // TODO should we stagger this effect so it doesn't get executed 5 times on first load? And/or bypass it while there are no files, rules and accounts
   useEffect(() => {
     setCalculating((old) => true);
     const txDateRange = transferrableDateRange(dateRange);
@@ -92,7 +89,7 @@ const AppContent = () => {
         });
         setCalculating((old) => false);
       });
-  }, [files, rules, accounts, dateRange, categories, consoleLogger]);
+  }, [files, rules, accounts, dateRange, categories]);
 
   return (
     <Box sx={{ display: "flex" }}>
