@@ -7,7 +7,7 @@ import { FileDescriptor } from "../domain/file";
 import { RawRecordFilters } from "../domain/filters";
 import { isUncategorised, sum, Transaction } from "../domain/transaction";
 import { groupBy } from "../util/reducers";
-import { zer0 } from "../util/util";
+import { AmountFilter, zer0 } from "../util/util";
 import { Chart } from "./Chart";
 import { AddFile, FileDrop } from "./FileDrop";
 import { FileList, FileToggleCallback } from "./FileList";
@@ -28,6 +28,9 @@ export const MainAppScreen: React.FC<{
 
   allCategories: Category[];
   setCategories: (func: (prev: Category[]) => Category[]) => void;
+
+  amountFilter: AmountFilter;
+  setAmountFilter: (func: (prev: AmountFilter) => AmountFilter) => void;
 }> = (props) => {
   function totalByCategoryFor(transactions: Transaction[]) {
     return transactions
@@ -65,6 +68,8 @@ export const MainAppScreen: React.FC<{
               setDateRange={props.setDateRange}
               allCategories={props.allCategories}
               setCategories={props.setCategories}
+              amountFilter={props.amountFilter}
+              setAmountFilter={props.setAmountFilter}
             />
           </Paper>
         </Grid>

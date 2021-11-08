@@ -1,38 +1,43 @@
-import {
-  Box,
-  Slider, ToggleButton, ToggleButtonGroup
-} from "@mui/material";
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import TuneIcon from '@mui/icons-material/Tune';
+import { Box, Slider, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
+import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import TuneIcon from "@mui/icons-material/Tune";
 import * as React from "react";
-import { Range,AmountFilter } from "../../util/util";
+import { AmountFilter } from "../../util/util";
 
-export const AmountPicker: React.FC<{
-  min: number;
-  max: number;
-  current: AmountFilter; // TODO AmountFilter
-}> = (props) => {
-  const [range, setRange] = React.useState<AmountFilter>(props.current); // TODO <AmountFilter>
-  const [sliderEnabled, setSliderEnabled] = React.useState<boolean>(true);
+export type AmountPickerProps = {
+  amountFilter: AmountFilter;
+  setAmountFilter: (func: (prev: AmountFilter) => AmountFilter) => void;
+};
+export const AmountPicker: React.FC<
+  AmountPickerProps & { min: number; max: number }
+> = (props) => {
+  const [sliderRange, setSliderRange] = React.useState<number[]>(
+    props.amountFilter as number[]
+  ); // TODO yikes
   const [radioValue, setRadioValue] = React.useState<string | null>(null);
+  const [sliderEnabled, setSliderEnabled] = React.useState<boolean>(true);
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    // TODO enforce array-of-2?
-    setRange(newValue as AmountFilter);
-    // setRadioValue(() => null);
+    setSliderRange(newValue as number[]);
+    // TODO enforce array-of-2? and/or have a different state for slider
+    // TODO stagger?
+    props.setAmountFilter(() => newValue as AmountFilter);
   };
 
   const handleToggleChange = (
     event: React.MouseEvent<HTMLElement>,
-    newValue: string | null,
+    newValue: string | null
   ) => {
     setRadioValue(newValue);
-    if (newValue==="slider") {
+    if (newValue === "slider") {
       setSliderEnabled(true);
     } else {
       setSliderEnabled(false);
     }
+    props.setAmountFilter(() =>
+      newValue !== null ? (newValue as AmountFilter) : "#noFilter"
+    );
   };
   return (
     <Box>
@@ -54,7 +59,7 @@ export const AmountPicker: React.FC<{
       <Slider
         // getAriaLabel={() => 'Temperature range'}
         // getAriaValueText={valuetext}
-        value={typeof range === "string" ?  [0,0]:range as number[]}
+        value={sliderRange}
         min={props.min}
         max={props.max}
         onChange={handleSliderChange}
@@ -62,21 +67,6 @@ export const AmountPicker: React.FC<{
         disableSwap={true}
         disabled={!sliderEnabled}
       />
-      {/*<FormControl component="fieldset">*/}
-      {/*  /!*<FormLabel component="legend">Gender</FormLabel>*!/*/}
-      {/*  <RadioGroup row value={radioValue} onChange={handleRadioChange}>*/}
-      {/*    <FormControlLabel*/}
-      {/*      value="debitOnly"*/}
-      {/*      control={<Radio />}*/}
-      {/*      label="Debit Only"*/}
-      {/*    />*/}
-      {/*    <FormControlLabel*/}
-      {/*      value="creditOnly"*/}
-      {/*      control={<Radio />}*/}
-      {/*      label="Credit Only"*/}
-      {/*    />*/}
-      {/*  </RadioGroup>*/}
-      {/*</FormControl>*/}
     </Box>
   );
 };

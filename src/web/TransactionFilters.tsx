@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AmountPicker } from "./util-comps/AmountPicker";
+import { AmountPicker, AmountPickerProps } from "./util-comps/AmountPicker";
 import {
   CategorySelect,
   CategorySelectProps,
@@ -9,7 +9,9 @@ import {
   PresetTimeframePickerProps,
 } from "./util-comps/PresetTimeframePicker";
 
-type TransactionFiltersProps = PresetTimeframePickerProps & CategorySelectProps;
+type TransactionFiltersProps = PresetTimeframePickerProps &
+  CategorySelectProps &
+  AmountPickerProps;
 
 /**
  * time filters (radio-year, time-span, a few  predefined "since", a few predefined "last period")
@@ -28,12 +30,18 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   setDateRange,
   allCategories,
   setCategories,
+  amountFilter,
+  setAmountFilter,
 }) => {
   return (
     <React.Fragment>
       <PresetTimeframePicker {...{ dateRange, setDateRange }} />
       <CategorySelect {...{ allCategories, setCategories }} />
-      <AmountPicker min={-10000} max={10000} current={[10,20]} />
+      <AmountPicker
+        min={-10000}
+        max={10000}
+        {...{ amountFilter, setAmountFilter }}
+      />
     </React.Fragment>
   );
 };

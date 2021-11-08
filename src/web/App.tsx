@@ -16,6 +16,7 @@ import {
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
 import { ConsoleLogger } from "../util/log";
+import { AmountFilter } from "../util/util";
 import {
   FileLoadWorkResult,
   TransactionProcessWorkResult,
@@ -79,6 +80,9 @@ const AppContent = () => {
 
   const [dateRange, setDateRange] = useState<DateRange>(() => MAX_DATE_RANGE);
   const [categories, setCategories] = useState<Category[]>(() => []);
+  const [amountFilter, setAmountFilter] = useState<AmountFilter>(
+    () => "#noFilter"
+  );
 
   // The parsed files with raw records
   const [filesWithRecords, setFilesWithRecords] = useState<
@@ -144,7 +148,8 @@ const AppContent = () => {
         rules,
         accounts.accounts,
         txDateRange,
-        categories
+        categories,
+        amountFilter
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
         setTransactions((old) => {
@@ -156,7 +161,7 @@ const AppContent = () => {
         });
         setCalculating((old) => false);
       });
-  }, [filesWithRecords, rules, accounts, dateRange, categories]);
+  }, [filesWithRecords, rules, accounts, dateRange, categories, amountFilter]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -196,6 +201,8 @@ const AppContent = () => {
               setDateRange,
               allCategories,
               setCategories,
+              amountFilter,
+              setAmountFilter,
             }}
             files={fileDescs}
           />

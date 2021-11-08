@@ -9,6 +9,7 @@
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
 import { FileWithRawRecords, TransactionsFile } from "../domain/file";
+import { RawRecordFilters } from "../domain/filters";
 import { TransactionsProcessor } from "../domain/processor";
 import { Rules } from "../domain/rules";
 import {
@@ -19,6 +20,7 @@ import {
   TransactionsLoader,
 } from "../domain/transaction";
 import { ArrayLogger, LogEntry } from "../util/log";
+import { AmountFilter } from "../util/util";
 import {
   fromTransferrableFilesWithRawRecords,
   toTransferrable,
@@ -71,8 +73,10 @@ export const reloadTransactions = (
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[],
   dateRange: TransferrableDateRange,
-  categories: Category[]
+  categories: Category[],
+  amountFilter: AmountFilter
 ): TransactionProcessWorkResult => {
+  console.log("amountFilter:", amountFilter);
   const log = new ArrayLogger(false);
   const rules = ruleDescs.map(Rules.toRule);
   const transactionsProcessor = new TransactionsProcessor(rules, log);
@@ -81,6 +85,19 @@ export const reloadTransactions = (
   let txFilter = isBetween(transferredDateRange(dateRange));
   if (categories.length > 0) {
     txFilter = txFilter.and(isInCategories(categories));
+  }
+  switch (amountFilter) {
+    case "#noFilter":
+      break;
+    case "creditOnly":
+      txFilter = txFilter.and(RawRecordFilters.isCredit());
+      break;
+    case "debitOnly":
+      txFilter = txFilter.and(RawRecordFilters.isDebit());
+      break;
+    default:
+      // TODO
+      console.log("work out support for ranges", amountFilter);
   }
 
   const filteredTransactions = fromTransferrableFilesWithRawRecords(files)
