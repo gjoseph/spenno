@@ -1,4 +1,5 @@
 import * as React from "react";
+import { AmountPicker } from "./util-comps/AmountPicker";
 import {
   CategorySelect,
   CategorySelectProps,
@@ -32,6 +33,7 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
     <React.Fragment>
       <PresetTimeframePicker {...{ dateRange, setDateRange }} />
       <CategorySelect {...{ allCategories, setCategories }} />
+      <AmountPicker min={-10000} max={10000} current={[10,20]} />
     </React.Fragment>
   );
 };

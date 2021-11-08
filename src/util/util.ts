@@ -1,5 +1,8 @@
 import Big from "big.js";
 
+export type Range = [number,number];
+export type AmountFilter = "creditOnly" | "debitOnly" | Range;
+
 export const signedAmount = (
   debit: number,
   credit: number,
