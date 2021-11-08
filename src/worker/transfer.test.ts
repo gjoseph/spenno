@@ -8,15 +8,20 @@
 import Big from "big.js";
 import moment from "moment";
 import { Transaction } from "../domain/transaction";
+import { toEqualMoment } from "../jest/toEqualMoment";
 import {
+  Transferrable,
   fromTransferrable,
   toTransferrable,
-  TransferrableTransaction,
+  TransferrableMappings,
 } from "./transfer";
+
+// Copied from https://gist.github.com/robwise/1b36656e6ed7645ae33716dfb19fb60a
+expect.extend({ toEqualMoment });
 
 const { MessageChannel } = require("worker_threads");
 
-const tx: Transaction = {
+const typedTx: Transaction = {
   account: { id: "b1", name: "b2" },
   date: moment(),
   desc: "d",
@@ -25,7 +30,7 @@ const tx: Transaction = {
   category: "c",
 };
 
-const tt: TransferrableTransaction = {
+const transferrableTx: Transferrable<Transaction> = {
   account: { id: "b1", name: "b2" },
   date: moment().toISOString(),
   desc: "d",
@@ -34,21 +39,51 @@ const tt: TransferrableTransaction = {
   category: "c",
 };
 
-test("conversion methods are symmetric 1", () => {
-  expect(toTransferrable(fromTransferrable(tt))).toEqual(tt);
+test("conversion methods are symmetric (to(from))", () => {
+  const result: any = toTransferrable(
+    fromTransferrable(TransferrableMappings.Transaction)(transferrableTx)
+  );
+  expect(result).toEqual(transferrableTx);
 });
 
-// this is another reason to ditch moment.js
-test.skip("conversion methods are symmetric 2", () => {
-  expect(fromTransferrable(toTransferrable(tx))).toEqual(tx);
+test("conversion methods are symmetric (from(to))", () => {
+  const result: Transaction = fromTransferrable(
+    TransferrableMappings.Transaction
+  )(toTransferrable(typedTx));
+  // this is another reason to ditch moment.js -- moment instances are never equal to each other
+  // expect(result).toEqual(tx);
+  const { date, ...txWithoutDate } = typedTx;
+  expect(result).toMatchObject(txWithoutDate);
+  // assert type of properties we know are transformed
+  expect(moment.isMoment(result.date)).toEqual(true);
+  expect(result.amount).toBeInstanceOf(Big);
+  // assert date property because moment sucks
+  expect(result.date).toEqualMoment(typedTx.date);
+});
+
+test("Transferrable<> remaps Big as string", () => {
+  const test: Transferrable<Transaction> = {
+    amount: "123",
+    date: "moment()",
+    category: "",
+    desc: "",
+    account: { id: "", name: "" },
+    merchant: "",
+  };
+  expect(test.date).toEqual("moment()");
+  expect(typeof test.date).toEqual("string");
+  expect(test.amount).toEqual("123");
+  expect(typeof test.amount).toEqual("string");
 });
 
 test("TransferrableTransaction is really transferrable", () => {
-  return expect(structuredClone(tt)).resolves.toEqual(tt);
+  return expect(structuredClone(transferrableTx)).resolves.toEqual(
+    transferrableTx
+  );
 });
 
 test("Transaction is not transferrable", () => {
-  return notTransferrable(tx, /number % 10/);
+  return notTransferrable(typedTx, /number % 10/);
 });
 
 test("Big.js objects are not transferrable", () => {

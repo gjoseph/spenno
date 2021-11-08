@@ -13,11 +13,7 @@ export class TransactionsLoader {
 
   loadRawRecords(transactionsFile: TransactionsFile): RawRecord[] {
     const bankfileHandler = this.getHandler(transactionsFile);
-    const rawRecords = bankfileHandler.loadRawRecords(transactionsFile);
-    // arguably, this could be the responsibility of bankfileHandler, but this leaves us with a single place to do it...
-    // more arguably, this should just be a different type/object
-    transactionsFile.rawRecords = rawRecords;
-    return rawRecords;
+    return bankfileHandler.loadRawRecords(transactionsFile);
   }
 
   private getHandler(transactionsFile: TransactionsFile) {

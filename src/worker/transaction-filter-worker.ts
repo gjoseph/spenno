@@ -8,42 +8,73 @@
 
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
-import { TransactionsFile } from "../domain/file";
+import { FileWithRawRecords, TransactionsFile } from "../domain/file";
 import { TransactionsProcessor } from "../domain/processor";
 import { Rules } from "../domain/rules";
 import {
   isBetween,
   isInCategories,
-  isUncategorised,
+  RawRecord,
+  Transaction,
   TransactionsLoader,
 } from "../domain/transaction";
 import { ArrayLogger, LogEntry } from "../util/log";
 import {
+  fromTransferrableFilesWithRawRecords,
   toTransferrable,
+  toTransferrableFilesWithRawRecords,
+  Transferrable,
   TransferrableDateRange,
-  TransferrableTransaction,
+  TransferrableFileWithRawRecords,
   transferredDateRange,
 } from "./transfer";
 
-export interface WorkResult {
-  transactions: TransferrableTransaction[];
+export interface FileLoadWorkResult {
+  files: TransferrableFileWithRawRecords[];
+  log: LogEntry[];
+}
+
+export const reloadFiles = (
+  // we're passing the whole files (File#fileContents) as string between threads, I'm not sure how efficient this is
+  files: TransactionsFile[],
+  // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
+  accounts: Bank.Account[]
+): FileLoadWorkResult => {
+  const log = new ArrayLogger(false);
+  const transactionsLoader = new TransactionsLoader(
+    new Bank.Accounts(accounts),
+    log
+  );
+  const filesWithRawRecords = files.map((file) => {
+    // we're reparsing the CSV everytime... how not useful
+    const rawRecords: RawRecord[] = transactionsLoader.loadRawRecords(file);
+    return {
+      ...file,
+      rawRecords,
+    } as FileWithRawRecords;
+  });
+  return {
+    files: toTransferrableFilesWithRawRecords(filesWithRawRecords),
+    log: log.logEntries,
+  };
+};
+
+export interface TransactionProcessWorkResult {
+  transactions: Transferrable<Transaction>[];
   log: LogEntry[];
 }
 
 export const reloadTransactions = (
-  files: TransactionsFile[],
+  // we're passing the whole files (File#fileContents) as string between threads, I'm not sure how efficient this is
+  files: TransferrableFileWithRawRecords[],
   ruleDescs: Rules.RuleDesc[],
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[],
   dateRange: TransferrableDateRange,
   categories: Category[]
-): WorkResult => {
+): TransactionProcessWorkResult => {
   const log = new ArrayLogger(false);
   const rules = ruleDescs.map(Rules.toRule);
-  const transactionsLoader = new TransactionsLoader(
-    new Bank.Accounts(accounts),
-    log
-  );
   const transactionsProcessor = new TransactionsProcessor(rules, log);
 
   // TODO it might be more efficient to apply the date filter on raw records instead
@@ -52,19 +83,18 @@ export const reloadTransactions = (
     txFilter = txFilter.and(isInCategories(categories));
   }
 
-  const transactions = files
+  const filteredTransactions = fromTransferrableFilesWithRawRecords(files)
     .filter((f) => f.enabled)
-    .flatMap((f) => {
-      const rawRecords = transactionsLoader.loadRawRecords(f);
-      return transactionsProcessor.applyRules(rawRecords);
+    .flatMap((e) => {
+      return transactionsProcessor.applyRules(e.rawRecords);
     })
     .filter(txFilter)
     .map(toTransferrable);
   log.info(
-    `Total: processed ${transactions.length} records from ${files.length} files`
+    `Total: processed ${filteredTransactions.length} records from ${files.length} files`
   );
   return {
-    transactions: transactions,
+    transactions: filteredTransactions,
     log: log.logEntries,
   };
 };

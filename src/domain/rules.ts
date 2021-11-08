@@ -33,8 +33,10 @@ export namespace Rules {
     return Array.from(new Set(allCats)).sort();
   };
 
-  // For transactions and dateRange, we're doing this conversion in worker/transfer, but i'm not sure this'll scale
-  // ... and maybe there's a better solution than hand-rolling conversion methods out there
+  // For transactions and dateRange, we're doing conversions in worker/transfer,
+  // to workaround the types of Big.js and moment.js that aren't "transferrable" between webworkers.
+  // Here, we want to eval/type a Function from a string, which is incompatible but we also don't want
+  // to eval it every time we send work to worker?
   export const toRule: (r: RuleDesc) => Rule = (r: RuleDesc) => {
     return {
       name: r.name,

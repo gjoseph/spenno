@@ -8,13 +8,26 @@ import { useEffect, useMemo, useState } from "react";
 import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
-import { TransactionsFile } from "../domain/file";
+import {
+  FileDescriptor,
+  FileWithRawRecords,
+  TransactionsFile,
+} from "../domain/file";
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
 import { ConsoleLogger } from "../util/log";
-import { WorkResult } from "../worker/transaction-filter-worker";
+import {
+  FileLoadWorkResult,
+  TransactionProcessWorkResult,
+} from "../worker/transaction-filter-worker";
 import * as CalculatorWorker from "../worker/transaction-filter-worker";
-import { fromTransferrable, transferrableDateRange } from "../worker/transfer";
+import {
+  fromTransferrable,
+  fromTransferrableFilesWithRawRecords,
+  toTransferrableFilesWithRawRecords,
+  transferrableDateRange,
+  TransferrableMappings,
+} from "../worker/transfer";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
@@ -61,35 +74,89 @@ const AppContent = () => {
   );
   const allCategories = useMemo(() => Rules.extractCategories(rules), [rules]);
 
+  // TODO: FileDesc instead?
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
   const [dateRange, setDateRange] = useState<DateRange>(() => MAX_DATE_RANGE);
   const [categories, setCategories] = useState<Category[]>(() => []);
 
+  // The parsed files with raw records
+  const [filesWithRecords, setFilesWithRecords] = useState<
+    FileWithRawRecords[]
+  >([]);
+
   // The filtered transactions to render
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  // TODO should we stagger this effect so it doesn't get executed 5 times on first load? And/or bypass it while there are no files, rules and accounts
+  const fileDescs = useMemo<FileDescriptor[]>(() => {
+    return filesWithRecords.map((f) => {
+      return {
+        ...f,
+        recordCount: f.rawRecords.length,
+      };
+    });
+  }, [filesWithRecords]);
+
+  const addFile = (filename: string, contents: string) => {
+    setFiles((prevValue) => {
+      prevValue.push(new TransactionsFile(filename, "westpac.csv", contents));
+      return prevValue.slice(); // i forgot why exactly but without this shit breaks
+    });
+  };
+
+  const toggleFile = (fileId: string, enabled: boolean) => {
+    setFiles((prevValue) => {
+      const transactionsFile = prevValue.find((f) => f.id === fileId);
+      if (!transactionsFile) {
+        throw new Error("File with id " + fileId + " not found!?");
+      }
+      transactionsFile.enabled = enabled;
+      return prevValue.slice();
+    });
+  };
+
+  // TODO should we stagger these effects so it doesn't get executed 5 times on first load? And/or bypass it while there are no files, rules and accounts
+  useEffect(() => {
+    setCalculating((old) => true);
+    calcWorker
+      .reloadFiles(files, accounts.accounts)
+      .then((res: FileLoadWorkResult) => {
+        setFilesWithRecords((old) => {
+          const newFiles = fromTransferrableFilesWithRawRecords(res.files);
+          consoleLogger.debug(
+            "Loaded",
+            newFiles.length,
+            "files with",
+            newFiles.map((f) => f.rawRecords.length),
+            "raw records"
+          );
+          return newFiles;
+        });
+        setCalculating((old) => false);
+      });
+  }, [files, accounts]);
   useEffect(() => {
     setCalculating((old) => true);
     const txDateRange = transferrableDateRange(dateRange);
     calcWorker
       .reloadTransactions(
-        files,
+        toTransferrableFilesWithRawRecords(filesWithRecords),
         rules,
         accounts.accounts,
         txDateRange,
         categories
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
-      .then((res: WorkResult) => {
+      .then((res: TransactionProcessWorkResult) => {
         setTransactions((old) => {
-          const newTxs = res.transactions.map(fromTransferrable);
+          const newTxs = res.transactions.map(
+            fromTransferrable(TransferrableMappings.Transaction)
+          );
           consoleLogger.debug("Loaded", newTxs.length, "transactions");
           return newTxs;
         });
         setCalculating((old) => false);
       });
-  }, [files, rules, accounts, dateRange, categories]);
+  }, [filesWithRecords, rules, accounts, dateRange, categories]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -119,15 +186,18 @@ const AppContent = () => {
           <p>from {dateRange[0]?.toDate().toString()}</p>
           <p>to {dateRange[1]?.toDate().toString()}</p>
           <MainAppScreen
-            files={files}
-            setFiles={setFiles}
-            transactions={transactions}
-            accounts={accounts}
-            // how to make passing filters around less verbose?
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            allCategories={allCategories}
-            setCategories={setCategories}
+            // how to make passing stuff around less verbose?
+            {...{
+              addFile,
+              toggleFile,
+              transactions,
+              accounts,
+              dateRange,
+              setDateRange,
+              allCategories,
+              setCategories,
+            }}
+            files={fileDescs}
           />
           <Copyright />
         </Container>

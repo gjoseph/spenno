@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { TransactionsFile } from "../domain/file";
+import { SimpleProgressIndicator } from "./util-comps/Progress";
 
-export type AddFile = (f: TransactionsFile) => void;
+export type AddFile = (filename: string, contents: string) => void;
 const onDropDelegateToAddFile =
-  (addFile: AddFile) => (acceptedFiles: File[]) => {
+  (addFile: AddFile, onStart: () => void, onUploaded: () => void) =>
+  (acceptedFiles: File[]) => {
+    onStart();
     console.debug(
       "onDrop#acceptedFiles:",
       acceptedFiles.map((f) => f.name)
@@ -15,7 +17,8 @@ const onDropDelegateToAddFile =
       reader.onerror = () => console.warn(file.name, "reading has failed");
       reader.onload = () => {
         const binaryStr = reader.result as string;
-        addFile(new TransactionsFile(file.name, "westpac.csv", binaryStr));
+        addFile(file.name, binaryStr);
+        onUploaded();
       };
       reader.readAsText(file);
     });
@@ -48,7 +51,12 @@ const baseStyle = {
 };
 export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
   const onDrop = useMemo(
-    () => onDropDelegateToAddFile(props.addFile),
+    () =>
+      onDropDelegateToAddFile(
+        props.addFile,
+        () => setInProgress(() => true),
+        () => setInProgress(() => false)
+      ),
     [props.addFile]
   );
   // COPIED FROM https://react-dropzone.js.org/#section-styling-dropzone
@@ -64,7 +72,6 @@ export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
     onDropAccepted: onDrop,
   });
 
-  // TODO understand how useMemo works
   const style = useMemo(
     () => ({
       ...baseStyle,
@@ -74,10 +81,16 @@ export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
     }),
     [isDragActive, isDragReject, isDragAccept]
   );
+
+  // if we set to false, 2 parallel uploads might cancel each other?
+  const [inProgress, setInProgress] = useState<boolean>(false);
+
   return (
     <div {...getRootProps({ style })}>
       <input {...getInputProps()} />
       {props.children}
+      <SimpleProgressIndicator inProgress={inProgress} />
+      {inProgress ? <p>Uploading [filename here]</p> : null}
     </div>
   );
 };

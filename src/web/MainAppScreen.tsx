@@ -3,24 +3,23 @@ import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
-import { TransactionsFile } from "../domain/file";
+import { FileDescriptor } from "../domain/file";
 import { RawRecordFilters } from "../domain/filters";
 import { isUncategorised, sum, Transaction } from "../domain/transaction";
 import { groupBy } from "../util/reducers";
 import { zer0 } from "../util/util";
 import { Chart } from "./Chart";
-import { FileDrop } from "./FileDrop";
-import { FileList } from "./FileList";
+import { AddFile, FileDrop } from "./FileDrop";
+import { FileList, FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
 import { TransactionFilters } from "./TransactionFilters";
 import { TransactionTable } from "./TransactionTable";
 import { DateRange } from "../util/time-util";
 
 export const MainAppScreen: React.FC<{
-  files: TransactionsFile[];
-  setFiles: (
-    func: (prevState: TransactionsFile[]) => TransactionsFile[]
-  ) => void;
+  files: FileDescriptor[];
+  addFile: AddFile;
+  toggleFile: FileToggleCallback;
   transactions: Transaction[];
   accounts: Bank.Accounts;
 
@@ -30,24 +29,6 @@ export const MainAppScreen: React.FC<{
   allCategories: Category[];
   setCategories: (func: (prev: Category[]) => Category[]) => void;
 }> = (props) => {
-  const addFile = (f: TransactionsFile) => {
-    props.setFiles((prevValue) => {
-      prevValue.push(f);
-      return prevValue.slice();
-    });
-  };
-
-  const toggleFile = (fileId: string, enabled: boolean) => {
-    props.setFiles((prevValue) => {
-      const transactionsFile = prevValue.find((f) => f.id === fileId);
-      if (!transactionsFile) {
-        throw new Error("File with id " + fileId + " not found!?");
-      }
-      transactionsFile.enabled = enabled;
-      return prevValue.slice();
-    });
-  };
-
   function totalByCategoryFor(transactions: Transaction[]) {
     return transactions
       .reduce(...groupBy((t: Transaction) => t.category))
@@ -96,8 +77,8 @@ export const MainAppScreen: React.FC<{
               height: 240,
             }}
           >
-            <FileDrop addFile={addFile}>
-              <FileList files={props.files} toggleFile={toggleFile} />
+            <FileDrop addFile={props.addFile}>
+              <FileList files={props.files} toggleFile={props.toggleFile} />
             </FileDrop>
           </Paper>
         </Grid>

@@ -1,31 +1,49 @@
+import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import FormHelperText from "@mui/material/FormHelperText";
+import FormLabel from "@mui/material/FormLabel";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import Box from "@mui/material/Box";
-import FormLabel from "@mui/material/FormLabel";
-import FormControl from "@mui/material/FormControl";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormHelperText from "@mui/material/FormHelperText";
-import Checkbox from "@mui/material/Checkbox";
-import { TransactionsFile } from "../domain/file";
+import { FileDescriptor } from "../domain/file";
 
-// TODO perhaps these props could be file "descriptor" ie without the records, if that makes a diff
 export type FileToggleCallback = (filePath: string, checked: boolean) => void;
+type CheckboxEventHandler = (
+  event: React.SyntheticEvent<Element, Event>,
+  checked: boolean
+) => void;
 
-const FileLabel: React.FC<{ file: TransactionsFile }> = ({ file }) => {
+const FileLabel: React.FC<{ file: FileDescriptor }> = ({ file }) => {
   return (
     <React.Fragment>
       {file.filePath}{" "}
       <Typography variant="caption" display="inline" gutterBottom>
-        ({file.rawRecords ? `${file.rawRecords.length} records` : "parsing ..."}
-        )
+        {/* TODO this isn't really relevant anymore because we don't get the file until it's parsed iirc */}
+        ({file.recordCount ? `${file.recordCount} records` : "parsing ..."})
       </Typography>
     </React.Fragment>
   );
 };
 
+const FileWithCheckbox: React.FC<{
+  file: FileDescriptor;
+  handleChange: CheckboxEventHandler;
+}> = ({ file, handleChange }) => {
+  return (
+    <FormControlLabel
+      control={<Checkbox />}
+      checked={file.enabled}
+      name={file.id}
+      onChange={handleChange}
+      label={<FileLabel file={file} />}
+    />
+  );
+};
+
 export const FileList: React.FC<{
-  files: TransactionsFile[];
+  files: FileDescriptor[];
   toggleFile: FileToggleCallback;
 }> = (props) => {
   const handleChange = (
@@ -47,14 +65,11 @@ export const FileList: React.FC<{
       >
         <FormLabel component="legend">Files</FormLabel>
         <FormGroup>
-          {props.files.map((file: TransactionsFile, idx: number) => (
-            <FormControlLabel
+          {props.files.map((file, idx) => (
+            <FileWithCheckbox
               key={idx}
-              control={<Checkbox />}
-              checked={file.enabled}
-              name={file.id}
-              onChange={handleChange}
-              label={<FileLabel file={file} />}
+              file={file}
+              handleChange={handleChange}
             />
           ))}
         </FormGroup>
