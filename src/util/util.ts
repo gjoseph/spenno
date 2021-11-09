@@ -1,7 +1,11 @@
 import Big from "big.js";
 
-export type Range = [number, number];
-export type AmountFilter = "#noFilter" | "creditOnly" | "debitOnly" | Range;
+export type AmountRange = [number, number];
+export type AmountFilterType = null | "creditOnly" | "debitOnly" | "range";
+export type AmountFilter = {
+  type: AmountFilterType;
+  range: AmountRange | null;
+};
 
 export const signedAmount = (
   debit: number,

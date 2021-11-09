@@ -9,7 +9,7 @@ import {
   PresetTimeframePickerProps,
 } from "./util-comps/PresetTimeframePicker";
 
-type TransactionFiltersProps = PresetTimeframePickerProps &
+export type TransactionFiltersProps = PresetTimeframePickerProps &
   CategorySelectProps &
   AmountPickerProps;
 
@@ -32,16 +32,14 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   setCategories,
   amountFilter,
   setAmountFilter,
+  min,
+  max,
 }) => {
   return (
     <React.Fragment>
       <PresetTimeframePicker {...{ dateRange, setDateRange }} />
       <CategorySelect {...{ allCategories, setCategories }} />
-      <AmountPicker
-        min={-10000}
-        max={10000}
-        {...{ amountFilter, setAmountFilter }}
-      />
+      <AmountPicker {...{ min, max, amountFilter, setAmountFilter }} />
     </React.Fragment>
   );
 };

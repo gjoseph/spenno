@@ -2,36 +2,30 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
-import { Category } from "../domain/category";
 import { FileDescriptor } from "../domain/file";
 import { RawRecordFilters } from "../domain/filters";
 import { isUncategorised, sum, Transaction } from "../domain/transaction";
 import { groupBy } from "../util/reducers";
-import { AmountFilter, zer0 } from "../util/util";
+import { zer0 } from "../util/util";
 import { Chart } from "./Chart";
 import { AddFile, FileDrop } from "./FileDrop";
 import { FileList, FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
-import { TransactionFilters } from "./TransactionFilters";
+import {
+  TransactionFilters,
+  TransactionFiltersProps,
+} from "./TransactionFilters";
 import { TransactionTable } from "./TransactionTable";
-import { DateRange } from "../util/time-util";
 
-export const MainAppScreen: React.FC<{
-  files: FileDescriptor[];
-  addFile: AddFile;
-  toggleFile: FileToggleCallback;
-  transactions: Transaction[];
-  accounts: Bank.Accounts;
-
-  dateRange: DateRange;
-  setDateRange: (func: (prev: DateRange) => DateRange) => void;
-
-  allCategories: Category[];
-  setCategories: (func: (prev: Category[]) => Category[]) => void;
-
-  amountFilter: AmountFilter;
-  setAmountFilter: (func: (prev: AmountFilter) => AmountFilter) => void;
-}> = (props) => {
+export const MainAppScreen: React.FC<
+  {
+    files: FileDescriptor[];
+    addFile: AddFile;
+    toggleFile: FileToggleCallback;
+    transactions: Transaction[];
+    accounts: Bank.Accounts;
+  } & TransactionFiltersProps
+> = (props) => {
   function totalByCategoryFor(transactions: Transaction[]) {
     return transactions
       .reduce(...groupBy((t: Transaction) => t.category))
@@ -70,6 +64,8 @@ export const MainAppScreen: React.FC<{
               setCategories={props.setCategories}
               amountFilter={props.amountFilter}
               setAmountFilter={props.setAmountFilter}
+              min={props.min}
+              max={props.max}
             />
           </Paper>
         </Grid>

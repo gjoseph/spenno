@@ -80,9 +80,10 @@ const AppContent = () => {
 
   const [dateRange, setDateRange] = useState<DateRange>(() => MAX_DATE_RANGE);
   const [categories, setCategories] = useState<Category[]>(() => []);
-  const [amountFilter, setAmountFilter] = useState<AmountFilter>(
-    () => "#noFilter"
-  );
+  const [amountFilter, setAmountFilter] = useState<AmountFilter>(() => ({
+    type: null,
+    range: null,
+  }));
 
   // The parsed files with raw records
   const [filesWithRecords, setFilesWithRecords] = useState<
@@ -163,6 +164,15 @@ const AppContent = () => {
       });
   }, [filesWithRecords, rules, accounts, dateRange, categories, amountFilter]);
 
+  const [txAmountMin, txAmountMax] = useMemo(() => {
+    const amounts = filesWithRecords
+      .flatMap((f) => f.rawRecords)
+      .map((t) => t.amount.toNumber());
+    const numbers = [Math.min(...amounts), Math.max(...amounts)];
+    console.log("min,max:", numbers);
+    return numbers;
+  }, [filesWithRecords]);
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -204,6 +214,8 @@ const AppContent = () => {
               amountFilter,
               setAmountFilter,
             }}
+            min={txAmountMin}
+            max={txAmountMax}
             files={fileDescs}
           />
           <Copyright />

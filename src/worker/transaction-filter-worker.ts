@@ -86,8 +86,8 @@ export const reloadTransactions = (
   if (categories.length > 0) {
     txFilter = txFilter.and(isInCategories(categories));
   }
-  switch (amountFilter) {
-    case "#noFilter":
+  switch (amountFilter.type) {
+    case null:
       break;
     case "creditOnly":
       txFilter = txFilter.and(RawRecordFilters.isCredit());
