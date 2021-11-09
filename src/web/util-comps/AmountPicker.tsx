@@ -11,6 +11,14 @@ export type AmountPickerProps = {
   min: number;
   max: number;
 };
+
+// log scales not really useful
+// const log = (x:number) => Math.log(x) ;
+// const log10 = (x:number) => Math.log(x) / Math.log(10);
+const marks = [
+  -100_000, -10_000, -1_000, -100, -10, 0, 10, 100, 1_000, 10_000, 100_000,
+].map((n) => ({ value: n, label: n.toString() }));
+
 export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
   const [sliderRange, setSliderRange] = React.useState<AmountRange>(() => {
     console.log("props.amountFilter:", props.amountFilter);
@@ -71,7 +79,7 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
         value={sliderRange}
         min={props.min}
         max={props.max}
-        marks={[{ value: 0, label: "0" }]}
+        marks={marks}
         onChange={handleSliderChange}
         valueLabelDisplay="on"
         disableSwap={true}
