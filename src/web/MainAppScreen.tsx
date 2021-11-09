@@ -58,12 +58,9 @@ export const MainAppScreen: React.FC<
             }}
           >
             <TransactionFilters
-              dateRange={props.dateRange}
-              setDateRange={props.setDateRange}
+              filterConfig={props.filterConfig}
+              setFilterConfig={props.setFilterConfig}
               allCategories={props.allCategories}
-              setCategories={props.setCategories}
-              amountFilter={props.amountFilter}
-              setAmountFilter={props.setAmountFilter}
               min={props.min}
               max={props.max}
             />

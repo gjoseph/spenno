@@ -1,13 +1,14 @@
-import { Box, Slider, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import TuneIcon from "@mui/icons-material/Tune";
+import { Box, Slider, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import * as React from "react";
 import { AmountFilter, AmountFilterType, AmountRange } from "../../util/util";
+import { SetFilterConfig } from "../App";
 
 export type AmountPickerProps = {
   amountFilter: AmountFilter;
-  setAmountFilter: (func: (prev: AmountFilter) => AmountFilter) => void;
+  setFilterConfig: SetFilterConfig;
   min: number;
   max: number;
 };
@@ -33,10 +34,12 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
     setSliderRange(newValue as AmountRange);
     // TODO enforce array-of-2? and/or have a different state for slider
     // TODO stagger?
-    props.setAmountFilter((prev) => ({
-      ...prev,
-      range: newValue as AmountRange,
-    }));
+    props.setFilterConfig((prev) => {
+      return {
+        ...prev,
+        amount: { ...prev.amount, range: newValue as AmountRange },
+      };
+    });
   };
 
   const handleToggleChange = (
@@ -49,11 +52,11 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
     } else {
       setSliderEnabled(false);
     }
-    props.setAmountFilter((prev) => {
-      console.log("prevValue:", prev);
-      console.log("newValue:", newValue);
-      const type = newValue as AmountFilterType;
-      return { ...prev, type: type };
+    props.setFilterConfig((prev) => {
+      return {
+        ...prev,
+        amount: { ...prev.amount, type: newValue as AmountFilterType },
+      };
     });
   };
   return (

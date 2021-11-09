@@ -11,6 +11,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { Category } from "../../domain/category";
+import { SetFilterConfig } from "../App";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -56,11 +57,12 @@ const renderTags = (
 
 export interface CategorySelectProps {
   allCategories: Category[];
-  setCategories: (func: (prev: Category[]) => Category[]) => void;
+  setFilterConfig: SetFilterConfig;
 }
+
 export const CategorySelect: React.FC<CategorySelectProps> = (props) => {
   const onChange = (_: React.SyntheticEvent, newValue: Category[]) => {
-    props.setCategories((prev) => newValue);
+    props.setFilterConfig((prev) => ({ ...prev, categories: newValue }));
   };
   return (
     <Autocomplete

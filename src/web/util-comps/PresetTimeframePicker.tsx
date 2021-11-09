@@ -6,6 +6,7 @@ import {
   endOfYear,
   startOfYear,
 } from "../../util/time-util";
+import { SetFilterConfig } from "../App";
 
 // N period ago
 // Since beginning of N period ago
@@ -14,7 +15,7 @@ import {
 
 export type PresetTimeframePickerProps = {
   dateRange: DateRange;
-  setDateRange: (func: (prev: DateRange) => DateRange) => void;
+  setFilterConfig: SetFilterConfig;
 };
 export const PresetTimeframePicker: React.FC<PresetTimeframePickerProps> = (
   props
@@ -40,7 +41,8 @@ export const PresetTimeframePicker: React.FC<PresetTimeframePickerProps> = (
     const y2 = selectedYears[selectedYears.length - 1];
     const m1 = startOfYear(y1);
     const m2 = endOfYear(y2);
-    props.setDateRange((prev) => [m1, m2]);
+    const dateRange: DateRange = [m1, m2];
+    props.setFilterConfig((prev) => ({ ...prev, dateRange }));
   };
 
   return (

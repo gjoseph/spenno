@@ -4,7 +4,7 @@ import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme } from "@mui/material/styles";
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
@@ -60,6 +60,13 @@ const reloadAccounts = (result: string) =>
 const reloadRules = (result: string) =>
   new Rules.RulesLoader(consoleLogger).loadYaml(result);
 
+export type SetFilterConfig = Dispatch<SetStateAction<FilterConfig>>;
+export type FilterConfig = {
+  dateRange: DateRange;
+  categories: Category[]; // currently, empty array == no filter == all categories, but we may want to have a truly "no categories" filter
+  amount: AmountFilter;
+};
+
 const AppContent = () => {
   const [calculating, setCalculating] = useState(true);
 
@@ -78,11 +85,13 @@ const AppContent = () => {
   // TODO: FileDesc instead?
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
-  const [dateRange, setDateRange] = useState<DateRange>(() => MAX_DATE_RANGE);
-  const [categories, setCategories] = useState<Category[]>(() => []);
-  const [amountFilter, setAmountFilter] = useState<AmountFilter>(() => ({
-    type: null,
-    range: null,
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => ({
+    dateRange: MAX_DATE_RANGE,
+    categories: [],
+    amount: {
+      type: null,
+      range: null,
+    },
   }));
 
   // The parsed files with raw records
@@ -142,15 +151,15 @@ const AppContent = () => {
   }, [files, accounts]);
   useEffect(() => {
     setCalculating((old) => true);
-    const txDateRange = transferrableDateRange(dateRange);
+    const txDateRange = transferrableDateRange(filterConfig.dateRange);
     calcWorker
       .reloadTransactions(
         toTransferrableFilesWithRawRecords(filesWithRecords),
         rules,
         accounts.accounts,
         txDateRange,
-        categories,
-        amountFilter
+        filterConfig.categories,
+        filterConfig.amount
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
         setTransactions((old) => {
@@ -162,7 +171,7 @@ const AppContent = () => {
         });
         setCalculating((old) => false);
       });
-  }, [filesWithRecords, rules, accounts, dateRange, categories, amountFilter]);
+  }, [filesWithRecords, rules, accounts, filterConfig]);
 
   const [txAmountMin, txAmountMax] = useMemo(() => {
     const amounts = filesWithRecords
@@ -198,21 +207,18 @@ const AppContent = () => {
             {rulesLoaded || "loading"}
             {rules.length} rules [button to reload] {rulesError}
           </p>
-          <p>from {dateRange[0]?.toDate().toString()}</p>
-          <p>to {dateRange[1]?.toDate().toString()}</p>
+          <p>from {filterConfig.dateRange[0]?.toDate().toString()}</p>
+          <p>to {filterConfig.dateRange[1]?.toDate().toString()}</p>
           <MainAppScreen
-            // how to make passing stuff around less verbose?
             {...{
               addFile,
               toggleFile,
               transactions,
               accounts,
-              dateRange,
-              setDateRange,
               allCategories,
-              setCategories,
-              amountFilter,
-              setAmountFilter,
+
+              filterConfig,
+              setFilterConfig,
             }}
             min={txAmountMin}
             max={txAmountMax}

@@ -1,17 +1,19 @@
 import * as React from "react";
-import { AmountPicker, AmountPickerProps } from "./util-comps/AmountPicker";
-import {
-  CategorySelect,
-  CategorySelectProps,
-} from "./util-comps/CategorySelect";
-import {
-  PresetTimeframePicker,
-  PresetTimeframePickerProps,
-} from "./util-comps/PresetTimeframePicker";
+import { Category } from "../domain/category";
+import { FilterConfig, SetFilterConfig } from "./App";
+import { AmountPicker } from "./util-comps/AmountPicker";
+import { CategorySelect } from "./util-comps/CategorySelect";
+import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
 
-export type TransactionFiltersProps = PresetTimeframePickerProps &
-  CategorySelectProps &
-  AmountPickerProps;
+export type TransactionFiltersProps = {
+  filterConfig: FilterConfig;
+  setFilterConfig: SetFilterConfig;
+
+  // TODO move these to FilterConfig as well? They're more static, don't represent user selection
+  allCategories: Category[];
+  min: number;
+  max: number;
+};
 
 /**
  * time filters (radio-year, time-span, a few  predefined "since", a few predefined "last period")
@@ -26,20 +28,23 @@ export type TransactionFiltersProps = PresetTimeframePickerProps &
  * merge credit and debit (e.g health could have both)
  */
 export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
-  dateRange,
-  setDateRange,
+  filterConfig,
+  setFilterConfig,
   allCategories,
-  setCategories,
-  amountFilter,
-  setAmountFilter,
   min,
   max,
 }) => {
   return (
     <React.Fragment>
-      <PresetTimeframePicker {...{ dateRange, setDateRange }} />
-      <CategorySelect {...{ allCategories, setCategories }} />
-      <AmountPicker {...{ min, max, amountFilter, setAmountFilter }} />
+      <PresetTimeframePicker
+        dateRange={filterConfig.dateRange}
+        {...{ setFilterConfig }}
+      />
+      <CategorySelect {...{ allCategories, setFilterConfig }} />
+      <AmountPicker
+        amountFilter={filterConfig.amount}
+        {...{ min, max, setFilterConfig }}
+      />
     </React.Fragment>
   );
 };
