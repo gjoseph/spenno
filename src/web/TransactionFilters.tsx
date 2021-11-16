@@ -54,7 +54,10 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
           setFilterConfig((prev) => ({ ...prev, groupBy: newValue }))
         }
       />
-      <p>Split by:</p>
+      <p>
+        Split by: (when splitting by year, a pie chart will make no sense of
+        positive _and_ negative numbers
+      </p>
       <GroupByToggle
         value={filterConfig.splitBy}
         updateFilterConfig={(newValue) =>

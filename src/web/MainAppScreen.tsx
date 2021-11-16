@@ -160,7 +160,12 @@ export const MainAppScreen: React.FC<
           >
             <Grid container spacing={0}>
               {charts.map((chart, idx) => (
-                <Chart key={idx} chart={chart} containerHeight={500 - 70} />
+                <Chart
+                  key={idx}
+                  type="bar"
+                  chart={chart}
+                  containerHeight={500 - 70}
+                />
               ))}
             </Grid>
           </Paper>
