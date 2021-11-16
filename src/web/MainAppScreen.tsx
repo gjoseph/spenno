@@ -3,13 +3,8 @@ import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
 import { FileDescriptor } from "../domain/file";
-import { RawRecordFilters } from "../domain/filters";
-import { isUncategorised, sum, Transaction } from "../domain/transaction";
-import { groupBy } from "../util/reducers";
-import { ALL_YEARS } from "../util/time-util";
-import { zer0 } from "../util/util";
-import { GroupBy, GroupByFunctions, SplitBy } from "../domain/charting";
-import { ChartDataItem, ChartDesc } from "../domain/charting";
+import { isUncategorised, Transaction } from "../domain/transaction";
+import { getChartsFor } from "../domain/charting";
 import { ChartWrapper } from "./ChartWrapper";
 import { AddFile, FileDrop } from "./FileDrop";
 import { FileList, FileToggleCallback } from "./FileList";
@@ -19,90 +14,6 @@ import {
   TransactionFiltersProps,
 } from "./TransactionFilters";
 import { TransactionTable } from "./TransactionTable";
-
-const chartDataGroupedBy = (
-  transactions: Transaction[],
-  whatToGroupBy: GroupBy
-): ChartDataItem[] => {
-  const groupByFunction = GroupByFunctions[whatToGroupBy];
-  return transactions
-    .reduce(...groupBy(groupByFunction))
-    .toArray()
-    .map((e) => {
-      return {
-        name: e.key,
-        value: e.value.reduce(sum, zer0).abs().toNumber(),
-      };
-    });
-};
-
-type TransactionFilter = (t: Transaction) => boolean;
-const makeChart = (
-  title: string,
-  predicate: TransactionFilter,
-  whatToGroupBy: GroupBy,
-  transactions: Transaction[]
-): ChartDesc => ({
-  title,
-  data: chartDataGroupedBy(transactions.filter(predicate), whatToGroupBy),
-});
-
-type ChartMakerSauce = { title: string; predicate: TransactionFilter };
-
-const makeCharts: (sauce: ChartMakerSauce[]) => ChartMaker = (
-  sauce: ChartMakerSauce[]
-) => {
-  return (whatToGroupBy: GroupBy, transactions: Transaction[]) =>
-    sauce.map((x) => {
-      return makeChart(x.title, x.predicate, whatToGroupBy, transactions);
-    });
-};
-
-type ChartMaker = (
-  whatToGroupBy: GroupBy,
-  transactions: Transaction[]
-) => ChartDesc[];
-
-export const SplitByFunctions: Record<SplitBy, () => ChartMaker> = {
-  amount: () =>
-    makeCharts([
-      { title: "Credits", predicate: RawRecordFilters.isCredit() },
-      {
-        title: "Debits",
-        predicate: RawRecordFilters.isDebit(),
-      },
-    ]),
-  year: () =>
-    makeCharts(
-      // TODO actually we can reimplement this with a groupBy
-      ALL_YEARS.map((y) => ({
-        title: y.toString(),
-        predicate: (t) => t.date.year() === y,
-      }))
-    ),
-  category: () => {
-    throw new Error("Split by category is not implemented yet!");
-  },
-  account: () => {
-    return (whatToGroupBy: GroupBy, transactions: Transaction[]) => {
-      const map = transactions.reduce(...groupBy(GroupByFunctions["account"]));
-      return map.toArray().map((e: { key: string; value: Transaction[] }) => {
-        // predicate shoulndn't be required here, `value` is already filtered via the first groupBy
-        return makeChart(e.key, (t) => true, whatToGroupBy, e.value);
-      });
-    };
-  },
-};
-
-// TODO we should do this in the webworker
-const getChartsFor = (
-  whatToSplitBy: SplitBy,
-  whatToGroupBy: GroupBy,
-  transactions: Transaction[]
-) => {
-  const chartMaker = SplitByFunctions[whatToSplitBy]();
-  return chartMaker(whatToGroupBy, transactions);
-};
 
 export const MainAppScreen: React.FC<
   {
