@@ -25,15 +25,23 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
     console.log("props.amountFilter:", props.amountFilter);
     return props.amountFilter.range || [props.min, props.max];
   }); // TODO yikes
+
   const [radioValue, setRadioValue] = React.useState<AmountFilterType | null>(
     null
   );
   const [sliderEnabled, setSliderEnabled] = React.useState<boolean>(false);
 
+  // Keep state up-to-date when slider is being dragged
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     setSliderRange(newValue as AmountRange);
+  };
+
+  // Commit to config when slider handle is released
+  const handleSliderCommit = (
+    event: React.SyntheticEvent | Event,
+    newValue: number | number[]
+  ) => {
     // TODO enforce array-of-2? and/or have a different state for slider
-    // TODO stagger?
     props.setFilterConfig((prev) => {
       return {
         ...prev,
@@ -84,6 +92,7 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
         max={props.max}
         marks={marks}
         onChange={handleSliderChange}
+        onChangeCommitted={handleSliderCommit}
         valueLabelDisplay="on"
         disableSwap={true}
         disabled={!sliderEnabled}
