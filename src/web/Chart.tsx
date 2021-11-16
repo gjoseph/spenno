@@ -8,21 +8,21 @@ import {
 } from "recharts";
 import { Title } from "./layout/Title";
 
+export type ChartDesc = { title: string; data: ChartDataItem[] };
 export type ChartDataItem = { name: string; value: number };
 export const Chart: React.FC<{
-  title: string;
-  data: ChartDataItem[];
+  chart: ChartDesc;
   containerHeight: number;
-}> = ({ title, data, containerHeight }) => {
+}> = ({ chart, containerHeight }) => {
   return (
     <Grid item xs>
-      <Title>{title}</Title>
+      <Title>{chart.title}</Title>
       {/*there seems to be a weird bug between <Grid> and <ResponsiveContainer> where when the latter's height*/}
       {/*is set to 100%, it creates an infinitely increasing height. So instead of fiddling around more, I'm just*/}
       {/*passing the height from the parent component, which already has it hardcoded*/}
       {/*Maybe related to https://stackoverflow.com/questions/50891591/recharts-responsive-container-does-not-resize-correctly-in-flexbox*/}
       {/*and https://github.com/recharts/recharts/issues/172*/}
-      <PieChart {...{ data, containerHeight }} />
+      <PieChart data={chart.data} containerHeight={containerHeight} />
     </Grid>
   );
 };

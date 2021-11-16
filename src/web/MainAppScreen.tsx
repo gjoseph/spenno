@@ -6,9 +6,10 @@ import { FileDescriptor } from "../domain/file";
 import { RawRecordFilters } from "../domain/filters";
 import { isUncategorised, sum, Transaction } from "../domain/transaction";
 import { groupBy } from "../util/reducers";
+import { ALL_YEARS } from "../util/time-util";
 import { zer0 } from "../util/util";
-import { GroupByFunctions } from "./App";
-import { Chart, ChartDataItem } from "./Chart";
+import { GroupBy, GroupByFunctions, SplitBy } from "./App";
+import { Chart, ChartDataItem, ChartDesc } from "./Chart";
 import { AddFile, FileDrop } from "./FileDrop";
 import { FileList, FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
@@ -17,6 +18,69 @@ import {
   TransactionFiltersProps,
 } from "./TransactionFilters";
 import { TransactionTable } from "./TransactionTable";
+
+const chartDataGroupedBy = (
+  transactions: Transaction[],
+  whatToGroupBy: GroupBy
+): ChartDataItem[] => {
+  const groupByFunction = GroupByFunctions[whatToGroupBy];
+  return transactions
+    .reduce(...groupBy(groupByFunction))
+    .toArray()
+    .map((e) => {
+      return {
+        name: e.key,
+        value: e.value.reduce(sum, zer0).abs().toNumber(),
+      };
+    });
+};
+
+const makeChart = (
+  title: string,
+  predicate: (t: Transaction) => boolean,
+  whatToGroupBy: GroupBy,
+  transactions: Transaction[]
+) => ({
+  title,
+  data: chartDataGroupedBy(transactions.filter(predicate), whatToGroupBy),
+});
+const getChartsFor = (
+  whatToSplitBy: SplitBy,
+  whatToGroupBy: GroupBy,
+  transactions: Transaction[]
+) => {
+  // use generator functions?
+  const chartsByAmount: ChartDesc[] = [
+    makeChart(
+      "Creditorios",
+      RawRecordFilters.isCredit(),
+      whatToGroupBy,
+      transactions
+    ),
+    makeChart(
+      "Debitorios",
+      RawRecordFilters.isDebit(),
+      whatToGroupBy,
+      transactions
+    ),
+  ];
+  const chartsByYear: ChartDesc[] = ALL_YEARS.map((y) => {
+    return makeChart(
+      y.toString(),
+      (t) => t.date.year() === y,
+      whatToGroupBy,
+      transactions
+    );
+  });
+  switch (whatToSplitBy) {
+    case "amount":
+      return chartsByAmount;
+    case "year":
+      return chartsByYear;
+    default:
+      throw new Error("Split by " + whatToSplitBy + " is not supported yet");
+  }
+};
 
 export const MainAppScreen: React.FC<
   {
@@ -27,33 +91,11 @@ export const MainAppScreen: React.FC<
     accounts: Bank.Accounts;
   } & TransactionFiltersProps
 > = (props) => {
-  const chartDataGroupedBy = (transactions: Transaction[]): ChartDataItem[] => {
-    const groupByFunction = GroupByFunctions[props.filterConfig.groupBy];
-    return transactions
-      .reduce(...groupBy(groupByFunction))
-      .toArray()
-      .map((e) => {
-        return {
-          name: e.key,
-          value: e.value.reduce(sum, zer0).abs().toNumber(),
-        };
-      });
-  };
-
-  const charts: { title: string; data: ChartDataItem[] }[] = [
-    {
-      title: "Credits",
-      data: chartDataGroupedBy(
-        props.transactions.filter(RawRecordFilters.isCredit())
-      ),
-    },
-    {
-      title: "Debits",
-      data: chartDataGroupedBy(
-        props.transactions.filter(RawRecordFilters.isDebit())
-      ),
-    },
-  ];
+  const charts = getChartsFor(
+    props.filterConfig.splitBy,
+    props.filterConfig.groupBy,
+    props.transactions
+  );
 
   return (
     <React.Fragment>
@@ -97,11 +139,7 @@ export const MainAppScreen: React.FC<
           >
             <Grid container spacing={0}>
               {charts.map((chart, idx) => (
-                <Chart
-                  title={chart.title}
-                  data={chart.data}
-                  containerHeight={500 - 70}
-                />
+                <Chart chart={chart} containerHeight={500 - 70} />
               ))}
             </Grid>
           </Paper>
