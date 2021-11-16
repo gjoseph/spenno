@@ -5,7 +5,7 @@ import {
   PieChart as PieReChart,
   ResponsiveContainer,
 } from "recharts";
-import { ChartDataItem } from "../ChartWrapper";
+import { ChartDataItem } from "../../domain/charting";
 import { ChartColors } from "./ChartColors";
 
 export const PieChart: React.FC<{

@@ -8,6 +8,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
+import { GroupBy, SplitBy } from "../domain/charting";
 import {
   FileDescriptor,
   FileWithRawRecords,
@@ -69,22 +70,6 @@ export type FilterConfig = {
   groupBy: GroupBy;
   splitBy: SplitBy;
 };
-
-export type GroupBy =
-  | "year" // TODO or use a subset or moment's TimeUnit // should we split up GroupBy "type" and "parameter"
-  | "category" // the default TODO introduce depths
-  | "amount" // not great name - this could just be credit vs debit, or some other amount criteria?
-  | "account";
-
-export const GroupByFunctions: Record<GroupBy, (t: Transaction) => string> = {
-  year: (t) => t.date.year().toString(),
-  category: (t) => t.category,
-  amount: (t) => (t.amount.gt(0) ? "credit" : "debit"),
-  account: (t) => t.account.name,
-};
-
-export type SplitBy = GroupBy;
-// export const SplitByFunctions: Record<SplitBy, (t: Transaction) => string> = {};
 
 const AppContent = () => {
   const [calculating, setCalculating] = useState(true);
