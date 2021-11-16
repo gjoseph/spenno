@@ -5,7 +5,7 @@ import {
   PieChart as PieReChart,
   ResponsiveContainer,
 } from "recharts";
-import { ChartDataItem } from "../Chart";
+import { ChartDataItem } from "../ChartWrapper";
 import { ChartColors } from "./ChartColors";
 
 export const PieChart: React.FC<{
@@ -13,7 +13,7 @@ export const PieChart: React.FC<{
   containerHeight: number;
   halfPieBottom?: boolean;
 }> = (props) => {
-  // Another fun bug seems to be that if <ResponsiveContainer> is _outside_ this function (i.e in <Chart> above),
+  // Another fun bug seems to be that if <ResponsiveContainer> is _outside_ this function (i.e in <ChartWrapper> above),
   // then it doesn't work, the chart doesn't render at all
   return (
     <ResponsiveContainer width="100%" height={props.containerHeight}>

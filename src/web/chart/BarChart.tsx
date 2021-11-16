@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ChartDataItem } from "../Chart";
+import { ChartDataItem } from "../ChartWrapper";
 
 export const BarChart: React.FC<{
   data: ChartDataItem[];

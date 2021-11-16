@@ -9,7 +9,7 @@ import { groupBy } from "../util/reducers";
 import { ALL_YEARS } from "../util/time-util";
 import { zer0 } from "../util/util";
 import { GroupBy, GroupByFunctions, SplitBy } from "./App";
-import { Chart, ChartDataItem, ChartDesc } from "./Chart";
+import { ChartWrapper, ChartDataItem, ChartDesc } from "./ChartWrapper";
 import { AddFile, FileDrop } from "./FileDrop";
 import { FileList, FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
@@ -160,7 +160,7 @@ export const MainAppScreen: React.FC<
           >
             <Grid container spacing={0}>
               {charts.map((chart, idx) => (
-                <Chart
+                <ChartWrapper
                   key={idx}
                   type="bar"
                   chart={chart}
