@@ -7,7 +7,8 @@ import { RawRecordFilters } from "../domain/filters";
 import { isUncategorised, sum, Transaction } from "../domain/transaction";
 import { groupBy } from "../util/reducers";
 import { zer0 } from "../util/util";
-import { Chart } from "./Chart";
+import { GroupByFunctions } from "./App";
+import { Chart, ChartDataItem } from "./Chart";
 import { AddFile, FileDrop } from "./FileDrop";
 import { FileList, FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
@@ -26,9 +27,10 @@ export const MainAppScreen: React.FC<
     accounts: Bank.Accounts;
   } & TransactionFiltersProps
 > = (props) => {
-  function totalByCategoryFor(transactions: Transaction[]) {
+  const chartDataGroupedBy = (transactions: Transaction[]): ChartDataItem[] => {
+    const groupByFunction = GroupByFunctions[props.filterConfig.groupBy];
     return transactions
-      .reduce(...groupBy((t: Transaction) => t.category))
+      .reduce(...groupBy(groupByFunction))
       .toArray()
       .map((e) => {
         return {
@@ -36,14 +38,22 @@ export const MainAppScreen: React.FC<
           value: e.value.reduce(sum, zer0).abs().toNumber(),
         };
       });
-  }
+  };
 
-  const creditsByCategory = totalByCategoryFor(
-    props.transactions.filter(RawRecordFilters.isCredit())
-  );
-  const debitsByCategory = totalByCategoryFor(
-    props.transactions.filter(RawRecordFilters.isDebit())
-  );
+  const charts: { title: string; data: ChartDataItem[] }[] = [
+    {
+      title: "Credits",
+      data: chartDataGroupedBy(
+        props.transactions.filter(RawRecordFilters.isCredit())
+      ),
+    },
+    {
+      title: "Debits",
+      data: chartDataGroupedBy(
+        props.transactions.filter(RawRecordFilters.isDebit())
+      ),
+    },
+  ];
 
   return (
     <React.Fragment>
@@ -54,7 +64,7 @@ export const MainAppScreen: React.FC<
               p: 2,
               display: "flex",
               flexDirection: "column",
-              height: 240,
+              // TODO fix this up -- we may never have needed a height, but this is starting to look like crap height: 240,
             }}
           >
             <TransactionFilters
@@ -85,11 +95,15 @@ export const MainAppScreen: React.FC<
           <Paper
             sx={{ p: 2, display: "flex", flexDirection: "column", height: 500 }}
           >
-            <Chart
-              credits={creditsByCategory}
-              debits={debitsByCategory}
-              containerHeight={500 - 70}
-            />
+            <Grid container spacing={0}>
+              {charts.map((chart, idx) => (
+                <Chart
+                  title={chart.title}
+                  data={chart.data}
+                  containerHeight={500 - 70}
+                />
+              ))}
+            </Grid>
           </Paper>
         </Grid>
         <Grid item xs={12}>

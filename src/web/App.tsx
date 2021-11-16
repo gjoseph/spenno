@@ -65,7 +65,24 @@ export type FilterConfig = {
   dateRange: DateRange;
   categories: Category[]; // currently, empty array == no filter == all categories, but we may want to have a truly "no categories" filter
   amount: AmountFilter;
+
+  groupBy: GroupBy;
+  splitBy: SplitBy;
 };
+
+export type GroupBy =
+  | "year" // TODO or use a subset or moment's TimeUnit // should we split up GroupBy "type" and "parameter"
+  | "category" // the default TODO introduce depths
+  | "amount"; // not great name - this could just be credit vs debit, or some other amount criteria?
+
+export const GroupByFunctions: Record<GroupBy, (t: Transaction) => string> = {
+  year: (t) => t.date.year().toString(),
+  category: (t) => t.category,
+  amount: (t) => (t.amount.gt(0) ? "credit" : "debit"),
+};
+
+export type SplitBy = GroupBy;
+// export const SplitByFunctions: Record<SplitBy, (t: Transaction) => string> = {};
 
 const AppContent = () => {
   const [calculating, setCalculating] = useState(true);
@@ -92,6 +109,8 @@ const AppContent = () => {
       type: null,
       range: null,
     },
+    groupBy: "category",
+    splitBy: "amount",
   }));
 
   // The parsed files with raw records
