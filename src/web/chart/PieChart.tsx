@@ -13,6 +13,15 @@ export const PieChart: React.FC<{
   containerHeight: number;
   halfPieBottom?: boolean;
 }> = (props) => {
+  // TODO In chartDataGroupedBy, we used to get the abs() of each amount; negative amounts aren't gonna play well with a pie chart
+  // so either we enforce all numbers are of the same sign (in which case we can invert them all), or we blatantly refuse negative signs
+  // ... some of this logic should probably be in charting.ts
+  for (const i of props.data) {
+    if (i.value < 0) {
+      throw new Error("PieChart can only accept positive values");
+    }
+  }
+
   // Another fun bug seems to be that if <ResponsiveContainer> is _outside_ this function (i.e in <ChartWrapper> above),
   // then it doesn't work, the chart doesn't render at all
   return (

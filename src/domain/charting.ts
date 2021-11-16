@@ -34,7 +34,10 @@ const chartDataGroupedBy = (
     .map((e) => {
       return {
         name: e.key,
-        value: e.value.reduce(sum, zer0).abs().toNumber(),
+        value: e.value
+          .reduce(sum, zer0)
+          // .abs() wtf? maybe i did this for pies
+          .toNumber(),
       };
     });
 };
