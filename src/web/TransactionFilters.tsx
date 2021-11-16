@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Category } from "../domain/category";
 import { FilterConfig, SetFilterConfig } from "./App";
-import { AmountPicker } from "./util-comps/AmountPicker";
-import { CategorySelect } from "./util-comps/CategorySelect";
-import { GroupByToggle } from "./util-comps/GroupByToggle";
-import { PresetTimeframePicker } from "./util-comps/PresetTimeframePicker";
+import { AmountPicker } from "./config/AmountPicker";
+import { CategorySelect } from "./config/CategorySelect";
+import { GroupByToggle } from "./config/GroupByToggle";
+import { PresetTimeframePicker } from "./config/PresetTimeframePicker";
 
 export type TransactionFiltersProps = {
   filterConfig: FilterConfig;
