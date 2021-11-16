@@ -22,12 +22,14 @@ export type TransactionFiltersProps = {
  *   - category filters (dropdown with checkbox, search, "all")
  *   - category depth (maybe pie charts can do this automatically with surrounding pies, see e.g https://recharts.org/en-US/examples/TwoLevelPieChart)
  *   - amount filters
+ *   - include unknowns
+ *   - include credits (implied if split-by-credit-vs-debit, acceptable if using bar charts across axis..)
  * Split by: same criteria, generate multiple graphs
  * Group by: in each graph, which criteria generates a different pie piece
  * Time series graphs?
  * Other toggles:
- * 2 pie charts (one spend one income) or bar charts (which should support positive and negative on same chart)
- * merge credit and debit (e.g health could have both)
+ * - 2 pie charts (one spend one income) or bar charts (which should support positive and negative on same chart)
+ * - merge credit and debit (e.g health could have both)
  */
 export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   filterConfig,
