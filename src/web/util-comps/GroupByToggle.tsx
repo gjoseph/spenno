@@ -22,6 +22,7 @@ export const GroupByToggle = <T extends any>(props: GroupByToggleProps<T>) => {
         <ToggleButton value="year">year</ToggleButton>
         <ToggleButton value="category">category</ToggleButton>
         <ToggleButton value="amount">amount</ToggleButton>
+        <ToggleButton value="account">account</ToggleButton>
       </ToggleButtonGroup>
     </Box>
   );

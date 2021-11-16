@@ -35,51 +35,72 @@ const chartDataGroupedBy = (
     });
 };
 
+type TransactionFilter = (t: Transaction) => boolean;
 const makeChart = (
   title: string,
-  predicate: (t: Transaction) => boolean,
+  predicate: TransactionFilter,
   whatToGroupBy: GroupBy,
   transactions: Transaction[]
-) => ({
+): ChartDesc => ({
   title,
   data: chartDataGroupedBy(transactions.filter(predicate), whatToGroupBy),
 });
+
+type ChartMakerSauce = { title: string; predicate: TransactionFilter };
+
+const makeCharts: (sauce: ChartMakerSauce[]) => ChartMaker = (
+  sauce: ChartMakerSauce[]
+) => {
+  return (whatToGroupBy: GroupBy, transactions: Transaction[]) =>
+    sauce.map((x) => {
+      return makeChart(x.title, x.predicate, whatToGroupBy, transactions);
+    });
+};
+
+type ChartMaker = (
+  whatToGroupBy: GroupBy,
+  transactions: Transaction[]
+) => ChartDesc[];
+
+export const SplitByFunctions: Record<SplitBy, () => ChartMaker> = {
+  amount: () =>
+    makeCharts([
+      { title: "Credits", predicate: RawRecordFilters.isCredit() },
+      {
+        title: "Debits",
+        predicate: RawRecordFilters.isDebit(),
+      },
+    ]),
+  year: () =>
+    makeCharts(
+      // TODO actually we can reimplement this with a groupBy
+      ALL_YEARS.map((y) => ({
+        title: y.toString(),
+        predicate: (t) => t.date.year() === y,
+      }))
+    ),
+  category: () => {
+    throw new Error("Split by category is not implemented yet!");
+  },
+  account: () => {
+    return (whatToGroupBy: GroupBy, transactions: Transaction[]) => {
+      const map = transactions.reduce(...groupBy(GroupByFunctions["account"]));
+      return map.toArray().map((e: { key: string; value: Transaction[] }) => {
+        // predicate shoulndn't be required here, `value` is already filtered via the first groupBy
+        return makeChart(e.key, (t) => true, whatToGroupBy, e.value);
+      });
+    };
+  },
+};
+
+// TODO we should do this in the webworker
 const getChartsFor = (
   whatToSplitBy: SplitBy,
   whatToGroupBy: GroupBy,
   transactions: Transaction[]
 ) => {
-  // use generator functions?
-  const chartsByAmount: ChartDesc[] = [
-    makeChart(
-      "Creditorios",
-      RawRecordFilters.isCredit(),
-      whatToGroupBy,
-      transactions
-    ),
-    makeChart(
-      "Debitorios",
-      RawRecordFilters.isDebit(),
-      whatToGroupBy,
-      transactions
-    ),
-  ];
-  const chartsByYear: ChartDesc[] = ALL_YEARS.map((y) => {
-    return makeChart(
-      y.toString(),
-      (t) => t.date.year() === y,
-      whatToGroupBy,
-      transactions
-    );
-  });
-  switch (whatToSplitBy) {
-    case "amount":
-      return chartsByAmount;
-    case "year":
-      return chartsByYear;
-    default:
-      throw new Error("Split by " + whatToSplitBy + " is not supported yet");
-  }
+  const chartMaker = SplitByFunctions[whatToSplitBy]();
+  return chartMaker(whatToGroupBy, transactions);
 };
 
 export const MainAppScreen: React.FC<
@@ -139,7 +160,7 @@ export const MainAppScreen: React.FC<
           >
             <Grid container spacing={0}>
               {charts.map((chart, idx) => (
-                <Chart chart={chart} containerHeight={500 - 70} />
+                <Chart key={idx} chart={chart} containerHeight={500 - 70} />
               ))}
             </Grid>
           </Paper>
