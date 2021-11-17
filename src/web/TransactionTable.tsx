@@ -67,7 +67,6 @@ export const TransactionTable: React.FC<{
       field: "desc",
       headerName: "Description",
       flex: 3,
-      sortable: false,
     },
     {
       field: "merchant",
