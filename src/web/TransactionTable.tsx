@@ -1,19 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 import {
   DataGrid,
-  GridCellParams,
-  GridColDef,
-  GridRenderCellParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
-import Big from "big.js";
-import { Moment } from "moment";
-import "moment/locale/en-au";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
-import { Category, UNCATEGORISED } from "../domain/category";
 import { Transaction } from "../domain/transaction";
+
+import { TRANSACTIONS_GRID_COLUMNS } from "./table/TransactionsGridColumns";
 
 //
 // const CategoryView: React.FC<{ category: Category }> = ({ category }) => {
@@ -22,86 +17,44 @@ import { Transaction } from "../domain/transaction";
 //   return <span {...{ className }}>{category}</span>;
 // };
 
-const AmountView: React.FC<{ amount: Big }> = ({ amount }) => {
-  // negative for a debit, positive for a credit
-  return (
-    <span className={amount.lt(0) ? "amount-debit" : "amount-credit"}>
-      ${amount.toString()}
-    </span>
-  );
-};
+// const AmountView: React.FC<{ amount: Big }> = ({ amount }) => {
+//   // negative for a debit, positive for a credit
+//   return (
+//     <span className={amount.lt(0) ? "amount-debit" : "amount-credit"}>
+//       ${amount.toString()}
+//     </span>
+//   );
+// };
 
 // TODO this is not the right place to do this, a stable ID should be gen'd somewhere else?
+const transactionsWithId = (transactions: Transaction[]) => {
+  // TODO this is not the right place to do this, a stable ID should be gen'd somewhere else?
+  return transactions.map((t) => ({
+    id: uuidv4(),
+    ...t,
+  }));
+};
+
 type TransactionRow = { id: string } & Transaction;
 export const TransactionTable: React.FC<{
   accounts: Bank.Accounts;
   transactions: Transaction[];
 }> = ({ accounts, transactions }) => {
-  // TODO this is not the right place to do this, a stable ID should be gen'd somewhere else?
-  const rows = transactions.map((t) => ({
-    id: uuidv4(),
-    ...t,
-  }));
-  const columns: GridColDef[] = [
-    {
-      field: "account",
-      headerName: "Account",
-      flex: 1,
-      valueGetter: (p) => p.value.name,
-    },
-    {
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-      // It seems sorting just works -- either data grid knows about moment, or moment instances are Comparable
-      valueFormatter: (p) => {
-        // assuming p.value is a Moment
-        const value = p.value as Moment | undefined;
-        // obviously not the right place to change locale, but fuck those default us date formats
-        return value?.format("L");
-        // It seems like importing the locale was enough (it's possibly picked up by browser)
-        // return value?.locale("en-AU").format("L");
-      },
-    },
-    {
-      field: "desc",
-      headerName: "Description",
-      flex: 3,
-    },
-    {
-      field: "merchant",
-      headerName: "Merchant",
-      type: "number",
-      flex: 2,
-    },
-    {
-      field: "amount",
-      headerName: "Amount",
-      type: "number",
-      flex: 1.5,
-      // Alternatively we could use a cellClassName instead of renderCell, see e.g category
-      renderCell: (p: GridRenderCellParams<Big>) => (
-        <AmountView amount={p.value} />
-      ),
-    },
-    {
-      field: "category",
-      headerName: "Category",
-      flex: 2,
-      // renderCell: (p: GridRenderCellParams<Category>) => (
-      //   <CategoryView category={p.value} />
-      // ),
-      cellClassName: (p: GridCellParams<Category>) =>
-        p.value === UNCATEGORISED ? "category-uncategorised" : "category",
-    },
-  ];
+  const [rows, setRows] = React.useState<TransactionRow[]>(() => {
+    return transactionsWithId(transactions);
+  });
+
+  React.useEffect(() => {
+    setRows(transactionsWithId(transactions));
+  }, [transactions]);
+
   return (
     <React.Fragment>
       <div style={{ display: "flex", height: "100%" }}>
         <div style={{ flexGrow: 1 }}>
           <DataGrid
             rows={rows}
-            columns={columns}
+            columns={TRANSACTIONS_GRID_COLUMNS}
             pageSize={100}
             rowsPerPageOptions={[5]}
             autoHeight
@@ -138,25 +91,27 @@ const SimpleToolbar = () => (
 
 /*
 // Copied from https://mui.com/components/data-grid/filtering/#quick-filter (Jesus...)
+// these examples were presumably written for v4, so see https://mui.com/guides/migration-v4/#styles
 
-import { createStyles, makeStyles } from "@mui/material";
-import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
+import { createStyles, makeStyles, Theme } from "@mui/material/styles";
 import {
-  GridToolbarDensitySelector,
-} from '@mui/x-data-grid';
-import ClearIcon from '@mui/icons-material/Clear';
-import SearchIcon from '@mui/icons-material/Search';
-import { createTheme } from '@mui/material/styles';
-// import { createStyles, makeStyles } from '@mui/styles';
+  createTheme,
+  ThemeProvider,
+  StyledEngineProvider,
+} from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import { GridToolbarDensitySelector } from "@mui/x-data-grid";
+import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
 
 function escapeRegExp(value: string): string {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
-const defaultTheme = createTheme();
+const defaultTheme: Theme = createTheme();
 const useStyles = makeStyles(
-  (theme: any) =>
+  (theme: Theme) =>
     createStyles({
       root: {
         padding: theme.spacing(0.5, 0.5, 0),
@@ -166,7 +121,7 @@ const useStyles = makeStyles(
         flexWrap: 'wrap',
       },
       textField: {
-        [theme.breakpoints.down('xs')]: {
+        [theme.breakpoints.down('sm')]: {
           width: '100%',
         },
         margin: theme.spacing(1, 0.5, 1.5),
