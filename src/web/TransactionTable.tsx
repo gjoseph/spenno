@@ -55,10 +55,11 @@ export const TransactionTable: React.FC<{
             rows={rows}
             columns={TRANSACTIONS_GRID_COLUMNS}
             pageSize={100}
-            rowsPerPageOptions={[5]}
+            // rowsPerPageOptions={[5, 100, 500]}
             autoHeight
             density="compact"
-            disableColumnMenu // we always want all our columns, and we enable filtering like so:
+            disableSelectionOnClick
+            disableColumnMenu // we always want all our columns
             components={{ Toolbar: QuickSearchToolbar }}
             componentsProps={{
               toolbar: {
