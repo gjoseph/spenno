@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+.category-uncategorised {
+  color: red;
+}
+
 .amount-debit {
   color: red;
 }
