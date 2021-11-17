@@ -50,7 +50,14 @@ export const TRANSACTIONS_GRID_COLUMNS: GridColDef[] = [
     // ),
     cellClassName: (p: GridCellParams<Big>) =>
       p.value.lt(0) ? "amount-debit" : "amount-credit",
-    valueFormatter: (p: GridValueFormatterParams) => p.value?.toString(), // valueFormatter isn't generic, so no guarantee this is actually a Big!?
+    // valueFormatter isn't generic, so no guarantee p.value is actually a Big!?
+    valueFormatter: (p: GridValueFormatterParams) => {
+      if (p.value) {
+        const b = p.value as Big;
+        return "$" + b.abs().toString() + (b.gte(0) ? "+" : "-");
+      }
+      return "";
+    },
   },
   {
     field: "category",

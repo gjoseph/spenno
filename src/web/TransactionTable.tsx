@@ -10,22 +10,6 @@ import { Transaction } from "../domain/transaction";
 
 import { TRANSACTIONS_GRID_COLUMNS } from "./table/TransactionsGridColumns";
 
-//
-// const CategoryView: React.FC<{ category: Category }> = ({ category }) => {
-//   const className =
-//     category === UNCATEGORISED ? "category-uncategorised" : "category";
-//   return <span {...{ className }}>{category}</span>;
-// };
-
-// const AmountView: React.FC<{ amount: Big }> = ({ amount }) => {
-//   // negative for a debit, positive for a credit
-//   return (
-//     <span className={amount.lt(0) ? "amount-debit" : "amount-credit"}>
-//       ${amount.toString()}
-//     </span>
-//   );
-// };
-
 // TODO this is not the right place to do this, a stable ID should be gen'd somewhere else?
 const transactionsWithId = (transactions: Transaction[]) => {
   // TODO this is not the right place to do this, a stable ID should be gen'd somewhere else?
