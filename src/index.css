@@ -12,10 +12,20 @@ code {
     monospace;
 }
 
+.category-uncategorised {
+  color: red;
+}
+
 .amount-debit {
   color: red;
 }
 
 .amount-credit {
   color: green;
+}
+
+/* There's maybe a better way of doing this but oh well */
+.MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
+.MuiDataGrid-root .MuiDataGrid-cell:focus {
+  outline: none !important;
 }

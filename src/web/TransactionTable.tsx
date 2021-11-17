@@ -1,79 +1,77 @@
-import Big from "big.js";
-import { Moment } from "moment";
+import { DataGrid } from "@mui/x-data-grid";
 import * as React from "react";
-import Link from "@mui/material/Link";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import { v4 as uuidv4 } from "uuid";
 import { Bank } from "../domain/accounts";
-import { Category } from "../domain/category";
 import { Transaction } from "../domain/transaction";
+import { QuickSearchToolbar } from "./table/QuickSearchToolbar";
 
-function preventDefault(event: React.MouseEvent) {
-  event.preventDefault();
-}
+import { TRANSACTIONS_GRID_COLUMNS } from "./table/TransactionsGridColumns";
 
-const AccountView: React.FC<{ account: Bank.Account }> = ({ account }) => {
-  return <React.Fragment>{account.name}</React.Fragment>;
-};
-const CategoryView: React.FC<{ category: Category }> = ({ category }) => {
-  return <React.Fragment>{category}</React.Fragment>;
-};
-const DateView: React.FC<{ date: Moment }> = ({ date }) => {
-  return <React.Fragment>{date.format("L")}</React.Fragment>;
-};
-const AmountView: React.FC<{ amount: Big }> = ({ amount }) => {
-  // negative for a debit, positive for a credit
-  return (
-    <span className={amount.lt(0) ? "amount-debit" : "amount-credit"}>
-      ${amount.toString()}
-    </span>
-  );
+// TODO this is not the right place to do this, a stable ID should be gen'd somewhere else?
+const transactionsWithId = (transactions: Transaction[]) => {
+  // TODO this is not the right place to do this, a stable ID should be gen'd somewhere else?
+  return transactions.map((t) => ({
+    id: uuidv4(),
+    ...t,
+  }));
 };
 
+const escapeRegExp = (value: string): string => {
+  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
+type TransactionRow = { id: string } & Transaction;
 export const TransactionTable: React.FC<{
   accounts: Bank.Accounts;
   transactions: Transaction[];
 }> = ({ accounts, transactions }) => {
+  const [rows, setRows] = React.useState<TransactionRow[]>(() => {
+    return transactionsWithId(transactions);
+  });
+
+  const [searchText, setSearchText] = React.useState("");
+  const requestSearch = (searchValue: string) => {
+    setSearchText(searchValue);
+    const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
+    const filteredRows = transactions.filter((row: any) => {
+      return Object.keys(row).some((field: any) => {
+        console.log("row:", row);
+        console.log("field:", field);
+        return searchRegex.test(row[field]?.toString());
+      });
+    });
+    setRows(transactionsWithId(filteredRows));
+  };
+
+  React.useEffect(() => {
+    setRows(transactionsWithId(transactions));
+  }, [transactions]);
+
   return (
     <React.Fragment>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Account</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Merchant</TableCell>
-            <TableCell align="right">Amount</TableCell>
-            <TableCell>Category</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {transactions.map((row, idx) => (
-            <TableRow key={idx}>
-              <TableCell>
-                <AccountView account={row.account} />
-              </TableCell>
-              <TableCell>
-                <DateView date={row.date} />
-              </TableCell>
-              <TableCell>{row.desc}</TableCell>
-              <TableCell>{row.merchant}</TableCell>
-              <TableCell align="right">
-                <AmountView amount={row.amount} />
-              </TableCell>
-              <TableCell>
-                <CategoryView category={row.category} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
-        See more records
-      </Link>
+      <div style={{ display: "flex", height: "100%" }}>
+        <div style={{ flexGrow: 1 }}>
+          <DataGrid
+            rows={rows}
+            columns={TRANSACTIONS_GRID_COLUMNS}
+            pageSize={100}
+            // rowsPerPageOptions={[5, 100, 500]}
+            autoHeight
+            density="compact"
+            disableSelectionOnClick
+            disableColumnMenu // we always want all our columns
+            components={{ Toolbar: QuickSearchToolbar }}
+            componentsProps={{
+              toolbar: {
+                value: searchText,
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                  requestSearch(event.target.value),
+                clearSearch: () => requestSearch(""),
+              },
+            }}
+          />
+        </div>
+      </div>
     </React.Fragment>
   );
 };
