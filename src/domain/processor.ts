@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { Logger } from "../util/log";
 import { UNCATEGORISED } from "./category";
 import { Rules } from "./rules";
@@ -12,6 +13,7 @@ export class TransactionsProcessor {
       const category = rule ? rule.category : UNCATEGORISED;
       const merchant = rule?.merchant || null;
       return {
+        id: uuidv4(),
         account: raw.account,
         date: raw.date,
         desc: raw.desc,

@@ -35,6 +35,7 @@ export interface RawRecord {
 
 // extends RawRecord mostly so we can use same comparators/filters
 export interface Transaction extends RawRecord {
+  readonly id: string; // Arbitrary ID to identify the tx in a list -- really just doing this for mui's datagrid
   readonly account: Bank.Account;
   readonly date: moment.Moment;
   readonly desc: string;
