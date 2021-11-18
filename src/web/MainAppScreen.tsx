@@ -86,7 +86,7 @@ export const MainAppScreen: React.FC<
         </Grid>
         <Grid item xs={12}>
           <Paper sx={{ p: 2, pt: 0, display: "flex", flexDirection: "column" }}>
-            {/*TODO: tabs to switch different views (raw, per file, ... or even aggregations? */}
+            {/*TODO: Other tabs to show aggregations ? */}
             {/* Some of these tabs could possibly be predefined filters in TransactionsTable/Toolbar instead */}
             <TabbedPanels
               initialTabIdx={0}
@@ -109,7 +109,6 @@ export const MainAppScreen: React.FC<
                     accounts={props.accounts}
                   />
                 </TabPanel>,
-                <TabPanel label="Etc ...">Item Three</TabPanel>,
               ]}
             />
           </Paper>
