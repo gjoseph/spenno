@@ -9,8 +9,9 @@ export const TabPanel: React.FC<TabPanelProps> = ({ children, label }) => null;
 
 export const TabbedPanels: React.FC<{
   children: ReactElement<TabPanelProps>[];
+  initialTabIdx?: number;
 }> = (props) => {
-  const [tab, setTab] = React.useState(0);
+  const [tab, setTab] = React.useState<number>(props.initialTabIdx || 0);
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
