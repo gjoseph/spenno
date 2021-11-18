@@ -34,7 +34,7 @@ import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
-import { SimpleProgressIndicator } from "./util-comps/Progress";
+import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 import { useFetch } from "./util/hook-fetch";
 
 export default function App() {
@@ -191,7 +191,9 @@ const AppContent = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <TopBar />
+      <TopBar>
+        <ProgressIndicator inProgress={calculating} />
+      </TopBar>
       <Box
         component="main"
         sx={{
@@ -203,7 +205,6 @@ const AppContent = () => {
       >
         {/*mt, aka margin-top brings our container below TopBar -- used to have value 4 _and_ an empty Toolbar instead, wtf!?*/}
         <Container maxWidth="lg" sx={{ mt: 11, mb: 4 }}>
-          <SimpleProgressIndicator inProgress={calculating} />
           <p>
             {accountsLoaded || "loading"}
             {accounts.accounts.length} accounts [button to reload]{" "}

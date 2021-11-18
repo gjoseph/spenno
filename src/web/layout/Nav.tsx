@@ -6,7 +6,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 
-export const TopBar: React.FC<{}> = () => {
+export const TopBar: React.FC<{}> = (props) => {
   return (
     <React.Fragment>
       <AppBar position="absolute">
@@ -34,6 +34,7 @@ export const TopBar: React.FC<{}> = () => {
             </Button>
           </ButtonGroup>
         </Toolbar>
+        {props.children}
       </AppBar>
     </React.Fragment>
   );

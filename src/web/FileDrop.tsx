@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { SimpleProgressIndicator } from "./util-comps/Progress";
+import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 
 export type AddFile = (filename: string, contents: string) => void;
 const onDropDelegateToAddFile =
@@ -89,7 +89,7 @@ export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
     <div {...getRootProps({ style })}>
       <input {...getInputProps()} />
       {props.children}
-      <SimpleProgressIndicator inProgress={inProgress} />
+      <ProgressIndicator inProgress={inProgress} />
       {inProgress ? <p>Uploading [filename here]</p> : null}
     </div>
   );
