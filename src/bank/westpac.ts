@@ -1,4 +1,4 @@
-import csvParse from "csv-parse/lib/sync";
+import * as csv from "csv-parse/lib/sync";
 import moment from "moment";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
@@ -21,7 +21,7 @@ export namespace Westpac {
      * Bank Account,Date,Narrative,Debit Amount,Credit Amount,Balance,Categories,Serial
      */
     loadRawRecords(file: TransactionsFile): RawRecord[] {
-      const records: any[] = csvParse(file.fileContents, { columns: true });
+      const records: any[] = csv.parse(file.fileContents, { columns: true });
       const westpac: RawRecord[] = records.map((a) => {
         const desc = this.simplifyNarrative(a.Narrative);
         if (a.Serial) {
