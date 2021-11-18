@@ -1,3 +1,4 @@
+import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
@@ -26,6 +27,9 @@ export const TopBar: React.FC<{}> = (props) => {
           </Typography>
           <ButtonGroup color="inherit">
             {/*IconButton generates dom/react error logs, looks a bit different*/}
+            <Button>
+              <InfoIcon />
+            </Button>
             <Button>
               <SettingsIcon />
             </Button>
