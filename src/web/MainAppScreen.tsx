@@ -69,28 +69,24 @@ export const MainAppScreen: React.FC<
         </Grid>
 
         <Grid item xs={12}>
-          <Paper
-            sx={{ p: 2, display: "flex", flexDirection: "column", height: 500 }}
-          >
-            <Grid container spacing={0}>
-              {charts.map((chart, idx) => (
-                <ChartWrapper
-                  key={idx}
-                  type="bar"
-                  chart={chart}
-                  containerHeight={500 - 70}
-                />
-              ))}
-            </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
           <Paper sx={{ p: 2, pt: 0, display: "flex", flexDirection: "column" }}>
             {/*TODO: Other tabs to show aggregations ? */}
             {/* Some of these tabs could possibly be predefined filters in TransactionsTable/Toolbar instead */}
             <TabbedPanels
               initialTabIdx={0}
               panels={[
+                <TabPanel label="Graphs">
+                  <Grid container spacing={0}>
+                    {charts.map((chart, idx) => (
+                      <ChartWrapper
+                        key={idx}
+                        type="bar"
+                        chart={chart}
+                        containerHeight={500 - 70}
+                      />
+                    ))}
+                  </Grid>
+                </TabPanel>,
                 <TabPanel label="Transactions">
                   <TransactionsTable
                     accounts={props.accounts}
