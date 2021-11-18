@@ -1,8 +1,3 @@
-import FilterListIcon from "@mui/icons-material/FilterList";
-import InfoIcon from "@mui/icons-material/Info";
-import SettingsIcon from "@mui/icons-material/Settings";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-
 import {
   AppBar,
   ButtonGroup,
@@ -10,11 +5,17 @@ import {
 } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { MouseEventHandler } from "react";
 import * as React from "react";
 
-const IconButton: React.FC<{ icon: React.JSXElementConstructor<any> }> = (
-  props
-) => (
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+
+const IconButton: React.FC<{
+  icon: React.JSXElementConstructor<any>;
+  onClick?: MouseEventHandler | undefined;
+}> = (props) => (
   <MuiIconButton
     size="large"
     edge="start"
@@ -22,11 +23,23 @@ const IconButton: React.FC<{ icon: React.JSXElementConstructor<any> }> = (
     aria-label="menu"
     sx={{ ml: 0 }}
   >
-    <props.icon />
+    <props.icon onClick={props.onClick} />
   </MuiIconButton>
 );
 
-export const TopBar: React.FC<{}> = (props) => {
+type IconAndDialogContent = {
+  icon: React.JSXElementConstructor<any>;
+  title: React.ReactNode;
+  content: React.ReactNode;
+};
+
+export const TopBar: React.FC<{
+  iconAndDialogs: IconAndDialogContent[];
+}> = (props) => {
+  const [open, setOpen] = React.useState<number>(-1);
+  const handleOpen = (idx: number) => () => setOpen(idx);
+  const handleClose = () => setOpen(-1);
+
   return (
     <AppBar position="absolute">
       <Toolbar>
@@ -40,12 +53,20 @@ export const TopBar: React.FC<{}> = (props) => {
           Spenno - check da mullah
         </Typography>
         <ButtonGroup color="inherit">
-          <IconButton icon={FilterListIcon} />
-          <IconButton icon={UploadFileIcon} />
-          <IconButton icon={SettingsIcon} />
-          <IconButton icon={InfoIcon} />
+          {props.iconAndDialogs.map((i, idx) => (
+            <IconButton icon={i.icon} onClick={handleOpen(idx)} key={idx} />
+          ))}
         </ButtonGroup>
+
+        {/* TODO we could make these draggable and keep open https://mui.com/components/dialogs/#draggable-dialog*/}
+        {props.iconAndDialogs.map((i, idx) => (
+          <Dialog open={open === idx} onClose={handleClose}>
+            <DialogTitle>{i.title}</DialogTitle>
+            <DialogContent>{i.content}</DialogContent>
+          </Dialog>
+        ))}
       </Toolbar>
+
       {props.children}
     </AppBar>
   );

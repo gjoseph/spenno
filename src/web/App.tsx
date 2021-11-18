@@ -1,7 +1,13 @@
+import FilterListIcon from "@mui/icons-material/FilterList";
+import InfoIcon from "@mui/icons-material/Info";
+import SettingsIcon from "@mui/icons-material/Settings";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+
 import { Theme, ThemeProvider } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
+import DialogContentText from "@mui/material/DialogContentText";
 import { createTheme } from "@mui/material/styles";
 import * as React from "react";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
@@ -189,10 +195,47 @@ const AppContent = () => {
     return numbers;
   }, [filesWithRawRecords]);
 
+  const infoDialogContent = (
+    <div>
+      <p>
+        {accountsLoaded || "loading"}
+        {accounts.accounts.length} accounts [button to reload]
+        {accountsError}
+      </p>
+      <p>
+        {rulesLoaded || "loading"}
+        {rules.length} rules [button to reload]
+        {rulesError}
+      </p>
+      <p>from {filterConfig.dateRange[0]?.toDate().toString()}</p>
+      <p>to {filterConfig.dateRange[1]?.toDate().toString()}</p>
+    </div>
+  );
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <TopBar>
+      <TopBar
+        iconAndDialogs={[
+          { icon: FilterListIcon, title: "", content: "" },
+          { icon: UploadFileIcon, title: "Files", content: "" },
+          {
+            icon: SettingsIcon,
+            title: "Settings",
+            content: (
+              <div>
+                <img src="logo192.png" />
+                <DialogContentText>lorem ipsum</DialogContentText>
+              </div>
+            ),
+          },
+          {
+            icon: InfoIcon,
+            title: "Debugging Info",
+            content: infoDialogContent,
+          },
+        ]}
+      >
         <ProgressIndicator inProgress={calculating} />
       </TopBar>
       <Box
@@ -206,17 +249,6 @@ const AppContent = () => {
       >
         {/*mt, aka margin-top brings our container below TopBar -- used to have value 4 _and_ an empty Toolbar instead, wtf!?*/}
         <Container maxWidth="lg" sx={{ mt: 11, mb: 4 }}>
-          <p>
-            {accountsLoaded || "loading"}
-            {accounts.accounts.length} accounts [button to reload]{" "}
-            {accountsError}
-          </p>
-          <p>
-            {rulesLoaded || "loading"}
-            {rules.length} rules [button to reload] {rulesError}
-          </p>
-          <p>from {filterConfig.dateRange[0]?.toDate().toString()}</p>
-          <p>to {filterConfig.dateRange[1]?.toDate().toString()}</p>
           <MainAppScreen
             {...{
               addFile,
