@@ -31,38 +31,50 @@ export const QuickSearchToolbar: React.FC<QuickSearchToolbarProps> = (
       }}
     >
       <GridToolbarFilterButton sx={{ my: 1, mr: 0.5, ml: 1.5 }} />
-      <TextField
-        variant="standard"
-        size="small" // this doesn't make a whole lot of difference...
+      <SearchTextField
         value={props.value}
         onChange={props.onChange}
-        placeholder="Search…"
-        sx={{
-          // less than sm should have width 100%
-          width: { xs: "100%", sm: "auto" },
-          // use all space left in flex row
-          flexGrow: 1,
-          my: 1,
-          mr: 0.5,
-          ml: 1.5,
-          // '& .MuiSvgIcon-root': { marginRight: theme.spacing(0.5), },
-          // '& .MuiInput-underline:before': { borderBottom: `1px solid ${theme.palette.divider}`, },
-        }}
-        InputProps={{
-          startAdornment: <SearchIcon fontSize="small" />,
-          endAdornment: (
-            <IconButton
-              title="Clear"
-              aria-label="Clear"
-              size="small"
-              style={{ visibility: props.value ? "visible" : "hidden" }}
-              onClick={props.clearSearch}
-            >
-              <ClearIcon fontSize="small" />
-            </IconButton>
-          ),
-        }}
+        onClick={props.clearSearch}
       />
     </Box>
   );
 };
+
+const SearchTextField: React.FC<{
+  value: string;
+  onChange: () => void;
+  onClick: () => void;
+}> = (props) => (
+  <TextField
+    variant="standard"
+    size="small" // this doesn't make a whole lot of difference...
+    value={props.value}
+    onChange={props.onChange}
+    placeholder="Search…"
+    sx={{
+      // less than sm should have width 100%
+      width: { xs: "100%", sm: "auto" },
+      // use all space left in flex row
+      flexGrow: 1,
+      my: 1,
+      mr: 0.5,
+      ml: 1.5,
+      // '& .MuiSvgIcon-root': { marginRight: theme.spacing(0.5), },
+      // '& .MuiInput-underline:before': { borderBottom: `1px solid ${theme.palette.divider}`, },
+    }}
+    InputProps={{
+      startAdornment: <SearchIcon fontSize="small" />,
+      endAdornment: (
+        <IconButton
+          title="Clear"
+          aria-label="Clear"
+          size="small"
+          style={{ visibility: props.value ? "visible" : "hidden" }}
+          onClick={props.onClick}
+        >
+          <ClearIcon fontSize="small" />
+        </IconButton>
+      ),
+    }}
+  />
+);
