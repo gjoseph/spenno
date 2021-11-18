@@ -6,10 +6,6 @@ import { QuickSearchToolbar } from "./table/QuickSearchToolbar";
 
 import { transactionsGridColumns } from "./table/TransactionsGridColumns";
 
-const escapeRegExp = (value: string): string => {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-};
-
 export const TransactionTable: React.FC<{
   accounts: Bank.Accounts;
   transactions: Transaction[];
@@ -22,15 +18,21 @@ export const TransactionTable: React.FC<{
   );
 };
 
-const genericRowFilter = (searchRegex: RegExp) => (row: any) => {
+const escapeRegExp = (value: string): string => {
+  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
+const genericRowFilter = (searchValue: string) => (row: any) => {
+  const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
   return Object.keys(row).some((field: any) => {
     return searchRegex.test(row[field]?.toString());
   });
 };
 
 type DataGridWrapperProps<T> = {
-  rows: T[];
   columns: GridColDef[];
+  rows: T[];
+  rowFilter?: (row: T) => boolean;
 };
 
 export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
@@ -42,8 +44,8 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
   const [searchText, setSearchText] = React.useState("");
   const requestSearch = (searchValue: string) => {
     setSearchText(searchValue);
-    const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
-    const filteredRows = props.rows.filter(genericRowFilter(searchRegex));
+    const rowFilter = props.rowFilter || genericRowFilter(searchValue);
+    const filteredRows = props.rows.filter(rowFilter);
     setRows(filteredRows);
   };
 
