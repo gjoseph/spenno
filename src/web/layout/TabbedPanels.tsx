@@ -8,7 +8,7 @@ export const TabPanel: React.FC<TabPanelProps> = ({ children, label }) => null;
 // is this the right way to do a render-less component? we just want props (and children)
 
 export const TabbedPanels: React.FC<{
-  children: ReactElement<TabPanelProps>[];
+  panels: ReactElement<TabPanelProps>[];
   initialTabIdx?: number;
 }> = (props) => {
   const [tab, setTab] = React.useState<number>(props.initialTabIdx || 0);
@@ -20,12 +20,12 @@ export const TabbedPanels: React.FC<{
     <React.Fragment>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tab} onChange={handleTabChange}>
-          {props.children.map((tp, idx) => (
+          {props.panels.map((tp, idx) => (
             <Tab label={tp.props.label} value={idx} key={"tab-" + idx} />
           ))}
         </Tabs>
       </Box>
-      {props.children.map((tp, idx) => (
+      {props.panels.map((tp, idx) => (
         <TabPanelContent currentTab={tab} index={idx} key={"tab-panel-" + idx}>
           {tp.props.children}
         </TabPanelContent>

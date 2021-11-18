@@ -46,7 +46,7 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
             rows={rows}
             getRowId={(row) => row.id} // Just for clarity, since this is the default behaviour if getRowId is not specified
             pageSize={100}
-            rowsPerPageOptions={[-1]} // disable rowsPerPage selector
+            rowsPerPageOptions={[100]} // single value disables rowsPerPage selector
             autoHeight
             density="compact"
             disableSelectionOnClick

@@ -2,18 +2,19 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
-import { FileDescriptor } from "../domain/file";
+import { FileDescriptor, FileWithRawRecords } from "../domain/file";
 import { isUncategorised, Transaction } from "../domain/transaction";
 import { getChartsFor } from "../domain/charting";
 import { ChartWrapper } from "./ChartWrapper";
 import { AddFile, FileDrop } from "./FileDrop";
 import { FileList, FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
+import { RawRecordsTable } from "./table/RawRecordsTable";
+import { TransactionsTable } from "./table/TransactionsTable";
 import {
   TransactionFilters,
   TransactionFiltersProps,
 } from "./TransactionFilters";
-import { TransactionTable } from "./TransactionTable";
 
 export const MainAppScreen: React.FC<
   {
@@ -21,6 +22,7 @@ export const MainAppScreen: React.FC<
     addFile: AddFile;
     toggleFile: FileToggleCallback;
     transactions: Transaction[];
+    filesWithRawRecords: FileWithRawRecords[];
     accounts: Bank.Accounts;
   } & TransactionFiltersProps
 > = (props) => {
@@ -85,23 +87,36 @@ export const MainAppScreen: React.FC<
         <Grid item xs={12}>
           <Paper sx={{ p: 2, pt: 0, display: "flex", flexDirection: "column" }}>
             {/*TODO: tabs to switch different views (raw, per file, ... or even aggregations? */}
-            {/* Some of these tabs could possibly be predefined filters in TransactionTable/Toolbar instead */}
-            <TabbedPanels initialTabIdx={0}>
-              <TabPanel label="Transactions">
-                <TransactionTable
-                  accounts={props.accounts}
-                  transactions={props.transactions}
-                />
-              </TabPanel>
-              <TabPanel label="Uncategorised transactions">
-                <TransactionTable
-                  accounts={props.accounts}
-                  transactions={props.transactions.filter(isUncategorised())}
-                />
-              </TabPanel>
-              <TabPanel label="Raw records">Item Two</TabPanel>
-              <TabPanel label="Etc ...">Item Three</TabPanel>
-            </TabbedPanels>
+            {/* Some of these tabs could possibly be predefined filters in TransactionsTable/Toolbar instead */}
+            <TabbedPanels
+              initialTabIdx={0}
+              panels={[
+                <TabPanel label="Transactions">
+                  <TransactionsTable
+                    accounts={props.accounts}
+                    transactions={props.transactions}
+                  />
+                </TabPanel>,
+                <TabPanel label="Uncategorised transactions">
+                  <TransactionsTable
+                    accounts={props.accounts}
+                    transactions={props.transactions.filter(isUncategorised())}
+                  />
+                </TabPanel>,
+                ...props.filesWithRawRecords.map((f, idx) => (
+                  <TabPanel
+                    label={`Raw records (${f.filePath})`}
+                    key={`raw-tab-${idx}`}
+                  >
+                    <RawRecordsTable
+                      fileWithRawRecords={f}
+                      accounts={props.accounts}
+                    />
+                  </TabPanel>
+                )),
+                <TabPanel label="Etc ...">Item Three</TabPanel>,
+              ]}
+            />
           </Paper>
         </Grid>
       </Grid>

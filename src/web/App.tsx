@@ -101,21 +101,21 @@ const AppContent = () => {
   }));
 
   // The parsed files with raw records
-  const [filesWithRecords, setFilesWithRecords] = useState<
+  const [filesWithRawRecords, setFilesWithRawRecords] = useState<
     FileWithRawRecords[]
   >([]);
 
-  // The filtered transactions to render
+  // The processed (categorised) and filtered transactions
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const fileDescs = useMemo<FileDescriptor[]>(() => {
-    return filesWithRecords.map((f) => {
+    return filesWithRawRecords.map((f) => {
       return {
         ...f,
         recordCount: f.rawRecords.length,
       };
     });
-  }, [filesWithRecords]);
+  }, [filesWithRawRecords]);
 
   const addFile = (filename: string, contents: string) => {
     setFiles((prevValue) => {
@@ -141,7 +141,7 @@ const AppContent = () => {
     calcWorker
       .reloadFiles(files, accounts.accounts)
       .then((res: FileLoadWorkResult) => {
-        setFilesWithRecords((old) => {
+        setFilesWithRawRecords((old) => {
           const newFiles = fromTransferrableFilesWithRawRecords(res.files);
           consoleLogger.debug(
             "Loaded",
@@ -160,7 +160,7 @@ const AppContent = () => {
     const txDateRange = transferrableDateRange(filterConfig.dateRange);
     calcWorker
       .reloadTransactions(
-        toTransferrableFilesWithRawRecords(filesWithRecords),
+        toTransferrableFilesWithRawRecords(filesWithRawRecords),
         rules,
         accounts.accounts,
         txDateRange,
@@ -173,20 +173,21 @@ const AppContent = () => {
             fromTransferrable(TransferrableMappings.Transaction)
           );
           consoleLogger.debug("Loaded", newTxs.length, "transactions");
+          consoleLogger.debug("filterConfig", filterConfig);
           return newTxs;
         });
         setCalculating((old) => false);
       });
-  }, [filesWithRecords, rules, accounts, filterConfig]);
+  }, [filesWithRawRecords, rules, accounts, filterConfig]);
 
   const [txAmountMin, txAmountMax] = useMemo(() => {
-    const amounts = filesWithRecords
+    const amounts = filesWithRawRecords
       .flatMap((f) => f.rawRecords)
       .map((t) => t.amount.toNumber());
     const numbers = [Math.min(...amounts), Math.max(...amounts)];
     console.log("min,max:", numbers);
     return numbers;
-  }, [filesWithRecords]);
+  }, [filesWithRawRecords]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -221,6 +222,7 @@ const AppContent = () => {
               addFile,
               toggleFile,
               transactions,
+              filesWithRawRecords,
               accounts,
               allCategories,
 

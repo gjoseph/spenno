@@ -1,40 +1,14 @@
-import {
-  GridCellParams,
-  GridColDef,
-  GridValueFormatterParams,
-} from "@mui/x-data-grid";
-import Big from "big.js";
-import { Moment } from "moment";
-import "moment/locale/en-au";
+import { GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { Bank } from "../../domain/accounts";
 import { Category, UNCATEGORISED } from "../../domain/category";
+import { CellTypes } from "./util";
 
 export const transactionsGridColumns = (
   accounts: Bank.Accounts
 ): GridColDef[] => {
   return [
-    {
-      field: "account",
-      headerName: "Account",
-      flex: 1,
-      type: "singleSelect",
-      valueGetter: (p) => p.value.name,
-      valueOptions: accounts.accounts.map((a) => a.name),
-    },
-    {
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-      // It seems sorting just works -- either data grid knows about moment, or moment instances are Comparable
-      valueFormatter: (p) => {
-        // assuming p.value is a Moment
-        const value = p.value as Moment | undefined;
-        // obviously not the right place to change locale, but fuck those default us date formats
-        return value?.format("L");
-        // It seems like importing the locale was enough (it's possibly picked up by browser)
-        // return value?.locale("en-AU").format("L");
-      },
-    },
+    CellTypes.account(accounts),
+    CellTypes.date,
     {
       field: "desc",
       headerName: "Description",
@@ -46,25 +20,7 @@ export const transactionsGridColumns = (
       type: "number",
       flex: 2,
     },
-    {
-      field: "amount",
-      headerName: "Amount",
-      type: "number",
-      flex: 1.5,
-      // renderCell: (p: GridRenderCellParams<Big>) => (
-      //   <AmountView amount={p.value} />
-      // ),
-      cellClassName: (p: GridCellParams<Big>) =>
-        p.value.lt(0) ? "amount-debit" : "amount-credit",
-      // valueFormatter isn't generic, so no guarantee p.value is actually a Big!?
-      valueFormatter: (p: GridValueFormatterParams) => {
-        if (p.value) {
-          const b = p.value as Big;
-          return "$" + b.abs().toString() + (b.gte(0) ? "+" : "-");
-        }
-        return "";
-      },
-    },
+    CellTypes.amount,
     {
       field: "category",
       headerName: "Category",
