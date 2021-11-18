@@ -3,19 +3,33 @@ import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
-import { AppBar, Button, ButtonGroup } from "@mui/material";
+import {
+  AppBar,
+  ButtonGroup,
+  IconButton as MuiIconButton,
+} from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 
+const IconButton: React.FC<{ icon: React.JSXElementConstructor<any> }> = (
+  props
+) => (
+  <MuiIconButton
+    size="large"
+    edge="start"
+    color="inherit"
+    aria-label="menu"
+    sx={{ ml: 0 }}
+  >
+    <props.icon />
+  </MuiIconButton>
+);
+
 export const TopBar: React.FC<{}> = (props) => {
   return (
     <AppBar position="absolute">
-      <Toolbar
-        sx={{
-          pr: "24px", // keep right padding when drawer closed
-        }}
-      >
+      <Toolbar>
         <Typography
           component="h1"
           variant="h6"
@@ -26,19 +40,10 @@ export const TopBar: React.FC<{}> = (props) => {
           Spenno - check da mullah
         </Typography>
         <ButtonGroup color="inherit">
-          {/*IconButton generates dom/react error logs, looks a bit different*/}
-          <Button>
-            <FilterListIcon />
-          </Button>
-          <Button>
-            <UploadFileIcon />
-          </Button>
-          <Button>
-            <SettingsIcon />
-          </Button>
-          <Button>
-            <InfoIcon />
-          </Button>
+          <IconButton icon={FilterListIcon} />
+          <IconButton icon={UploadFileIcon} />
+          <IconButton icon={SettingsIcon} />
+          <IconButton icon={InfoIcon} />
         </ButtonGroup>
       </Toolbar>
       {props.children}
