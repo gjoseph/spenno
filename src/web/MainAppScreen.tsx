@@ -103,17 +103,12 @@ export const MainAppScreen: React.FC<
                     transactions={props.transactions.filter(isUncategorised())}
                   />
                 </TabPanel>,
-                ...props.filesWithRawRecords.map((f, idx) => (
-                  <TabPanel
-                    label={`Raw records (${f.filePath})`}
-                    key={`raw-tab-${idx}`}
-                  >
-                    <RawRecordsTable
-                      fileWithRawRecords={f}
-                      accounts={props.accounts}
-                    />
-                  </TabPanel>
-                )),
+                <TabPanel label="Raw records">
+                  <RawRecordsTable
+                    filesWithRawRecords={props.filesWithRawRecords}
+                    accounts={props.accounts}
+                  />
+                </TabPanel>,
                 <TabPanel label="Etc ...">Item Three</TabPanel>,
               ]}
             />

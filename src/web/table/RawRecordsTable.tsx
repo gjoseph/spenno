@@ -6,12 +6,13 @@ import { rawRecordsGridColumns } from "./RawRecordsGridColumns";
 
 export const RawRecordsTable: React.FC<{
   accounts: Bank.Accounts;
-  fileWithRawRecords: FileWithRawRecords;
+  filesWithRawRecords: FileWithRawRecords[];
 }> = (props) => {
-  const rows = props.fileWithRawRecords.rawRecords.map((rr, recordIdx) => ({
-    id: recordIdx,
-    ...rr,
-  }));
+  const rows = props.filesWithRawRecords
+    // only display enabled files
+    .filter((f) => f.enabled)
+    .flatMap((f) => f.rawRecords);
+
   return (
     <DataGridWrapper
       columns={rawRecordsGridColumns(props.accounts)}

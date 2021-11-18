@@ -1,5 +1,6 @@
 import * as csv from "csv-parse/lib/sync";
 import moment from "moment";
+import { v4 as uuidv4 } from "uuid";
 import { Bank } from "../domain/accounts";
 import { TransactionsFile } from "../domain/file";
 import { RawRecord } from "../domain/transaction";
@@ -29,6 +30,7 @@ export namespace Westpac {
           this.log.warn("WE FOUND A SERIAL: " + a.Serial);
         }
         return {
+          id: uuidv4(),
           account: this.accounts.getAccount(a["Bank Account"]),
           date: moment(a.Date, "D/M/YYYY"),
           desc: desc,
