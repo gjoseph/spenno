@@ -89,7 +89,7 @@ export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
     <div {...getRootProps({ style })}>
       <input {...getInputProps()} />
       {props.children}
-      <ProgressIndicator inProgress={inProgress} />
+      <ProgressIndicator inProgress={inProgress} dramatic />
       {inProgress ? <p>Uploading [filename here]</p> : null}
     </div>
   );
