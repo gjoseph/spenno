@@ -1,4 +1,3 @@
-import { Grid } from "@mui/material";
 import * as React from "react";
 import { ChartDesc } from "../domain/charting";
 import { BarChart } from "./chart/BarChart";
@@ -35,7 +34,7 @@ export const ChartWrapper: React.FC<{
   };
 
   return (
-    <Grid item xs>
+    <React.Fragment>
       <Title>{props.chart.title}</Title>
       {/*there seems to be a weird bug between <Grid> and <ResponsiveContainer> where when the latter's height*/}
       {/*is set to 100%, it creates an infinitely increasing height. So instead of fiddling around more, I'm just*/}
@@ -43,6 +42,6 @@ export const ChartWrapper: React.FC<{
       {/*Maybe related to https://stackoverflow.com/questions/50891591/recharts-responsive-container-does-not-resize-correctly-in-flexbox*/}
       {/*and https://github.com/recharts/recharts/issues/172*/}
       {chart()}
-    </Grid>
+    </React.Fragment>
   );
 };

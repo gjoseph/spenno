@@ -34,14 +34,12 @@ export const MainAppScreen: React.FC<
 
   return (
     <React.Fragment>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8} lg={9}>
+      <Grid container spacing={3} alignItems="stretch">
+        <Grid item xs={12} md={9}>
           <Paper
             sx={{
               p: 2,
-              display: "flex",
-              flexDirection: "column",
-              // TODO fix this up -- we may never have needed a height, but this is starting to look like crap height: 240,
+              height: "100%", // combined with alignItems="stretch", i _think_ we ensure these 2 grid items have the same height
             }}
           >
             <TransactionFilters
@@ -53,13 +51,11 @@ export const MainAppScreen: React.FC<
             />
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4} lg={3}>
+        <Grid item xs={12} md={3}>
           <Paper
             sx={{
               p: 2,
-              display: "flex",
-              flexDirection: "column",
-              height: 240,
+              height: "100%",
             }}
           >
             <FileDrop addFile={props.addFile}>
@@ -67,9 +63,8 @@ export const MainAppScreen: React.FC<
             </FileDrop>
           </Paper>
         </Grid>
-
         <Grid item xs={12}>
-          <Paper sx={{ p: 2, pt: 0, display: "flex", flexDirection: "column" }}>
+          <Paper sx={{ p: 2, pt: 0 }}>
             {/*TODO: Other tabs to show aggregations ? */}
             {/* Some of these tabs could possibly be predefined filters in TransactionsTable/Toolbar instead */}
             <TabbedPanels
@@ -78,12 +73,13 @@ export const MainAppScreen: React.FC<
                 <TabPanel label="Graphs">
                   <Grid container spacing={0}>
                     {charts.map((chart, idx) => (
-                      <ChartWrapper
-                        key={idx}
-                        type="bar"
-                        chart={chart}
-                        containerHeight={500 - 70}
-                      />
+                      <Grid item xs={12} md={6} xl={4} key={idx}>
+                        <ChartWrapper
+                          type="bar"
+                          chart={chart}
+                          containerHeight={500 - 70}
+                        />
+                      </Grid>
                     ))}
                   </Grid>
                 </TabPanel>,
