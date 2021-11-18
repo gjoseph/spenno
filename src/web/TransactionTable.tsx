@@ -4,7 +4,7 @@ import { Bank } from "../domain/accounts";
 import { Transaction } from "../domain/transaction";
 import { QuickSearchToolbar } from "./table/QuickSearchToolbar";
 
-import { TRANSACTIONS_GRID_COLUMNS } from "./table/TransactionsGridColumns";
+import { transactionsGridColumns } from "./table/TransactionsGridColumns";
 
 const escapeRegExp = (value: string): string => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -39,7 +39,7 @@ export const TransactionTable: React.FC<{
       <div style={{ display: "flex", height: "100%" }}>
         <div style={{ flexGrow: 1 }}>
           <DataGrid
-            columns={TRANSACTIONS_GRID_COLUMNS}
+            columns={transactionsGridColumns(accounts)}
             rows={rows}
             getRowId={(row) => row.id} // Just for clarity, since this is the default behaviour if getRowId is not specified
             pageSize={100}
