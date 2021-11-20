@@ -56,7 +56,7 @@
     "pretty-quick": "3.1.2",
     "react-scripts": "4.0.3",
     "ts-jest": "27.0.7",
-    "typescript": "4.4.4",
+    "typescript": "4.5.2",
     "workerize-loader": "1.3.0"
   },
   "//": "Also see .prettierignore -- https://github.com/prettier/prettier/issues/4708",
