@@ -71,7 +71,9 @@ export const FileList: React.FC<{
             />
           ))}
         </FormGroup>
-        <FormHelperText>Drop more files here</FormHelperText>
+        <FormHelperText>
+          Drop {props.files.length > 0 ? "more" : ""} files here
+        </FormHelperText>
       </FormControl>
     </Box>
   );
