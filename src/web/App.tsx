@@ -36,10 +36,13 @@ import {
   transferrableDateRange,
   TransferrableMappings,
 } from "../worker/transfer";
+import { FileDrop } from "./FileDrop";
+import { FileList } from "./FileList";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
+import { TransactionFilters } from "./TransactionFilters";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 import { useFetch } from "./util/hook-fetch";
 
@@ -195,7 +198,31 @@ const AppContent = () => {
     return numbers;
   }, [filesWithRawRecords]);
 
-  const infoDialogContent = (
+  const filtersDialog = (
+    <TransactionFilters
+      filterConfig={filterConfig}
+      setFilterConfig={setFilterConfig}
+      allCategories={allCategories}
+      min={txAmountMin}
+      max={txAmountMax}
+    />
+  );
+
+  const fileDialog = (
+    <FileDrop addFile={addFile}>
+      <FileList files={fileDescs} toggleFile={toggleFile} />
+    </FileDrop>
+    // TODO close on drop?
+  );
+
+  const settingsDialog = (
+    <div>
+      <img src="logo192.png" />
+      <DialogContentText>lorem ipsum</DialogContentText>
+    </div>
+  );
+
+  const infoDialog = (
     <div>
       <p>
         {accountsLoaded || "loading"}
@@ -217,23 +244,10 @@ const AppContent = () => {
       <CssBaseline />
       <TopBar
         iconAndDialogs={[
-          { icon: FilterListIcon, title: "", content: "" },
-          { icon: UploadFileIcon, title: "Files", content: "" },
-          {
-            icon: SettingsIcon,
-            title: "Settings",
-            content: (
-              <div>
-                <img src="logo192.png" />
-                <DialogContentText>lorem ipsum</DialogContentText>
-              </div>
-            ),
-          },
-          {
-            icon: InfoIcon,
-            title: "Debugging Info",
-            content: infoDialogContent,
-          },
+          { icon: FilterListIcon, title: "Filters", content: filtersDialog },
+          { icon: UploadFileIcon, title: "Files", content: fileDialog },
+          { icon: SettingsIcon, title: "Settings", content: settingsDialog },
+          { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
         ]}
       >
         <ProgressIndicator inProgress={calculating} />

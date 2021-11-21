@@ -6,20 +6,15 @@ import { FileDescriptor, FileWithRawRecords } from "../domain/file";
 import { isUncategorised, Transaction } from "../domain/transaction";
 import { getChartsFor } from "../domain/charting";
 import { ChartWrapper } from "./ChartWrapper";
-import { AddFile, FileDrop } from "./FileDrop";
-import { FileList, FileToggleCallback } from "./FileList";
+import { FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
 import { RawRecordsTable } from "./table/RawRecordsTable";
 import { TransactionsTable } from "./table/TransactionsTable";
-import {
-  TransactionFilters,
-  TransactionFiltersProps,
-} from "./TransactionFilters";
+import { TransactionFiltersProps } from "./TransactionFilters";
 
 export const MainAppScreen: React.FC<
   {
     files: FileDescriptor[];
-    addFile: AddFile;
     toggleFile: FileToggleCallback;
     transactions: Transaction[];
     filesWithRawRecords: FileWithRawRecords[];
@@ -35,34 +30,6 @@ export const MainAppScreen: React.FC<
   return (
     <React.Fragment>
       <Grid container spacing={3} alignItems="stretch">
-        <Grid item xs={12} md={9}>
-          <Paper
-            sx={{
-              p: 2,
-              height: "100%", // combined with alignItems="stretch", i _think_ we ensure these 2 grid items have the same height
-            }}
-          >
-            <TransactionFilters
-              filterConfig={props.filterConfig}
-              setFilterConfig={props.setFilterConfig}
-              allCategories={props.allCategories}
-              min={props.min}
-              max={props.max}
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Paper
-            sx={{
-              p: 2,
-              height: "100%",
-            }}
-          >
-            <FileDrop addFile={props.addFile}>
-              <FileList files={props.files} toggleFile={props.toggleFile} />
-            </FileDrop>
-          </Paper>
-        </Grid>
         <Grid item xs={12}>
           <Paper sx={{ p: 2, pt: 0 }}>
             {/*TODO: Other tabs to show aggregations ? */}
