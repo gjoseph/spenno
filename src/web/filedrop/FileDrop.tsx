@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { ProgressIndicator } from "./util-comps/ProgressIndicator";
+import { ProgressIndicator } from "../util-comps/ProgressIndicator";
 
 export type AddFile = (filename: string, contents: string) => void;
 const onDropDelegateToAddFile =
@@ -23,6 +23,7 @@ const onDropDelegateToAddFile =
       reader.readAsText(file);
     });
   };
+
 const activeStyle = {
   borderColor: "#2196f3",
 };
@@ -34,6 +35,7 @@ const acceptStyle = {
 const rejectStyle = {
   borderColor: "#ff1744",
 };
+
 const baseStyle = {
   // flex: 1,
   // display: 'flex',
@@ -49,6 +51,7 @@ const baseStyle = {
   outline: "none",
   transition: "border .24s ease-in-out",
 };
+
 export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
   const onDrop = useMemo(
     () =>

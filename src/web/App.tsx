@@ -36,7 +36,7 @@ import {
   transferrableDateRange,
   TransferrableMappings,
 } from "../worker/transfer";
-import { FileDrop } from "./FileDrop";
+import { FileDrop } from "./filedrop/FileDrop";
 import { FileList } from "./FileList";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
