@@ -219,7 +219,7 @@ const AppContent = () => {
     <div>
       <img
         src="logo192.png"
-        alt="random image just to prove i could use any element here, not just text or <DialogContentText>"
+        alt="random <img> tag just to prove i could use any element here, not just text or <DialogContentText>"
       />
       <DialogContentText>lorem ipsum</DialogContentText>
     </div>
