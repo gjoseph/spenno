@@ -121,7 +121,7 @@ export const FileDrop: React.FC<FileDropProps> = (props) => {
     <ProgressIndicator inProgress={inProgress} type={progressType} key={-1} />,
   ];
   if (inProgress && !props.minimal) {
-    progressIndicator.push(<p>Uploading [filename here]</p>);
+    progressIndicator.push(<p key={-2}>Uploading [filename here]</p>);
   }
 
   return (
