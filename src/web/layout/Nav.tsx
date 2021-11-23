@@ -78,7 +78,7 @@ export const TopBar: React.FC<{
 
         {/* TODO we could make these draggable and keep open https://mui.com/components/dialogs/#draggable-dialog*/}
         {props.iconAndDialogs.map((i, idx) => (
-          <Dialog open={open === idx} onClose={handleClose}>
+          <Dialog open={open === idx} onClose={handleClose} key={idx}>
             <DialogTitle>{i.title}</DialogTitle>
             <DialogContent>{i.content}</DialogContent>
           </Dialog>

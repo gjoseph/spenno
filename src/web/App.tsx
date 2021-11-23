@@ -255,7 +255,7 @@ const AppContent = () => {
           { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
         ]}
       >
-        <ProgressIndicator inProgress={calculating} style="line" />
+        <ProgressIndicator inProgress={calculating} type="line" />
       </TopBar>
       <Box
         component="main"

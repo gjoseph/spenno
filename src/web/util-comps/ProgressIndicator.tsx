@@ -3,12 +3,12 @@ import * as React from "react";
 
 export const ProgressIndicator: React.FC<{
   inProgress: boolean;
-  style: "withBackdrop" | "small" | "line";
+  type: "withBackdrop" | "small" | "line";
 }> = (props) => {
   if (!props.inProgress) {
     return null;
   }
-  switch (props.style) {
+  switch (props.type) {
     case "withBackdrop":
       return (
         <Backdrop

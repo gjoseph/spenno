@@ -115,9 +115,10 @@ export const FileDrop: React.FC<FileDropProps> = (props) => {
   // in minimal mode, only render children when not in progress
   const shouldRenderChildren = !props.minimal || !inProgress;
 
-  const progressStyle = props.minimal ? "small" : "withBackdrop";
+  const progressType = props.minimal ? "small" : "withBackdrop";
   let progressIndicator = [
-    <ProgressIndicator inProgress={inProgress} style={progressStyle} />,
+    // we know full well there's only one here, but React wants a key, boohoo
+    <ProgressIndicator inProgress={inProgress} type={progressType} key={-1} />,
   ];
   if (inProgress && !props.minimal) {
     progressIndicator.push(<p>Uploading [filename here]</p>);
