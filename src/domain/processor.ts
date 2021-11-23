@@ -52,8 +52,12 @@ export class TransactionsProcessor {
       return null;
     }
 
-    throw new Error(
-      `${JSON.stringify(raw)} matches 0 or more than 1 rule: ${matches}`
+    // TODO return the error so we can expose to ui
+    // TODO or merely just return another special category?
+    // ... and/or include error in Transaction object
+    this.log.warn(
+      `${JSON.stringify(raw)} matches more than 1 rule: ${matches}`
     );
+    return null;
   }
 }
