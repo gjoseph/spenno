@@ -37,6 +37,7 @@ type IconAndDialogContent = {
 };
 
 export const TopBar: React.FC<{
+  appTitle: React.ReactNode;
   iconAndDialogs: IconAndDialogContent[];
 }> = (props) => {
   const [open, setOpen] = React.useState<number>(-1);
@@ -53,7 +54,7 @@ export const TopBar: React.FC<{
           noWrap
           sx={{ flexGrow: 1 }}
         >
-          Spenno - check da mullah
+          {props.appTitle}
         </Typography>
         <ButtonGroup color="inherit">
           {props.iconAndDialogs.map((i, idx) => {

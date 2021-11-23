@@ -2,6 +2,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import DollarIcon from "@mui/icons-material/LocalAtmOutlined";
 
 import { Theme, ThemeProvider } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -255,6 +256,15 @@ const AppContent = () => {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <TopBar
+        appTitle={
+          <>
+            Spenno{" "}
+            <DollarIcon
+              sx={{ position: "relative", bottom: -10 }}
+              fontSize="large"
+            />
+          </>
+        }
         iconAndDialogs={[
           { icon: FilterListIcon, title: "Filters", content: filtersDialog },
           {
