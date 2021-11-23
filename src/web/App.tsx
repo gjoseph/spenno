@@ -23,7 +23,7 @@ import {
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
 import { ConsoleLogger } from "../util/log";
-import { AmountFilter } from "../util/util";
+import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
 import {
   FileLoadWorkResult,
   TransactionProcessWorkResult,
@@ -118,12 +118,21 @@ const AppContent = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const fileDescs = useMemo<FileDescriptor[]>(() => {
-    return filesWithRawRecords.map((f) => {
-      return {
-        ...f,
-        recordCount: f.rawRecords.length,
-      };
-    });
+    return filesWithRawRecords
+      .map(
+        addUniquenessSuffixToThings(
+          (f: FileWithRawRecords) => f.filePath,
+          (f, suffixedName) => ({ ...f, label: suffixedName })
+        )
+      )
+      .map((f, idx) => {
+        // remove rawRecords, fileContents, and inject recordCount property
+        const { rawRecords, fileContents, ...fileDesc } = f;
+        return {
+          ...fileDesc,
+          recordCount: f.rawRecords.length,
+        };
+      });
   }, [filesWithRawRecords]);
 
   const addFile = (filename: string, contents: string) => {

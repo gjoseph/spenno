@@ -23,8 +23,12 @@ export interface FileWithRawRecords extends TransactionsFile {
 
 export interface FileDescriptor {
   readonly id: string;
+  readonly enabled: boolean;
   readonly filePath: string;
   readonly type: FileType;
-  readonly enabled: boolean;
+
+  // Typically, label will just be the filePath, with an added differentiator if multiple files have the same name/path
+  readonly label: string;
+
   readonly recordCount?: number;
 }

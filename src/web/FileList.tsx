@@ -17,7 +17,7 @@ type CheckboxEventHandler = (
 const FileLabel: React.FC<{ file: FileDescriptor }> = ({ file }) => {
   return (
     <React.Fragment>
-      {file.filePath}{" "}
+      {file.label}{" "}
       <Typography variant="caption" display="inline" gutterBottom>
         {/* TODO this isn't really relevant anymore because we don't get the file until it's parsed iirc */}
         ({file.recordCount ? `${file.recordCount} records` : "parsing ..."})
