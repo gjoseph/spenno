@@ -50,7 +50,7 @@ export namespace CellTypes {
     field: "amount",
     headerName: "Amount",
     type: "number",
-    flex: 1.5,
+    flex: 1,
     cellClassName: (p: GridCellParams<Big>) =>
       p.value.lt(0) ? "amount-debit" : "amount-credit",
     valueFormatter: CellFormatters.bigFormatter,

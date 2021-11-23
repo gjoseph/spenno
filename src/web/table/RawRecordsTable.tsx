@@ -11,7 +11,13 @@ export const RawRecordsTable: React.FC<{
   const rows = props.filesWithRawRecords
     // only display enabled files
     .filter((f) => f.enabled)
-    .flatMap((f) => f.rawRecords);
+    // flatmap raw records from each with filePath as an added column for each
+    .flatMap((f) => {
+      return f.rawRecords.map((record) => ({
+        filePath: f.filePath,
+        ...record,
+      }));
+    });
 
   return (
     <DataGridWrapper

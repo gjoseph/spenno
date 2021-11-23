@@ -6,12 +6,17 @@ export const rawRecordsGridColumns = (
   accounts: Bank.Accounts
 ): GridColDef[] => {
   return [
+    {
+      field: "filePath",
+      headerName: "File",
+      flex: 1,
+    },
     CellTypes.account(accounts),
     CellTypes.date,
     {
       field: "desc",
       headerName: "Description",
-      flex: 3,
+      flex: 4,
     },
     CellTypes.amount,
   ];

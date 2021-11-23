@@ -60,6 +60,8 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
                 clearSearch: () => requestSearch(""),
               },
             }}
+            // TODO https://mui.com/components/data-grid/components/#cell has an example that allows a popover to show the full value
+            // value of a cell (e.g for filePath)
           />
         </div>
       </div>

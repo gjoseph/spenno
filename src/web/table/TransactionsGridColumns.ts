@@ -12,7 +12,7 @@ export const transactionsGridColumns = (
     {
       field: "desc",
       headerName: "Description",
-      flex: 3,
+      flex: 4,
     },
     {
       field: "merchant",
@@ -24,7 +24,7 @@ export const transactionsGridColumns = (
     {
       field: "category",
       headerName: "Category",
-      flex: 2,
+      flex: 3,
       // renderCell: (p: GridRenderCellParams<Category>) => (
       //   <CategoryView category={p.value} />
       // ),
