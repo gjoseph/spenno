@@ -209,7 +209,7 @@ const AppContent = () => {
   );
 
   const fileDialog = (
-    <FileDrop addFile={addFile}>
+    <FileDrop addFile={addFile} minimal={false}>
       <FileList files={fileDescs} toggleFile={toggleFile} />
     </FileDrop>
     // TODO close on drop?
@@ -245,12 +245,17 @@ const AppContent = () => {
       <TopBar
         iconAndDialogs={[
           { icon: FilterListIcon, title: "Filters", content: filtersDialog },
-          { icon: UploadFileIcon, title: "Files", content: fileDialog },
+          {
+            icon: UploadFileIcon,
+            title: "Files",
+            content: fileDialog,
+            onDrop: addFile,
+          },
           { icon: SettingsIcon, title: "Settings", content: settingsDialog },
           { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
         ]}
       >
-        <ProgressIndicator inProgress={calculating} />
+        <ProgressIndicator inProgress={calculating} style="line" />
       </TopBar>
       <Box
         component="main"

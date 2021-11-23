@@ -36,6 +36,17 @@ const rejectStyle = {
   borderColor: "#ff1744",
 };
 
+const minimalBaseStyle = {
+  padding: 0,
+  borderWidth: 2,
+  borderRadius: 2,
+  borderColor: "transparent",
+  borderStyle: "dashed",
+  // backgroundColor: "#fafafa",
+  // color: "#bdbdbd",
+  outline: "none",
+  transition: "border .24s ease-in-out",
+};
 const baseStyle = {
   // flex: 1,
   // display: 'flex',
@@ -52,7 +63,20 @@ const baseStyle = {
   transition: "border .24s ease-in-out",
 };
 
-export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
+// for some reason I can't spell WrappedComponent as wrappedComponent or isn't happy
+export const withDropZone =
+  <P extends object>(
+    WrappedComponent: React.ComponentType<P>
+  ): React.FC<P & FileDropProps> =>
+  ({ addFile, minimal, ...props }: FileDropProps) =>
+    (
+      <FileDrop addFile={addFile} minimal={minimal}>
+        <WrappedComponent {...(props as P)} />
+      </FileDrop>
+    );
+
+type FileDropProps = { addFile: AddFile; minimal: boolean };
+export const FileDrop: React.FC<FileDropProps> = (props) => {
   const onDrop = useMemo(
     () =>
       onDropDelegateToAddFile(
@@ -77,23 +101,33 @@ export const FileDrop: React.FC<{ addFile: AddFile }> = (props) => {
 
   const style = useMemo(
     () => ({
-      ...baseStyle,
+      ...(props.minimal ? minimalBaseStyle : baseStyle),
       ...(isDragActive ? activeStyle : {}),
       ...(isDragAccept ? acceptStyle : {}),
       ...(isDragReject ? rejectStyle : {}),
     }),
-    [isDragActive, isDragReject, isDragAccept]
+    [props.minimal, isDragActive, isDragReject, isDragAccept]
   );
 
   // if we set to false, 2 parallel uploads might cancel each other?
   const [inProgress, setInProgress] = useState<boolean>(false);
 
+  // in minimal mode, only render children when not in progress
+  const shouldRenderChildren = !props.minimal || !inProgress;
+
+  const progressStyle = props.minimal ? "small" : "withBackdrop";
+  let progressIndicator = [
+    <ProgressIndicator inProgress={inProgress} style={progressStyle} />,
+  ];
+  if (inProgress && !props.minimal) {
+    progressIndicator.push(<p>Uploading [filename here]</p>);
+  }
+
   return (
     <div {...getRootProps({ style })}>
       <input {...getInputProps()} />
-      {props.children}
-      <ProgressIndicator inProgress={inProgress} dramatic />
-      {inProgress ? <p>Uploading [filename here]</p> : null}
+      {shouldRenderChildren ? props.children : null}
+      {progressIndicator}
     </div>
   );
 };

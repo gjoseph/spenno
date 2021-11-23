@@ -11,6 +11,7 @@ import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import { AddFile, withDropZone } from "../filedrop/FileDrop";
 
 const IconButton: React.FC<{
   icon: React.JSXElementConstructor<any>;
@@ -26,11 +27,13 @@ const IconButton: React.FC<{
     <props.icon onClick={props.onClick} />
   </MuiIconButton>
 );
+const FileDropIcon = withDropZone(IconButton);
 
 type IconAndDialogContent = {
   icon: React.JSXElementConstructor<any>;
   title: React.ReactNode;
   content: React.ReactNode;
+  onDrop?: AddFile;
 };
 
 export const TopBar: React.FC<{
@@ -53,9 +56,24 @@ export const TopBar: React.FC<{
           Spenno - check da mullah
         </Typography>
         <ButtonGroup color="inherit">
-          {props.iconAndDialogs.map((i, idx) => (
-            <IconButton icon={i.icon} onClick={handleOpen(idx)} key={idx} />
-          ))}
+          {props.iconAndDialogs.map((i, idx) => {
+            // Surely, there is a more React-like way of using an HoC like FileDropIcon without this if statement
+            if (i.onDrop) {
+              return (
+                <FileDropIcon
+                  minimal
+                  icon={i.icon}
+                  onClick={handleOpen(idx)}
+                  addFile={i.onDrop}
+                  key={idx}
+                />
+              );
+            } else {
+              return (
+                <IconButton icon={i.icon} onClick={handleOpen(idx)} key={idx} />
+              );
+            }
+          })}
         </ButtonGroup>
 
         {/* TODO we could make these draggable and keep open https://mui.com/components/dialogs/#draggable-dialog*/}
