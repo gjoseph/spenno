@@ -68,6 +68,17 @@ export const MainAppScreen: React.FC<
                     accounts={props.accounts}
                   />
                 </TabPanel>,
+                <TabPanel
+                  label="Duplicates in raw records"
+                  tooltip={
+                    "(TODO)Use this tab to find overlapping/duplicate records in CSV files"
+                  }
+                >
+                  <RawRecordsTable
+                    filesWithRawRecords={props.filesWithRawRecords}
+                    accounts={props.accounts}
+                  />
+                </TabPanel>,
               ]}
             />
           </Paper>

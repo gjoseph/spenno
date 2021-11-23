@@ -1,9 +1,13 @@
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, Tooltip } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import { PropsWithChildren, ReactElement } from "react";
 import * as React from "react";
 
 // We can't restrict the type of child nodes, but we can type-check their props, so there's that. https://github.com/microsoft/TypeScript/issues/21699
-type TabPanelProps = PropsWithChildren<{ label: React.ReactNode }>;
+type TabPanelProps = PropsWithChildren<{
+  label: React.ReactNode;
+  tooltip?: React.ReactNode;
+}>;
 export const TabPanel: React.FC<TabPanelProps> = ({ children, label }) => null;
 // is this the right way to do a render-less component? we just want props (and children)
 
@@ -20,9 +24,24 @@ export const TabbedPanels: React.FC<{
     <React.Fragment>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tab} onChange={handleTabChange}>
-          {props.panels.map((tp, idx) => (
-            <Tab label={tp.props.label} value={idx} key={"tab-" + idx} />
-          ))}
+          {props.panels.map((tp, idx) => {
+            const tooltip = tp.props.tooltip ? (
+              <Tooltip title={tp.props.tooltip}>
+                <InfoIcon fontSize="small" />
+              </Tooltip>
+            ) : undefined;
+
+            return (
+              // TODO the icon adds padding to the tab?
+              <Tab
+                label={tp.props.label}
+                icon={tooltip}
+                iconPosition="end"
+                value={idx}
+                key={"tab-" + idx}
+              />
+            );
+          })}
         </Tabs>
       </Box>
       {props.panels.map((tp, idx) => (
