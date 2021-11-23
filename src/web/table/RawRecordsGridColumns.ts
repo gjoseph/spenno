@@ -7,7 +7,7 @@ export const rawRecordsGridColumns = (
 ): GridColDef[] => {
   return [
     {
-      field: "filePath", // we can't use label here, since we have FileWithRawRecords rather than FileDescriptor
+      field: "filePath", // it's a "label", really
       headerName: "File",
       flex: 1,
     },

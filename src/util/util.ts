@@ -45,15 +45,18 @@ export const zer0 = new Big(0);
 type StringOccurenceCounter = {
   [key: string]: number;
 };
+
 type StringOccurenceFormatter = (s: string, c: number) => string;
 
 const defaultSuffixFormat = (s: string, c: number) => {
   return c > 1 ? `${s} (${c})` : s;
 };
 
-const formatStringsWithCounter =
-  (counts: StringOccurenceCounter, formatter: StringOccurenceFormatter) =>
-  (s: string, idx: number) => {
+const formatStringsWithCounter = (
+  formatter: StringOccurenceFormatter = defaultSuffixFormat
+) => {
+  const counts: StringOccurenceCounter = {};
+  return (s: string) => {
     if (counts[s] === undefined) {
       counts[s] = 1;
     } else {
@@ -61,11 +64,12 @@ const formatStringsWithCounter =
     }
     return formatter(s, counts[s]);
   };
+};
 
 export const addUniquenessSuffix = (
   formatter: StringOccurenceFormatter = defaultSuffixFormat
 ) => {
-  return formatStringsWithCounter({}, formatter);
+  return formatStringsWithCounter(formatter);
 };
 
 export const addUniquenessSuffixToThings = <T, U>(
@@ -73,10 +77,9 @@ export const addUniquenessSuffixToThings = <T, U>(
   replacer: (item: T, suffixedString: string) => U,
   formatter: StringOccurenceFormatter = defaultSuffixFormat
 ) => {
-  const counts: StringOccurenceCounter = {};
-  const formatStrings = formatStringsWithCounter(counts, formatter);
-  return (t: T, idx: number) => {
-    const formattedString = formatStrings(extractor(t), idx);
+  const formatStrings = formatStringsWithCounter(formatter);
+  return (t: T) => {
+    const formattedString = formatStrings(extractor(t));
     return replacer(t, formattedString);
   };
 };
