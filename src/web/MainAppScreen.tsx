@@ -3,12 +3,15 @@ import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
 import { FileDescriptor, FileWithRawRecords } from "../domain/file";
-import { isUncategorised, Transaction } from "../domain/transaction";
+import { Transaction } from "../domain/transaction";
 import { getChartsFor } from "../domain/charting";
+import { uncategorisedStats } from "../domain/uncategorised-stats";
 import { ChartWrapper } from "./ChartWrapper";
 import { FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
+import { DataGridWrapper } from "./table/DataGridWrapper";
 import { RawRecordsTable } from "./table/RawRecordsTable";
+import { mostCommonDescriptionsColumns } from "./table/StatsGridColumns";
 import { TransactionsTable } from "./table/TransactionsTable";
 import { TransactionFiltersProps } from "./TransactionFilters";
 
@@ -27,14 +30,13 @@ export const MainAppScreen: React.FC<
     props.filterConfig.groupBy,
     props.transactions
   );
-  const uncategorised = props.transactions.filter(isUncategorised());
+  const uncategorised = uncategorisedStats(props.transactions, 100);
 
   return (
     <React.Fragment>
       <Grid container spacing={3} alignItems="stretch">
         <Grid item xs={12}>
           <Paper sx={{ p: 2, pt: 0 }}>
-            {/*TODO: Other tabs to show aggregations ? */}
             {/* Some of these tabs could possibly be predefined filters in TransactionsTable/Toolbar instead */}
             <TabbedPanels
               initialTabIdx={0}
@@ -61,13 +63,27 @@ export const MainAppScreen: React.FC<
                 <TabPanel
                   label="Uncategorised"
                   warning={
-                    uncategorised.length &&
-                    `There are ${uncategorised.length} uncategorised records`
+                    uncategorised.uncategorisedTransactions.length &&
+                    `There are ${uncategorised.uncategorisedTransactions.length} uncategorised records`
                   }
                 >
-                  <TransactionsTable
-                    accounts={props.accounts}
-                    transactions={uncategorised}
+                  <TabbedPanels
+                    initialTabIdx={0}
+                    panels={[
+                      <TabPanel label="All">
+                        <TransactionsTable
+                          accounts={props.accounts}
+                          transactions={uncategorised.uncategorisedTransactions}
+                        />
+                      </TabPanel>,
+                      <TabPanel label="Most common">
+                        <DataGridWrapper
+                          columns={mostCommonDescriptionsColumns}
+                          rows={uncategorised.mostCommonDescriptions}
+                          addIdField
+                        />
+                      </TabPanel>,
+                    ]}
                   />
                 </TabPanel>,
                 <TabPanel label="Raw records">

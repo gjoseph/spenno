@@ -1,5 +1,6 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import * as React from "react";
+import { v4 as uuidv4 } from "uuid";
 import { QuickSearchToolbar } from "./QuickSearchToolbar";
 
 const escapeRegExp = (value: string): string => {
@@ -13,16 +14,20 @@ const genericRowFilter = (searchValue: string) => (row: any) => {
   });
 };
 
+const rowsWithIdField = <T,>(rows: T[], addIdField: boolean = false) =>
+  addIdField ? rows.map((e, idx) => ({ ...e, id: uuidv4() })) : rows;
+
 type DataGridWrapperProps<T> = {
   columns: GridColDef[];
   rows: T[];
   rowFilter?: (row: T) => boolean;
+  addIdField?: boolean;
 };
 
 export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
   const [rows, setRows] = React.useState<T[]>(() => {
     // TODO: not sure initialState is needed, since we have a useEffect below that also sets it
-    return props.rows;
+    return rowsWithIdField(props.rows, props.addIdField);
   });
 
   const [searchText, setSearchText] = React.useState("");
@@ -34,8 +39,8 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
   };
 
   React.useEffect(() => {
-    setRows(props.rows);
-  }, [props.rows]);
+    setRows(rowsWithIdField(props.rows, props.addIdField));
+  }, [props.rows, props.addIdField]);
 
   return (
     <React.Fragment>
