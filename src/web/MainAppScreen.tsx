@@ -56,7 +56,7 @@ export const MainAppScreen: React.FC<
                     transactions={props.transactions}
                   />
                 </TabPanel>,
-                <TabPanel label="Uncategorised transactions">
+                <TabPanel label="Uncategorised">
                   <TransactionsTable
                     accounts={props.accounts}
                     transactions={props.transactions.filter(isUncategorised())}
@@ -69,7 +69,7 @@ export const MainAppScreen: React.FC<
                   />
                 </TabPanel>,
                 <TabPanel
-                  label="Duplicates in raw records"
+                  label="Duplicates"
                   tooltip={
                     "(TODO)Use this tab to find overlapping/duplicate records in CSV files"
                   }

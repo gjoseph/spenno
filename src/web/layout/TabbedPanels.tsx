@@ -23,7 +23,12 @@ export const TabbedPanels: React.FC<{
   return (
     <React.Fragment>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={tab} onChange={handleTabChange}>
+        <Tabs
+          value={tab}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
           {props.panels.map((tp, idx) => {
             const tooltip = tp.props.tooltip ? (
               <Tooltip title={tp.props.tooltip}>
