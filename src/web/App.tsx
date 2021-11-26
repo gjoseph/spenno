@@ -4,7 +4,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DollarIcon from "@mui/icons-material/LocalAtmOutlined";
 
-import { Theme, ThemeProvider } from "@mui/material";
+import { Button, Theme, ThemeProvider } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -65,10 +65,10 @@ const consoleLogger = new ConsoleLogger();
 
 const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
 
-const reloadAccounts = (result: string) =>
+const readAccounts = (result: string) =>
   new Bank.AccountsLoader(consoleLogger).loadYaml(result);
 
-const reloadRules = (result: string) =>
+const readRules = (result: string) =>
   new Rules.RulesLoader(consoleLogger).loadYaml(result);
 
 export type SetFilterConfig = Dispatch<SetStateAction<FilterConfig>>;
@@ -90,16 +90,16 @@ function unwrapJobResult(res: { log: LogEntry[] }) {
 const AppContent = () => {
   const [calculating, setCalculating] = useState(true);
 
-  const [accounts, accountsLoaded, accountsError] = useFetch<Bank.Accounts>(
-    "/accounts.yml",
-    () => new Bank.Accounts([]),
-    reloadAccounts
-  );
-  const [rules, rulesLoaded, rulesError] = useFetch<Rules.RuleDesc[]>(
-    "/rules.yml",
-    () => [],
-    reloadRules
-  );
+  const [accounts, accountsLoaded, accountsError, reFetchAccounts] =
+    useFetch<Bank.Accounts>(
+      "/accounts.yml",
+      () => new Bank.Accounts([]),
+      readAccounts
+    );
+
+  const [rules, rulesLoaded, rulesError, reFetchRules] = useFetch<
+    Rules.RuleDesc[]
+  >("/rules.yml", () => [], readRules);
   const allCategories = useMemo(() => Rules.extractCategories(rules), [rules]);
 
   // TODO: FileDesc instead?
@@ -244,12 +244,13 @@ const AppContent = () => {
     <div>
       <p>
         {accountsLoaded || "loading"}
-        {accounts.accounts.length} accounts [button to reload]
+        {accounts.accounts.length} accounts{" "}
+        <Button onClick={reFetchAccounts}>Reload</Button>
         {accountsError}
       </p>
       <p>
         {rulesLoaded || "loading"}
-        {rules.length} rules [button to reload]
+        {rules.length} rules <Button onClick={reFetchRules}>Reload</Button>
         {rulesError}
       </p>
       <p>from {filterConfig.dateRange[0]?.toDate().toString()}</p>

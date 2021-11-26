@@ -4,13 +4,14 @@ export function useFetch<T>(
   path: string,
   initialStateFactory: () => T,
   responseTransformer: (fetchResult: string) => T
-): [T, boolean, boolean] {
+): [state: T, loaded: boolean, error: boolean, reload: () => void] {
   const [value, setValue] = React.useState<T>(initialStateFactory);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   // TODO we may want a bit more detail than a boolean here
   const [error, setError] = React.useState<boolean>(false);
 
-  React.useEffect(() => {
+  const doTheFetch = () => {
+    console.log("Loading", path);
     fetch(process.env.PUBLIC_URL + path)
       .then((res) => res.text())
       .then(
@@ -27,6 +28,7 @@ export function useFetch<T>(
           setLoaded((old) => true);
         }
       );
-  }, [responseTransformer, path]);
-  return [value, loaded, error];
+  };
+  React.useEffect(doTheFetch, [responseTransformer, path]);
+  return [value, loaded, error, doTheFetch];
 }
