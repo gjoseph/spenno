@@ -42,7 +42,7 @@ export const reloadFiles = (
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[]
 ): FileLoadWorkResult => {
-  const log = new ArrayLogger(false);
+  const log = new ArrayLogger(true);
   const transactionsLoader = new TransactionsLoader(
     new Bank.Accounts(accounts),
     log
@@ -76,7 +76,6 @@ export const reloadTransactions = (
   categories: Category[],
   amountFilter: AmountFilter
 ): TransactionProcessWorkResult => {
-  console.log("amountFilter:", amountFilter);
   const log = new ArrayLogger(false);
   const rules = ruleDescs.map(Rules.toRule);
   const transactionsProcessor = new TransactionsProcessor(rules, log);

@@ -23,7 +23,7 @@ import {
 } from "../domain/file";
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
-import { ConsoleLogger } from "../util/log";
+import { ConsoleLogger, LogEntry } from "../util/log";
 import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
 import {
   FileLoadWorkResult,
@@ -80,6 +80,12 @@ export type FilterConfig = {
   groupBy: GroupBy;
   splitBy: SplitBy;
 };
+
+function unwrapJobResult(res: { log: LogEntry[] }) {
+  res.log.forEach((l) => {
+    consoleLogger[l.level]("[job result] " + l.message);
+  });
+}
 
 const AppContent = () => {
   const [calculating, setCalculating] = useState(true);
@@ -160,6 +166,7 @@ const AppContent = () => {
     calcWorker
       .reloadFiles(files, accounts.accounts)
       .then((res: FileLoadWorkResult) => {
+        unwrapJobResult(res);
         setFilesWithRawRecords((old) => {
           const newFiles = fromTransferrableFilesWithRawRecords(res.files);
           consoleLogger.debug(
@@ -187,12 +194,12 @@ const AppContent = () => {
         filterConfig.amount
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
+        unwrapJobResult(res);
         setTransactions((old) => {
           const newTxs = res.transactions.map(
             fromTransferrable(TransferrableMappings.Transaction)
           );
-          consoleLogger.debug("Loaded", newTxs.length, "transactions");
-          consoleLogger.debug("filterConfig", filterConfig);
+          consoleLogger.debug("Loaded", newTxs.length, "transactions", newTxs);
           return newTxs;
         });
         setCalculating((old) => false);
@@ -203,9 +210,7 @@ const AppContent = () => {
     const amounts = filesWithRawRecords
       .flatMap((f) => f.rawRecords)
       .map((t) => t.amount.toNumber());
-    const numbers = [Math.min(...amounts), Math.max(...amounts)];
-    console.log("min,max:", numbers);
-    return numbers;
+    return [Math.min(...amounts), Math.max(...amounts)];
   }, [filesWithRawRecords]);
 
   const filtersDialog = (
