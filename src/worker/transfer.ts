@@ -97,6 +97,7 @@ export const transferredDateRange: (
 export interface TransferrableFileWithRawRecords extends TransactionsFile {
   rawRecords: Transferrable<RawRecord>[];
 }
+
 export const fromTransferrableFilesWithRawRecords = (
   files: TransferrableFileWithRawRecords[]
 ) =>

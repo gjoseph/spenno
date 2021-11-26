@@ -1,15 +1,15 @@
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import Autocomplete from "@mui/material/Autocomplete";
 import type {
   AutocompleteRenderGetTagProps,
   AutocompleteRenderInputParams,
   AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete/Autocomplete";
-import Chip from "@mui/material/Chip";
-import * as React from "react";
 import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import * as React from "react";
 import { Category } from "../../domain/category";
 import { SetFilterConfig } from "../App";
 

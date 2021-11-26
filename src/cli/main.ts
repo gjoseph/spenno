@@ -20,7 +20,6 @@ import {
 import { Logger, TermLogger } from "../util/log";
 import { countBy, groupBy } from "../util/reducers";
 import { percentOf, zer0 } from "../util/util";
-import Rule = Rules.Rule;
 import RuleDesc = Rules.RuleDesc;
 
 function _doStuff(args: Args) {

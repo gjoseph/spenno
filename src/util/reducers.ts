@@ -7,10 +7,13 @@
  * is important)
  */
 class ArrayableMap<K, V> extends Map<K, V> {}
+
 type ArrayableMapEntry<K, V> = { key: K; value: V };
+
 interface ArrayableMap<K, V> {
   toArray(): ArrayableMapEntry<K, V>[];
 }
+
 ArrayableMap.prototype.toArray = function () {
   return Array.from(this.entries()).map((e) => {
     return {

@@ -5,10 +5,10 @@ import {
 } from "@mui/x-data-grid";
 import Big from "big.js";
 import { Moment } from "moment";
-import { Bank } from "../../domain/accounts";
 
 // See momentFormatter
 import "moment/locale/en-au";
+import { Bank } from "../../domain/accounts";
 
 export namespace CellFormatters {
   export const momentFormatter = (p: GridValueFormatterParams) => {

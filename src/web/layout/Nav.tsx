@@ -3,14 +3,14 @@ import {
   ButtonGroup,
   IconButton as MuiIconButton,
 } from "@mui/material";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { MouseEventHandler } from "react";
-import * as React from "react";
 
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import * as React from "react";
+import { MouseEventHandler } from "react";
 import { AddFile, withDropZone } from "../filedrop/FileDrop";
 
 const IconButton: React.FC<{

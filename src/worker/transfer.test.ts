@@ -10,9 +10,9 @@ import moment from "moment";
 import { Transaction } from "../domain/transaction";
 import { toEqualMoment } from "../jest/toEqualMoment";
 import {
-  Transferrable,
   fromTransferrable,
   toTransferrable,
+  Transferrable,
   TransferrableMappings,
 } from "./transfer";
 

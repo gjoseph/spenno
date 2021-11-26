@@ -17,7 +17,9 @@ export interface LogEntry {
 
 export class ArrayLogger implements Logger {
   readonly logEntries: LogEntry[] = [];
+
   constructor(readonly debugMode: boolean) {}
+
   debug(message: string, ...stuff: any[]): void {
     if (this.debugMode) {
       this.add("debug", [message, ...stuff].join(" "));

@@ -1,7 +1,7 @@
-import { RawRecord, Transaction } from "./transaction";
 import Big from "big.js";
 import moment from "moment";
 import { RawRecordFilters } from "./filters";
+import { RawRecord, Transaction } from "./transaction";
 
 const { inTime, between, isCredit, isDebit } = RawRecordFilters;
 

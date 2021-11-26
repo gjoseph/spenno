@@ -1,8 +1,8 @@
 import FilterListIcon from "@mui/icons-material/FilterList";
 import InfoIcon from "@mui/icons-material/Info";
+import DollarIcon from "@mui/icons-material/LocalAtmOutlined";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import DollarIcon from "@mui/icons-material/LocalAtmOutlined";
 
 import { Button, Theme, ThemeProvider } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -24,12 +24,13 @@ import {
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
 import { ConsoleLogger, LogEntry } from "../util/log";
+import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
+import * as CalculatorWorker from "../worker/transaction-filter-worker";
 import {
   FileLoadWorkResult,
   TransactionProcessWorkResult,
 } from "../worker/transaction-filter-worker";
-import * as CalculatorWorker from "../worker/transaction-filter-worker";
 import {
   fromTransferrable,
   fromTransferrableFilesWithRawRecords,
@@ -42,7 +43,6 @@ import { FileList } from "./FileList";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
-import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { TransactionFilters } from "./TransactionFilters";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 import { useFetch } from "./util/hook-fetch";

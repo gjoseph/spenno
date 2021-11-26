@@ -6,6 +6,7 @@ type FileType = "westpac.csv";
 export class TransactionsFile {
   readonly id: string;
   enabled: boolean;
+
   constructor(
     readonly filePath: string,
     readonly type: FileType = "westpac.csv",

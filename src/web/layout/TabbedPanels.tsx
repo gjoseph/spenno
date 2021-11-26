@@ -1,8 +1,8 @@
-import { Box, Tab, Tabs, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import WarningIcon from "@mui/icons-material/Warning";
-import { PropsWithChildren, ReactElement } from "react";
+import { Box, Tab, Tabs, Tooltip } from "@mui/material";
 import * as React from "react";
+import { PropsWithChildren, ReactElement } from "react";
 
 // We can't restrict the type of child nodes, but we can type-check their props, so there's that. https://github.com/microsoft/TypeScript/issues/21699
 type TabPanelProps = PropsWithChildren<{
