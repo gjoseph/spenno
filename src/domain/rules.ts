@@ -40,7 +40,7 @@ export namespace Rules {
   export const toRule: (r: RuleDesc) => Rule = (r: RuleDesc) => {
     return {
       name: r.name,
-      regex: new RegExp(r.regex),
+      regex: parseRegex(r.regex),
       category: r.category,
       merchant: r.merchant,
       additionalCheck: r.additionalCheck
@@ -48,6 +48,20 @@ export namespace Rules {
         : undefined,
     };
   };
+
+  function parseRegex(regexStr: string): RegExp {
+    if (regexStr[0] === "/") {
+      const lastIndexOf = regexStr.lastIndexOf("/");
+      if (lastIndexOf < 1) {
+        throw new Error("Invalid regular expression");
+      }
+      const exp = regexStr.slice(1, lastIndexOf);
+      const flags = regexStr.slice(lastIndexOf + 1);
+      return new RegExp(exp, flags);
+    } else {
+      return new RegExp(regexStr);
+    }
+  }
 
   function evalRule(additionalCheck: AdditionalCheckTS): AdditionalCheck {
     return evalAsFunction<RawRecord, boolean>(additionalCheck);
