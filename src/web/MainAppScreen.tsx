@@ -21,11 +21,13 @@ export const MainAppScreen: React.FC<
     accounts: Bank.Accounts;
   } & TransactionFiltersProps
 > = (props) => {
+  // TODO should these be useEffect()?
   const charts = getChartsFor(
     props.filterConfig.splitBy,
     props.filterConfig.groupBy,
     props.transactions
   );
+  const uncategorised = props.transactions.filter(isUncategorised());
 
   return (
     <React.Fragment>
@@ -56,10 +58,16 @@ export const MainAppScreen: React.FC<
                     transactions={props.transactions}
                   />
                 </TabPanel>,
-                <TabPanel label="Uncategorised">
+                <TabPanel
+                  label="Uncategorised"
+                  warning={
+                    uncategorised.length &&
+                    `There are ${uncategorised.length} uncategorised records`
+                  }
+                >
                   <TransactionsTable
                     accounts={props.accounts}
-                    transactions={props.transactions.filter(isUncategorised())}
+                    transactions={uncategorised}
                   />
                 </TabPanel>,
                 <TabPanel label="Raw records">
@@ -72,6 +80,7 @@ export const MainAppScreen: React.FC<
                   label="Duplicates"
                   tooltip={
                     "(TODO)Use this tab to find overlapping/duplicate records in CSV files"
+                    // TODO also highlight this when there _are_ duplicate records
                   }
                 >
                   <RawRecordsTable

@@ -1,5 +1,6 @@
 import { Box, Tab, Tabs, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import WarningIcon from "@mui/icons-material/Warning";
 import { PropsWithChildren, ReactElement } from "react";
 import * as React from "react";
 
@@ -7,6 +8,7 @@ import * as React from "react";
 type TabPanelProps = PropsWithChildren<{
   label: React.ReactNode;
   tooltip?: React.ReactNode;
+  warning?: React.ReactNode;
 }>;
 export const TabPanel: React.FC<TabPanelProps> = ({ children, label }) => null;
 // is this the right way to do a render-less component? we just want props (and children)
@@ -30,9 +32,13 @@ export const TabbedPanels: React.FC<{
           scrollButtons="auto"
         >
           {props.panels.map((tp, idx) => {
-            const tooltip = tp.props.tooltip ? (
+            const tooltip = tp.props.warning ? (
+              <Tooltip title={tp.props.warning}>
+                <WarningIcon fontSize="small" color="warning" />
+              </Tooltip>
+            ) : tp.props.tooltip ? (
               <Tooltip title={tp.props.tooltip}>
-                <InfoIcon fontSize="small" />
+                <InfoIcon fontSize="small" color="info" />
               </Tooltip>
             ) : undefined;
 
