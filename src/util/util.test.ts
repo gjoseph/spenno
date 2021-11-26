@@ -28,13 +28,14 @@ test("lists with added suffix using a custom formatter", () => {
   ]);
 });
 
-const things = [
+export type Thing = { name: string; blah: string; count: number };
+export const things: Thing[] = [
   { name: "a", blah: "foo", count: 123 },
   { name: "b", blah: "bar", count: 123 },
   { name: "a", blah: "qux", count: 123 },
-  { name: "c", blah: "qwe", count: 123 },
-  { name: "c", blah: "rty", count: 123 },
-  { name: "a", blah: "uio", count: 123 },
+  { name: "c", blah: "foo", count: 123 },
+  { name: "c", blah: "bar", count: 123 },
+  { name: "a", blah: "qux", count: 123 },
 ];
 
 test("list of things added suffix as a mapping function on list", () => {
@@ -50,9 +51,9 @@ test("list of things added suffix as a mapping function on list", () => {
     { name: "#1 for a", blah: "foo", count: 123 },
     { name: "#1 for b", blah: "bar", count: 123 },
     { name: "#2 for a", blah: "qux", count: 123 },
-    { name: "#1 for c", blah: "qwe", count: 123 },
-    { name: "#2 for c", blah: "rty", count: 123 },
-    { name: "#3 for a", blah: "uio", count: 123 },
+    { name: "#1 for c", blah: "foo", count: 123 },
+    { name: "#2 for c", blah: "bar", count: 123 },
+    { name: "#3 for a", blah: "qux", count: 123 },
   ]);
 });
 
@@ -66,8 +67,8 @@ test("list of things added suffix as a mapping function on list with property", 
     { name: "#1 for a", blah: "foo", count: 123 },
     { name: "#1 for b", blah: "bar", count: 123 },
     { name: "#2 for a", blah: "qux", count: 123 },
-    { name: "#1 for c", blah: "qwe", count: 123 },
-    { name: "#2 for c", blah: "rty", count: 123 },
-    { name: "#3 for a", blah: "uio", count: 123 },
+    { name: "#1 for c", blah: "foo", count: 123 },
+    { name: "#2 for c", blah: "bar", count: 123 },
+    { name: "#3 for a", blah: "qux", count: 123 },
   ]);
 });

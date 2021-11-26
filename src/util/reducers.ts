@@ -6,19 +6,51 @@
  * return ArrayableMapEntry<K, V>[]; right away, probably (or a different type altogether if adressing by "key"
  * is important)
  */
-class ArrayableMap<K, V> extends Map<K, V> {}
-type ArrayableMapEntry<K, V> = { key: K; value: V };
-interface ArrayableMap<K, V> {
-  toArray(): ArrayableMapEntry<K, V>[];
+// class ArrayableMap<K, V> extends Map<K, V> {}
+// type ArrayableMapEntry<K, V> = { key: K; value: V };
+// interface ArrayableMap<K, V> {
+//   toArray(): ArrayableMapEntry<K, V>[];
+// }
+// ArrayableMap.prototype.toArray = function () {
+//   return Array.from(this.entries()).map((e) => {
+//     return {
+//       key: e[0],
+//       value: e[1],
+//     };
+//   });
+// };
+class ArrayableMap<K, V> {
+  // Obviously poor name, but limits changes elsewhere for now.
+  // Also this seems like a terrible idea but it works https://stackoverflow.com/questions/43592760/typescript-javascript-using-tuple-as-key-of-map
+  // TODO YEAH IT WAS A TERRIBLE IDEA -- we lose all the types (e.g moment/bigjs)
+  private map = new Map<string, V>();
+
+  set(key: K, value: V): this {
+    this.map.set(JSON.stringify(key), value);
+    return this;
+  }
+
+  get(key: K): V | undefined {
+    return this.map.get(JSON.stringify(key));
+  }
+
+  has(key: K): boolean {
+    return this.map.has(JSON.stringify(key));
+  }
+
+  get size() {
+    return this.map.size;
+  }
+
+  toArray() {
+    return Array.from(this.map.entries()).map((e) => {
+      return {
+        key: JSON.parse(e[0]), // TODO LOL!?
+        value: e[1],
+      };
+    });
+  }
 }
-ArrayableMap.prototype.toArray = function () {
-  return Array.from(this.entries()).map((e) => {
-    return {
-      key: e[0],
-      value: e[1],
-    };
-  });
-};
 
 /**
  * @type T the type of objects reduced
@@ -59,6 +91,7 @@ const reducerFactory = <T, K, V>(
 const initialValue = <K, V>() => new ArrayableMap<K, V>();
 
 namespace GroupBy {
+  // TODO this currently only work with simple key types because Map won't consider {a:1} and {a:1} equal
   const addToArray = <K, T>(acc: ArrayableMap<K, T[]>, key: K, current: T) => {
     if (acc.has(key)) {
       acc.get(key)!.push(current);

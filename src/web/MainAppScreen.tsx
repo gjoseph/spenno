@@ -66,6 +66,7 @@ export const MainAppScreen: React.FC<
                   <RawRecordsTable
                     filesWithRawRecords={props.filesWithRawRecords}
                     accounts={props.accounts}
+                    variant="all"
                   />
                 </TabPanel>,
                 <TabPanel
@@ -77,6 +78,7 @@ export const MainAppScreen: React.FC<
                   <RawRecordsTable
                     filesWithRawRecords={props.filesWithRawRecords}
                     accounts={props.accounts}
+                    variant="duplicates"
                   />
                 </TabPanel>,
               ]}

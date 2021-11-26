@@ -1,4 +1,5 @@
 import { countBy, groupBy } from "./reducers";
+import { Thing, things } from "./util.test";
 
 test("groupBy reducer - by word length", () => {
   const words = ["dog", "cat", "chat", "hop", "hip", "hund", "chien"];
@@ -7,7 +8,8 @@ test("groupBy reducer - by word length", () => {
   expect(res).not.toBeNull();
   expect(res).toBeDefined();
   expect(res.size).toEqual(3);
-  expect(Array.from(res.keys())).toEqual([3, 4, 5]);
+  // expect(Array.from(res.keys())).toEqual([3, 4, 5]);
+  expect(res.toArray().map((e) => e.key)).toEqual([3, 4, 5]);
   expect(res.get(3)).toStrictEqual(["dog", "cat", "hop", "hip"]);
   expect(res.get(4)).toStrictEqual(["chat", "hund"]);
   expect(res.get(5)).toStrictEqual(["chien"]);
@@ -35,7 +37,13 @@ test("countBy reducer - by first letter", () => {
   expect(res).not.toBeNull();
   expect(res).toBeDefined();
   expect(res.size).toEqual(3);
-  expect(Array.from(res.keys()).sort()).toEqual(["c", "d", "h"]);
+  // expect(Array.from(res.keys()).sort()).toEqual(["c", "d", "h"]);
+  expect(
+    res
+      .toArray()
+      .map((e) => e.key)
+      .sort()
+  ).toEqual(["c", "d", "h"]);
   expect(res.get("c")).toBe(4);
   expect(res.get("d")).toBe(1);
   expect(res.get("h")).toBe(3);
@@ -51,4 +59,26 @@ test("countBy reducer - returns an arrayable map", () => {
       { key: "h", value: 3 },
     ])
   );
+});
+
+test("groupByreducer can work with complex keys", () => {
+  const reduced = things.reduce(
+    ...groupBy((t: Thing) => {
+      // remove name, since this is the only property we don't groupBy
+      const { name, ...rest } = t;
+      return rest;
+    })
+  );
+  const result: any = reduced.toArray().map((e) => {
+    // key = rest-of-object
+    // value = array-of-grouped-whole-objects
+    // so we just map value's array's name property (i.e the "source of duplicate"
+    const names = e.value.map((o) => o.name);
+    return { names, ...e.key };
+  });
+  expect(result).toEqual([
+    { names: ["a", "c"], blah: "foo", count: 123 },
+    { names: ["b", "c"], blah: "bar", count: 123 },
+    { names: ["a", "a"], blah: "qux", count: 123 }, // this particular case should in reality already have ["a", "a (2)"] rather than ["a", "a"]
+  ]);
 });
