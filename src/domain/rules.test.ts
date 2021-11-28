@@ -16,6 +16,21 @@ test("Transforms a RuleDesc such that additionalCondition can be eval'd", () => 
   expect(rule.additionalCheck!(withAmount(-5))).toEqual(true);
 });
 
+test("or() can be used in rule additionalChecks (not `||`)", () => {
+  const ruleDesc: Rules.RuleDesc = {
+    regex: ".*",
+    category: "what",
+    additionalCheck: "isDebit({ eq: 4.0 }).or(isCredit({ eq: 4.0 }))",
+  };
+
+  const rule = Rules.toRule(ruleDesc);
+  expect(rule.additionalCheck).toBeInstanceOf(Function);
+  expect(rule.additionalCheck!(withAmount(-4))).toEqual(true);
+  expect(rule.additionalCheck!(withAmount(+4))).toEqual(true);
+  expect(rule.additionalCheck!(withAmount(+5))).toEqual(false);
+  expect(rule.additionalCheck!(withAmount(-5))).toEqual(false);
+});
+
 test("regexp with no slash is used with no flags", () => {
   const rule = Rules.toRule(withRegexpString("^foo"));
   expect(rule.regex.test("foo bar")).toEqual(true);
