@@ -223,12 +223,27 @@ const AppContent = () => {
     />
   );
 
+  const dirPickerHandler = async () => {
+    const dirHandle = await window.showDirectoryPicker();
+    for await (const e of dirHandle.values()) {
+      if (e.kind === "file" && /.*\.csv/.test(e.name)) {
+        const file = await e.getFile();
+        const contents = await file.text();
+        // TODO file.name or e.name?
+        // TODO for some reason isa's file gets loaded twice
+        addFile(e.name, contents);
+      }
+    }
+  };
+
   const fileDialog = (
-    <FileDrop addFile={addFile} minimal={false}>
-      <FileList files={fileDescs} toggleFile={toggleFile} />
-    </FileDrop>
-    // TODO close on drop?
-  );
+    <React.Fragment>
+      <Button onClick={dirPickerHandler}>Select Folder</Button>
+      <FileDrop addFile={addFile} minimal={false}>
+        <FileList files={fileDescs} toggleFile={toggleFile} />
+      </FileDrop>
+    </React.Fragment>
+  ); // TODO close on drop?
 
   const settingsDialog = (
     <div>
