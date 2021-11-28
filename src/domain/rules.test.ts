@@ -5,7 +5,6 @@ import { RawRecord } from "./transaction";
 
 test("Transforms a RuleDesc such that additionalCondition can be eval'd", () => {
   const ruleDesc: Rules.RuleDesc = {
-    name: "Fancy Coffee",
     regex: ".*",
     category: "coffee/hip",
     additionalCheck: "isDebit({ min: 4.0 })",
@@ -62,7 +61,6 @@ test("regexp slashes and invalid flag throws exception", () => {
 });
 
 const withRegexpString = (r: string): Rules.RuleDesc => ({
-  name: "lol",
   regex: r,
   category: "lol",
 });

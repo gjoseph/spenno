@@ -53,10 +53,7 @@ class StuffDoer {
 
   doStuff() {
     const rules = this.loadRules();
-    this.log.debug(
-      "Loaded rules:",
-      rules.map((r) => r.name)
-    );
+    this.log.debug("Loaded ", rules.length, "rules");
 
     const accounts = this.loadAccounts();
     this.log.debug("Loaded accounts:", accounts);

@@ -11,7 +11,6 @@ export namespace Rules {
 
   /* The rule, pretty much as described in the yaml file -- could even have comments, line numbers, the lot */
   export interface RuleDesc {
-    readonly name: string;
     readonly merchant?: string;
     readonly category: string;
     readonly regex: string;
@@ -20,7 +19,6 @@ export namespace Rules {
 
   /* The rule, as used at runtime */
   export interface Rule {
-    readonly name: string;
     readonly merchant?: string;
     readonly category: Category;
     readonly regex: RegExp;
@@ -39,7 +37,6 @@ export namespace Rules {
   // to eval it every time we send work to worker?
   export const toRule: (r: RuleDesc) => Rule = (r: RuleDesc) => {
     return {
-      name: r.name,
       regex: parseRegex(r.regex),
       category: r.category,
       merchant: r.merchant,
@@ -85,7 +82,6 @@ export namespace Rules {
       } else {
         return Array.from(doc).map((yamlElement) => {
           return {
-            name: yamlElement["name"],
             merchant: yamlElement["merchant"],
             category: yamlElement["category"],
             regex: yamlElement["regex"],
