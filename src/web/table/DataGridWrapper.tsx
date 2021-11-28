@@ -35,7 +35,7 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
     setSearchText(searchValue);
     const rowFilter = props.rowFilter || genericRowFilter(searchValue);
     const filteredRows = props.rows.filter(rowFilter);
-    setRows(filteredRows);
+    setRows(rowsWithIdField(filteredRows, props.addIdField));
   };
 
   React.useEffect(() => {
