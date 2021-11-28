@@ -199,7 +199,7 @@ const AppContent = () => {
           const newTxs = res.transactions.map(
             fromTransferrable(TransferrableMappings.Transaction)
           );
-          consoleLogger.debug("Loaded", newTxs.length, "transactions", newTxs);
+          consoleLogger.debug("Loaded", newTxs.length, "transactions");
           return newTxs;
         });
         setCalculating((old) => false);

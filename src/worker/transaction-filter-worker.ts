@@ -42,7 +42,7 @@ export const reloadFiles = (
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[]
 ): FileLoadWorkResult => {
-  const log = new ArrayLogger(true);
+  const log = new ArrayLogger(false);
   const transactionsLoader = new TransactionsLoader(
     new Bank.Accounts(accounts),
     log
