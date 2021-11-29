@@ -45,7 +45,7 @@ export const PieChart: React.FC<{
   );
 };
 
-const labelValue: ({ name, value }: { name: string; value: string }) => string =
-  ({ name, value }) => {
-    return `${name} (${value})`;
-  };
+type ChartDataItemToString = (item: ChartDataItem) => string;
+const labelValue: ChartDataItemToString = ({ name, value }) => {
+  return `${name} (${value})`;
+};
