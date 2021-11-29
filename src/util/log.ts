@@ -1,4 +1,4 @@
-import * as chalk from "chalk";
+import chalk, { ChalkInstance } from "chalk";
 
 export interface Logger {
   debug(message: string, ...stuff: any[]): void;
@@ -78,7 +78,7 @@ export class TermLogger implements Logger {
     );
   }
 
-  private rndChlk = (): chalk.Chalk =>
+  private rndChlk = (): ChalkInstance =>
     chalk.rgb(this.rnd255(), this.rnd255(), this.rnd255());
 
   private rnd255 = (): number => {
