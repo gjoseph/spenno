@@ -7,7 +7,6 @@ import { FileDescriptor, FileWithRawRecords } from "../domain/file";
 import { Transaction } from "../domain/transaction";
 import { uncategorisedStats } from "../domain/uncategorised-stats";
 import { ChartWrapper } from "./ChartWrapper";
-import { FileToggleCallback } from "./FileList";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
 import { DataGridWrapper } from "./table/DataGridWrapper";
 import { RawRecordsTable } from "./table/RawRecordsTable";
@@ -18,7 +17,6 @@ import { TransactionFiltersProps } from "./TransactionFilters";
 export const MainAppScreen: React.FC<
   {
     files: FileDescriptor[];
-    toggleFile: FileToggleCallback;
     transactions: Transaction[];
     filesWithRawRecords: FileWithRawRecords[];
     accounts: Bank.Accounts;

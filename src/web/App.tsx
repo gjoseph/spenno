@@ -298,8 +298,6 @@ const AppContent = () => {
         <Container maxWidth="lg" sx={{ mt: 11, mb: 4 }}>
           <MainAppScreen
             {...{
-              addFile,
-              toggleFile,
               transactions,
               filesWithRawRecords,
               accounts,
