@@ -1,4 +1,4 @@
-import * as chalk from "chalk";
+import chalk, { ChalkInstance } from "chalk";
 
 export interface Logger {
   trace(message: string, ...stuff: any[]): void; // TODO not actually intended as console.trace, find other name? verbose?
@@ -102,7 +102,7 @@ export class TermLogger implements Logger {
     );
   }
 
-  private rndChlk = (): chalk.Chalk =>
+  private rndChlk = (): ChalkInstance =>
     chalk.rgb(this.rnd255(), this.rnd255(), this.rnd255());
 
   private rnd255 = (): number => {
