@@ -25,7 +25,7 @@
     "@mui/material": "5.2.1",
     "@mui/x-data-grid": "5.0.1",
     "big.js": "6.1.1",
-    "chalk": "4.1.2",
+    "chalk": "5.0.0",
     "csv-parse": "5.0.3",
     "js-yaml": "4.1.0",
     "moment": "2.29.1",
