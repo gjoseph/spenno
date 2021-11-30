@@ -46,6 +46,7 @@ import { MainAppScreen } from "./MainAppScreen";
 import { TransactionFilters } from "./TransactionFilters";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 import { useFetch } from "./util/hook-fetch";
+import { useStoredState } from "./util/hook-stored-state";
 
 export default function App() {
   return (
@@ -87,6 +88,27 @@ function unwrapJobResult(res: { log: LogEntry[] }) {
   });
 }
 
+type FilesStateDispatcher = (
+  value: (prevState: TransactionsFile[]) => TransactionsFile[]
+) => void;
+
+const newFile = (filename: string, contents: string) => {
+  return new TransactionsFile(filename, "westpac.csv", contents);
+};
+
+const loadFrom = async (localDirectoryHandle: FileSystemDirectoryHandle) => {
+  const files: TransactionsFile[] = [];
+  for await (const e of localDirectoryHandle.values()) {
+    if (e.kind === "file" && /.*\.csv/.test(e.name)) {
+      const file = await e.getFile();
+      const contents = await file.text();
+      // TODO file.name or e.name
+      files.push(newFile(e.name, contents));
+    }
+  }
+  return files;
+};
+
 const AppContent = () => {
   const [calculating, setCalculating] = useState(true);
 
@@ -102,8 +124,29 @@ const AppContent = () => {
   >("/rules.yml", () => [], readRules);
   const allCategories = useMemo(() => Rules.extractCategories(rules), [rules]);
 
-  // TODO: FileDesc instead?
-  const [files, setFiles] = useState<TransactionsFile[]>([]);
+  // TODO: keep track of files as FileDesc instead?
+  const [
+    localDirectoryHandle,
+    setLocaldirectoryHandle,
+    clearLocaldirectoryHandle,
+  ] = useStoredState<FileSystemDirectoryHandle>("spenno.localdir");
+  const [localFiles, setLocalFiles] = useState<TransactionsFile[]>([]);
+  useEffect(() => {
+    (async () => {
+      if (!localDirectoryHandle) {
+        console.log("localDirectoryHandle not set");
+        // return [];
+      } else {
+        console.log("localDirectoryHandle:", localDirectoryHandle);
+        setLocalFiles(await loadFrom(localDirectoryHandle));
+      }
+    })();
+    return () => {
+      console.log("this is the cleanup of useEffect#localDirectoryHandle");
+    };
+  }, [localDirectoryHandle]);
+
+  const [uploadedFiles, setUploadedFiles] = useState<TransactionsFile[]>([]);
 
   const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => ({
     dateRange: MAX_DATE_RANGE,
@@ -142,27 +185,32 @@ const AppContent = () => {
       });
   }, [filesWithRawRecords]);
 
-  const addFile = (filename: string, contents: string) => {
-    setFiles((prevValue) => {
-      prevValue.push(new TransactionsFile(filename, "westpac.csv", contents));
-      return prevValue.slice(); // i forgot why exactly but without this shit breaks
-    });
-  };
+  const addFile =
+    (filesStateDispatcher: FilesStateDispatcher) =>
+    (filename: string, contents: string) => {
+      filesStateDispatcher((prevValue) => {
+        prevValue.push(newFile(filename, contents));
+        return prevValue.slice(); // i forgot why exactly but without this shit breaks
+      });
+    };
 
-  const toggleFile = (fileId: string, enabled: boolean) => {
-    setFiles((prevValue) => {
-      const transactionsFile = prevValue.find((f) => f.id === fileId);
-      if (!transactionsFile) {
-        throw new Error("File with id " + fileId + " not found!?");
-      }
-      transactionsFile.enabled = enabled;
-      return prevValue.slice();
-    });
-  };
+  const toggleFile =
+    (filesStateDispatcher: FilesStateDispatcher) =>
+    (fileId: string, enabled: boolean) => {
+      filesStateDispatcher((prevValue) => {
+        const transactionsFile = prevValue.find((f) => f.id === fileId);
+        if (!transactionsFile) {
+          throw new Error("File with id " + fileId + " not found!?");
+        }
+        transactionsFile.enabled = enabled;
+        return prevValue.slice();
+      });
+    };
 
   // TODO should we stagger these effects so it doesn't get executed 5 times on first load? And/or bypass it while there are no files, rules and accounts
   useEffect(() => {
     setCalculating((old) => true);
+    const files = localFiles.concat(uploadedFiles);
     calcWorker
       .reloadFiles(files, accounts.accounts)
       .then((res: FileLoadWorkResult) => {
@@ -180,7 +228,7 @@ const AppContent = () => {
         });
         setCalculating((old) => false);
       });
-  }, [files, accounts]);
+  }, [localFiles, uploadedFiles, accounts]);
   useEffect(() => {
     setCalculating((old) => true);
     const txDateRange = transferrableDateRange(filterConfig.dateRange);
@@ -224,23 +272,16 @@ const AppContent = () => {
   );
 
   const dirPickerHandler = async () => {
-    const dirHandle = await window.showDirectoryPicker();
-    for await (const e of dirHandle.values()) {
-      if (e.kind === "file" && /.*\.csv/.test(e.name)) {
-        const file = await e.getFile();
-        const contents = await file.text();
-        // TODO file.name or e.name?
-        // TODO for some reason isa's file gets loaded twice
-        addFile(e.name, contents);
-      }
-    }
+    const dirHandle: any = await window.showDirectoryPicker();
+    setLocaldirectoryHandle(dirHandle);
   };
 
   const fileDialog = (
     <React.Fragment>
       <Button onClick={dirPickerHandler}>Select Folder</Button>
-      <FileDrop addFile={addFile} minimal={false}>
-        <FileList files={fileDescs} toggleFile={toggleFile} />
+      <FileList files={fileDescs} toggleFile={toggleFile(setLocalFiles)} />
+      <FileDrop addFile={addFile(setUploadedFiles)} minimal={false}>
+        <FileList files={fileDescs} toggleFile={toggleFile(setUploadedFiles)} />
       </FileDrop>
     </React.Fragment>
   ); // TODO close on drop?
@@ -292,7 +333,7 @@ const AppContent = () => {
             icon: UploadFileIcon,
             title: "Files",
             content: fileDialog,
-            onDrop: addFile,
+            onDrop: addFile(setUploadedFiles),
           },
           { icon: SettingsIcon, title: "Settings", content: settingsDialog },
           { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
