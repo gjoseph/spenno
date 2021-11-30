@@ -10,11 +10,15 @@ import React from "react";
  *
  * @param key the key used to store this state in localStorage against.
  * @param defaultValue can be a value of type T, a function that returns T or undefined, or undefined.
+ * @param serialise a function to serialise the value to a string, defaults to JSON.stringify
+ * @param deSerialise a function to deserialise the value from a string, defaults to JSON.parse
  * @return an array of [current value, dispatcher to set the value to a new value, a function to unset and remove the value from the store]
  */
 export function useStoredState<T>(
   key: string,
-  defaultValue?: T | (() => T | undefined) | undefined
+  defaultValue?: () => T | undefined,
+  serialise: (value: T) => string = JSON.stringify,
+  deSerialise: (serialisedValue: string) => T = JSON.parse
 ): [
   T | undefined,
   React.Dispatch<React.SetStateAction<T | undefined>>,
@@ -26,7 +30,7 @@ export function useStoredState<T>(
     // to the correct equality check than approximate consistency.
     if (stickyValue !== null) {
       try {
-        return JSON.parse(stickyValue);
+        return deSerialise(stickyValue);
       } catch (e) {
         console.error(
           `Could not parse value for ${key}: ${stickyValue}: ${e}, restoring defaults.`
@@ -34,15 +38,17 @@ export function useStoredState<T>(
         window.localStorage.removeItem(key);
       }
     }
-    return defaultValue;
+    return defaultValue && defaultValue();
   });
+
   React.useEffect(() => {
     if (value === undefined) {
       window.localStorage.removeItem(key);
     } else {
-      window.localStorage.setItem(key, JSON.stringify(value));
+      window.localStorage.setItem(key, serialise(value));
     }
   }, [key, value]);
+
   const removeValue = () => {
     window.localStorage.removeItem(key);
     setValue(undefined);
