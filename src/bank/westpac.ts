@@ -51,7 +51,7 @@ export namespace Westpac {
           westpacCategories
       );
 
-      this.log.info(`Loaded ${westpac.length} from Westpac file`);
+      this.log.info(`Loaded ${westpac.length} records from Westpac file`);
       return westpac;
     }
 
