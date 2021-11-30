@@ -1,6 +1,7 @@
+import DollarIcon from "@mui/icons-material/LocalAtmOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import InfoIcon from "@mui/icons-material/Info";
-import DollarIcon from "@mui/icons-material/LocalAtmOutlined";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
@@ -314,6 +315,14 @@ const AppContent = () => {
     </div>
   );
 
+  const reloadAll = () => {
+    reFetchAccounts();
+    reFetchRules();
+    if (localDirectoryHandle) {
+      loadFrom(localDirectoryHandle);
+    }
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -328,6 +337,7 @@ const AppContent = () => {
           </>
         }
         iconAndDialogs={[
+          { icon: RefreshIcon, title: "Reload all", onClick: reloadAll },
           { icon: FilterListIcon, title: "Filters", content: filtersDialog },
           {
             icon: UploadFileIcon,
