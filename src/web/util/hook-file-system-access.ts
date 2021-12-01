@@ -1,5 +1,5 @@
+import * as idb from "idb-keyval";
 import React from "react";
-import { useIndexedDBStoredState } from "./hook-stored-state";
 
 /**
  * Utilities to work with LFSA and React.
@@ -17,14 +17,41 @@ type WellKnownDirectories =
 
 const READ_ONLY: FileSystemHandlePermissionDescriptor = { mode: "read" };
 
+type RequestPermissionsCallback = (() => Promise<void>) | undefined;
 type PersistentDirectoryReturn = [
   // current value
   FileSystemDirectoryHandle | undefined,
   // open picker callback
   () => Promise<void>,
   // clean state and store callback
-  () => void
+  () => void,
+  // callback to request user perms
+  RequestPermissionsCallback
 ];
+
+const idbGet = <T>(key: string): Promise<T | undefined> => {
+  console.log("Retrieving from indexeddb", key);
+  return idb.get<T>(key).then((v) => {
+    console.log("RETRIEVED FROM INDEXEDDB:", v);
+    return v;
+  });
+};
+
+const idbSet = <T>(key: string, value: T): Promise<void> => {
+  console.log("Setting to indexeddb", key, value);
+  return idb.set(key, value).then((v) => {
+    console.log("SETTED TO INDEXEDDB:", value);
+    return v;
+  });
+};
+
+const idbRemove = (key: string): Promise<void> => {
+  console.log("Removing from indexeddb", key);
+  return idb.del(key).then((v) => {
+    console.log("DELETED FROM INDEXEDDB:", v);
+    return v;
+  });
+};
 
 /**
  * A hook that allows
@@ -47,60 +74,100 @@ export const usePersistentLocalDirectory: (
   key: string,
   startIn?: WellKnownDirectories
 ) => {
-  const [handle, setHandle, clearHandle] =
-    useIndexedDBStoredState<FileSystemDirectoryHandle>(key);
+  // initially set to undefined, so we can use useEffect with an async function for initial value
+  const [handle, setHandle] = React.useState<
+    FileSystemDirectoryHandle | undefined
+  >();
+  const [loadedDbValue, setLoadedDbValue] = React.useState<boolean>(false);
+  // Get initial value, if it exists set state
+  React.useEffect(() => {
+    idbGet<FileSystemDirectoryHandle>(key)
+      .then((h) =>
+        setHandle((old) => {
+          console.log("useEffect for initial value: old", old, "new:", h);
+          return h;
+        })
+      )
+      .then(() => setLoadedDbValue(true));
+  }, [key]);
 
-  // TODO
-  const [needsPerms, setNeedsPerm] = React.useState<boolean>();
+  React.useEffect(() => {
+    // TODO unclear why this gets called so many times -- even if we disable the get effect above...
+    console.log(
+      "usePersistentLocalDirectory#useEffect: key:",
+      key,
+      "handle:",
+      handle,
+      "loadedDbValue:",
+      loadedDbValue
+    );
+    if (!loadedDbValue) {
+      // Only persist values if we've loaded the initial one from db (TODO this may lead to race conditions if we try to set it before it's loaded?)
+      return;
+    }
 
-  // React.useEffect(() => {
-  //   (async () => {
-  //     if (handle) {
-  //       console.log("checking perms for handle");
-  //       // Check if permission was already granted. If so, return true. TODO return what?
-  //       const queryPerm = await handle.queryPermission(READ_ONLY);
-  //       console.log("queryPerm:", queryPerm);
-  //       if (queryPerm === "granted") {
-  //         console.log("was already granted");
-  //         return //true;
-  //         // } else if (queryPerm==="prompt") {
-  //
-  //         // Request permission. If the user grants permission, return true. TODO return what? should we _unset_ if rejected?
-  //         // const reqPerm = await handle.requestPermission(READ_ONLY);
-  //         // console.log("reqPerm:", reqPerm);
-  //         // if (reqPerm === "granted") {
-  //         //   console.log("is now granted");
-  //         //   return//true;
-  //         // }
-  //       } else {
-  //         setNeedsPerm(true);
-  //       }
-  //       console.log("not granted ... oops!?")
-  //     } else {
-  //       console.log("no handle yet");
-  //     }
-  //   })();
-  // }, [ handle]);
+    if (handle === undefined) {
+      // Only delete if we're done reading the initial value from the db
+      //    tODo old comment This means we might get a spurious delete at startup, TODO particularly if we've not read it yet?
+      idbRemove(key);
+    } else {
+      idbSet(key, handle);
+    }
+  }, [key, handle, loadedDbValue]);
+
+  const [requestPermissions, setRequestPermissions] =
+    React.useState<RequestPermissionsCallback>();
+  React.useEffect(() => {
+    (async () => {
+      if (handle) {
+        console.log("checking perms for handle");
+        // Check if permission was already granted. If so, return true. TODO return what?
+        const queryPerm = await handle.queryPermission(READ_ONLY);
+        console.log("queryPerm:", queryPerm);
+        if (queryPerm === "granted") {
+          // TODO should we setRequestPermissions(undefined); ?
+          console.log("was already granted");
+          return; //true;
+          // Request permission. If the user grants permission, return true. TODO return what? should we _unset_ if rejected?
+          // const reqPerm = await handle.requestPermission(READ_ONLY);
+          // console.log("reqPerm:", reqPerm);
+          // if (reqPerm === "granted") {
+          //   console.log("is now granted");
+          //   return//true;
+          // }
+        } else {
+          setRequestPermissions(() => {
+            return async () => {
+              const reqPerm = await handle.requestPermission(READ_ONLY);
+              console.log("reqPerm:", reqPerm);
+              setRequestPermissions(undefined);
+            };
+          });
+        }
+        console.log("not granted ... oops!?");
+      } else {
+        console.log("no handle yet");
+      }
+    })();
+    // cleanup
+    // return () => {
+    //   setRequestPermissions(undefined);
+    // }
+  }, [handle]);
 
   const picker = async () => {
     const newHandle: any = await window.showDirectoryPicker({
       id: key,
       startIn: handle || startIn,
     });
-    setHandle(newHandle);
+    // todo check if old==new with isSameEntry
+    setHandle((oldHandle) => newHandle);
   };
 
-  // TODO pbly needs to be an effect? depending on handle...
-  const requestPermissions =
-    handle &&
-    (async () => {
-      // if (handle) {
-      const reqPerm = await handle.requestPermission(READ_ONLY);
-      console.log("reqPerm:", reqPerm);
-      // } else {
-      //   console.log("nothing to request perms for")
-      // }
-    });
+  const clearHandle = () => {
+    // idbRemove(key);
+    setHandle(undefined);
+  };
 
-  return [handle, picker, clearHandle]; // needsPerms, requestPermissions];
+  return [handle, picker, clearHandle, requestPermissions];
 };

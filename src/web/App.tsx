@@ -47,7 +47,7 @@ import { MainAppScreen } from "./MainAppScreen";
 import { TransactionFilters } from "./TransactionFilters";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 import { useFetch } from "./util/hook-fetch";
-import { usePersistentLocalDirectory } from "./util/local-file-system-access";
+import { usePersistentLocalDirectory } from "./util/hook-file-system-access";
 
 export default function App() {
   return (
@@ -99,7 +99,7 @@ const newFile = (filename: string, contents: string) => {
 
 const loadFrom = async (localDirectoryHandle: FileSystemDirectoryHandle) => {
   const files: TransactionsFile[] = [];
-  console.log("loadFrom#localDirectoryHandle:", localDirectoryHandle);
+  // console.log("loadFrom#localDirectoryHandle:", localDirectoryHandle);
   for await (const e of localDirectoryHandle.values()) {
     if (e.kind === "file" && /.*\.csv/.test(e.name)) {
       const file = await e.getFile();
@@ -134,24 +134,30 @@ const AppContent = () => {
   // // ] = useLocalStorageState<FileSystemDirectoryHandle>("spenno.localdir");
   // ] = useIndexedDBStoredState<FileSystemDirectoryHandle>("spenno.localdir");
 
-  const [localDirectoryHandle, dirPickerHandler, clearDirectoryHandler] =
-    usePersistentLocalDirectory("spenno_local_3");
+  const [
+    localDirectoryHandle,
+    dirPickerHandler,
+    clearDirectoryHandler,
+    requestPermissions,
+  ] = usePersistentLocalDirectory("spenno_local_5");
+  // not sure why this log is printed a million times...
+  console.log("requestPermissions:", requestPermissions);
 
   const [localFiles, setLocalFiles] = useState<TransactionsFile[]>([]);
   useEffect(() => {
     (async () => {
-      if (!localDirectoryHandle) {
-        console.log("localDirectoryHandle not set");
+      if (!localDirectoryHandle || requestPermissions) {
+        // console.log("localDirectoryHandle not set");
         setLocalFiles([]);
       } else {
-        console.log("useEffect on localDirectoryHandle:", localDirectoryHandle);
+        // console.log("useEffect on localDirectoryHandle:", localDirectoryHandle);
         setLocalFiles(await loadFrom(localDirectoryHandle));
       }
     })();
     return () => {
-      console.log("this is the cleanup of useEffect#localDirectoryHandle");
+      // console.log("this is the cleanup of useEffect#localDirectoryHandle");
     };
-  }, [localDirectoryHandle]);
+  }, [localDirectoryHandle, requestPermissions]); // also retrigger on permissions change...
 
   const [uploadedFiles, setUploadedFiles] = useState<TransactionsFile[]>([]);
 
@@ -287,6 +293,9 @@ const AppContent = () => {
     <React.Fragment>
       <Button onClick={dirPickerHandler}>Select Folder</Button>
       <Button onClick={clearDirectoryHandler}>Unselect</Button>
+      {requestPermissions && (
+        <Button onClick={requestPermissions}>perms</Button>
+      )}
       <hr />
       {/*<FileList files={fileDescs} toggleFile={toggleFile(setLocalFiles)} />*/}
       <hr />
