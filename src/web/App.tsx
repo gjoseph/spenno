@@ -47,7 +47,7 @@ import { MainAppScreen } from "./MainAppScreen";
 import { TransactionFilters } from "./TransactionFilters";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 import { useFetch } from "./util/hook-fetch";
-import { useStoredState } from "./util/hook-stored-state";
+import { usePersistentLocalDirectory } from "./util/local-file-system-access";
 
 export default function App() {
   return (
@@ -99,6 +99,7 @@ const newFile = (filename: string, contents: string) => {
 
 const loadFrom = async (localDirectoryHandle: FileSystemDirectoryHandle) => {
   const files: TransactionsFile[] = [];
+  console.log("loadFrom#localDirectoryHandle:", localDirectoryHandle);
   for await (const e of localDirectoryHandle.values()) {
     if (e.kind === "file" && /.*\.csv/.test(e.name)) {
       const file = await e.getFile();
@@ -126,19 +127,24 @@ const AppContent = () => {
   const allCategories = useMemo(() => Rules.extractCategories(rules), [rules]);
 
   // TODO: keep track of files as FileDesc instead?
-  const [
-    localDirectoryHandle,
-    setLocaldirectoryHandle,
-    clearLocaldirectoryHandle,
-  ] = useStoredState<FileSystemDirectoryHandle>("spenno.localdir");
+  // const [
+  //   localDirectoryHandle,
+  //   setLocaldirectoryHandle,
+  //   clearLocaldirectoryHandle,
+  // // ] = useLocalStorageState<FileSystemDirectoryHandle>("spenno.localdir");
+  // ] = useIndexedDBStoredState<FileSystemDirectoryHandle>("spenno.localdir");
+
+  const [localDirectoryHandle, dirPickerHandler, clearDirectoryHandler] =
+    usePersistentLocalDirectory("spenno_local_3");
+
   const [localFiles, setLocalFiles] = useState<TransactionsFile[]>([]);
   useEffect(() => {
     (async () => {
       if (!localDirectoryHandle) {
         console.log("localDirectoryHandle not set");
-        // return [];
+        setLocalFiles([]);
       } else {
-        console.log("localDirectoryHandle:", localDirectoryHandle);
+        console.log("useEffect on localDirectoryHandle:", localDirectoryHandle);
         setLocalFiles(await loadFrom(localDirectoryHandle));
       }
     })();
@@ -272,15 +278,18 @@ const AppContent = () => {
     />
   );
 
-  const dirPickerHandler = async () => {
-    const dirHandle: any = await window.showDirectoryPicker();
-    setLocaldirectoryHandle(dirHandle);
-  };
+  // const dirPickerHandler = async () => {
+  //   const dirHandle: any = await window.showDirectoryPicker({startIn:'music'});
+  //   setLocaldirectoryHandle(dirHandle);
+  // };
 
   const fileDialog = (
     <React.Fragment>
       <Button onClick={dirPickerHandler}>Select Folder</Button>
-      <FileList files={fileDescs} toggleFile={toggleFile(setLocalFiles)} />
+      <Button onClick={clearDirectoryHandler}>Unselect</Button>
+      <hr />
+      {/*<FileList files={fileDescs} toggleFile={toggleFile(setLocalFiles)} />*/}
+      <hr />
       <FileDrop addFile={addFile(setUploadedFiles)} minimal={false}>
         <FileList files={fileDescs} toggleFile={toggleFile(setUploadedFiles)} />
       </FileDrop>
