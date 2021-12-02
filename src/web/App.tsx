@@ -70,15 +70,15 @@ const grayForTheme = (theme: Theme) =>
     ? theme.palette.grey[100]
     : theme.palette.grey[900];
 
-const consoleLogger = new ConsoleLogger();
+const logger = new ConsoleLogger();
 
 const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
 
 const readAccounts = (result: string) =>
-  new Bank.AccountsLoader(consoleLogger).loadYaml(result);
+  new Bank.AccountsLoader(logger).loadYaml(result);
 
 const readRules = (result: string) =>
-  new Rules.RulesLoader(consoleLogger).loadYaml(result);
+  new Rules.RulesLoader(logger).loadYaml(result);
 
 export type SetFilterConfig = Dispatch<SetStateAction<FilterConfig>>;
 export type FilterConfig = {
@@ -164,7 +164,7 @@ const AppContent = () => {
       setLocalFiles([]);
     } else {
       (async () => {
-        setLocalFiles(await loadFrom(localDirectoryHandle, consoleLogger));
+        setLocalFiles(await loadFrom(localDirectoryHandle, logger));
       })();
     }
   }, [localDirectoryHandle, requestPermissions]);
@@ -242,10 +242,10 @@ const AppContent = () => {
     calcWorker
       .reloadFiles(files, accounts.accounts)
       .then((res: FileLoadWorkResult) => {
-        forwardLogs(res.log, consoleLogger);
+        forwardLogs(res.log, logger);
         setFilesWithRawRecords((old) => {
           const newFiles = fromTransferrableFilesWithRawRecords(res.files);
-          consoleLogger.debug(
+          logger.debug(
             "Loaded",
             newFiles.length,
             "files with",
@@ -270,12 +270,12 @@ const AppContent = () => {
         filterConfig.amount
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
-        forwardLogs(res.log, consoleLogger);
+        forwardLogs(res.log, logger);
         setTransactions((old) => {
           const newTxs = res.transactions.map(
             fromTransferrable(TransferrableMappings.Transaction)
           );
-          consoleLogger.debug("Loaded", newTxs.length, "transactions");
+          logger.debug("Loaded", newTxs.length, "transactions");
           return newTxs;
         });
         setCalculating((old) => false);
