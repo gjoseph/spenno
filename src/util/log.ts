@@ -93,3 +93,9 @@ export class SilentLogger implements Logger {
 
   warn(message: string): void {}
 }
+
+export const forwardLogs = (logs: LogEntry[], targetLogger: Logger) => {
+  logs.forEach((l) => {
+    targetLogger[l.level]("[job result] " + l.message);
+  });
+};

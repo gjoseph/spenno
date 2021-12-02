@@ -31,7 +31,7 @@ import {
 } from "../domain/file";
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
-import { ConsoleLogger, LogEntry, Logger } from "../util/log";
+import { ConsoleLogger, Logger, forwardLogs } from "../util/log";
 import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
 import * as CalculatorWorker from "../worker/transaction-filter-worker";
@@ -89,12 +89,6 @@ export type FilterConfig = {
   groupBy: GroupBy;
   splitBy: SplitBy;
 };
-
-function unwrapJobResult(res: { log: LogEntry[] }) {
-  res.log.forEach((l) => {
-    consoleLogger[l.level]("[job result] " + l.message);
-  });
-}
 
 type FilesStateDispatcher = (
   value: (prevState: TransactionsFile[]) => TransactionsFile[]
@@ -248,7 +242,7 @@ const AppContent = () => {
     calcWorker
       .reloadFiles(files, accounts.accounts)
       .then((res: FileLoadWorkResult) => {
-        unwrapJobResult(res);
+        forwardLogs(res.log, consoleLogger);
         setFilesWithRawRecords((old) => {
           const newFiles = fromTransferrableFilesWithRawRecords(res.files);
           consoleLogger.debug(
@@ -276,7 +270,7 @@ const AppContent = () => {
         filterConfig.amount
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
-        unwrapJobResult(res);
+        forwardLogs(res.log, consoleLogger);
         setTransactions((old) => {
           const newTxs = res.transactions.map(
             fromTransferrable(TransferrableMappings.Transaction)
