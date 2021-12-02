@@ -17,53 +17,19 @@ type WellKnownDirectories =
 
 const READ_ONLY: FileSystemHandlePermissionDescriptor = { mode: "read" };
 
-type RequestPermissionsCallback = (() => Promise<void>) | undefined;
+type OpenPickerCallback = () => Promise<void>;
+type RequestPermissionsCallback = () => Promise<void>;
+type ClearStateAndStoreCallback = () => void;
+type RequestPermissionsCallbackStatus = {
+  callback?: RequestPermissionsCallback | undefined;
+  status: PermissionState | "loading";
+};
 type PersistentDirectoryReturn = [
-  // current value
   FileSystemDirectoryHandle | undefined,
-  // open picker callback
-  () => Promise<void>,
-  // clean state and store callback
-  () => void,
-  // callback to request user perms
-  RequestPermissionsCallback
+  OpenPickerCallback,
+  RequestPermissionsCallbackStatus,
+  ClearStateAndStoreCallback
 ];
-
-const idbGet = <T>(key: string): Promise<T | undefined> => {
-  console.log("Retrieving from indexeddb", key);
-  return idb.get<T>(key).then((v) => {
-    console.log("RETRIEVED FROM INDEXEDDB:", v);
-    return v;
-  });
-};
-
-const idbSet = <T>(key: string, value: T): Promise<void> => {
-  console.log("Setting to indexeddb", key, value);
-  return idb.set(key, value).then((v) => {
-    console.log("SETTED TO INDEXEDDB:", value);
-    return v;
-  });
-};
-
-const idbRemove = (key: string): Promise<void> => {
-  console.log("Removing from indexeddb", key);
-  return idb.del(key).then((v) => {
-    console.log("DELETED FROM INDEXEDDB:", v);
-    return v;
-  });
-};
-
-const requestPermissionsCallback =
-  (
-    handle: FileSystemDirectoryHandle,
-    callbackWhenDone: (state: PermissionState) => void
-  ) =>
-  () => {
-    return async () => {
-      const reqPerm = await handle.requestPermission(READ_ONLY);
-      callbackWhenDone(reqPerm);
-    };
-  };
 
 /**
  * A hook that allows
@@ -75,7 +41,10 @@ const requestPermissionsCallback =
  * @param key identifies this particular directory in the application. This is used both for storage and to enable `showDirectoryPicker` to re-open in the right location.
  *            APPARENTLY, Chrome does not allow `.` and who knows what other chars in the ID passed to `showDirectoryPicker`, so, don't.
  * @param startIn optionally, specify a starting directory if we haven't stored one for this `key` yet
- * @return [picker callback (to use on a button), ...]
+ * @return [the current handle as a state variable,
+ *          a callback function to trigger the browser's directory picker,
+ *          a tuple representing the state of permissions and an optional callback to prompt user,
+ *          and a callback to clear both state and store ]
  *
  * Notes: state setter not needed in return value since it's only used internally by the picker callback.
  */
@@ -128,7 +97,8 @@ export const usePersistentLocalDirectory: (
   }, [key, handle, loadedDbValue]);
 
   const [requestPermissions, setRequestPermissions] =
-    React.useState<RequestPermissionsCallback>();
+    React.useState<RequestPermissionsCallbackStatus>({ status: "loading" });
+  // the filesystem API is async, so can't initialise state right away, check permissions in an effect instead
   React.useEffect(() => {
     (async () => {
       if (handle) {
@@ -138,30 +108,28 @@ export const usePersistentLocalDirectory: (
         if (queryPerm === "granted") {
           // TODO should we explicitly setRequestPermissions(undefined); ?
           console.log("was already granted");
+          setRequestPermissions({ status: "granted" });
           return;
         } else {
-          const callbackWhenDone = (state: PermissionState) => {
-            if (state === "granted") {
-              setRequestPermissions(undefined);
-            } else {
-              console.log(
-                `requested permissions for ${handle}, but got ${state}`
-              );
-            }
-          };
-          setRequestPermissions(
-            requestPermissionsCallback(handle, callbackWhenDone)
-          );
+          setRequestPermissions({
+            status: "prompt",
+            callback: async () => {
+              const reqPerm = await handle.requestPermission(READ_ONLY);
+              if (reqPerm === "granted") {
+                setRequestPermissions({ status: "granted" });
+              } else {
+                setRequestPermissions({ status: reqPerm });
+                console.log(
+                  `requested permissions for ${handle}, but got ${reqPerm}`
+                );
+              }
+            },
+          });
         }
-        console.log("not granted ... oops!?");
       } else {
         console.log("no handle yet");
       }
     })();
-    // cleanup
-    // return () => {
-    //   setRequestPermissions(undefined);
-    // }
   }, [handle]);
 
   const picker = async () => {
@@ -178,5 +146,31 @@ export const usePersistentLocalDirectory: (
     setHandle(undefined);
   };
 
-  return [handle, picker, clearHandle, requestPermissions];
+  return [handle, picker, requestPermissions, clearHandle];
+};
+
+// ==== IDB wrapper functions, really just vaguely useful for logging
+
+const idbGet = <T>(key: string): Promise<T | undefined> => {
+  console.log("Retrieving from indexeddb", key);
+  return idb.get<T>(key).then((v) => {
+    console.log("RETRIEVED FROM INDEXEDDB:", v);
+    return v;
+  });
+};
+
+const idbSet = <T>(key: string, value: T): Promise<void> => {
+  console.log("Setting to indexeddb", key, value);
+  return idb.set(key, value).then((v) => {
+    console.log("SETTED TO INDEXEDDB:", value);
+    return v;
+  });
+};
+
+const idbRemove = (key: string): Promise<void> => {
+  console.log("Removing from indexeddb", key);
+  return idb.del(key).then((v) => {
+    console.log("DELETED FROM INDEXEDDB:", v);
+    return v;
+  });
 };

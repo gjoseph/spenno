@@ -12,7 +12,14 @@ import CssBaseline from "@mui/material/CssBaseline";
 import DialogContentText from "@mui/material/DialogContentText";
 import { createTheme } from "@mui/material/styles";
 import * as React from "react";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
@@ -97,6 +104,31 @@ const newFile = (filename: string, contents: string) => {
   return new TransactionsFile(filename, "westpac.csv", contents);
 };
 
+async function loadFile(e: FileSystemFileHandle, file: File) {
+  return newFile(file.name, await file.text());
+}
+
+const collectFilesFrom = async <T,>(
+  dir: FileSystemDirectoryHandle,
+  log: Logger,
+  fileLoader: (handle: FileSystemFileHandle, file: File) => Promise<T>
+): Promise<T[]> => {
+  console.log("collectFilesFrom#dir:", dir);
+  const perm = await dir.queryPermission();
+  if (perm !== "granted") {
+    log.warn("Can't open load files from " + dir.name + ": " + perm);
+    return [];
+  }
+  const files: T[] = [];
+  for await (const e of dir.values()) {
+    if (e.kind === "file" && /.*\.csv/.test(e.name)) {
+      const file = await e.getFile();
+      files.push(await fileLoader(e, file));
+    }
+  }
+  return files;
+};
+
 const loadFrom: (
   dir: FileSystemDirectoryHandle,
   log: Logger
@@ -104,22 +136,7 @@ const loadFrom: (
   dir: FileSystemDirectoryHandle,
   log: Logger
 ) => {
-  console.log("loadFrom#dir:", dir);
-  const perm = await dir.queryPermission();
-  if (perm !== "granted") {
-    log.warn("Can't open load files from " + dir.name + ": " + perm);
-    return [];
-  }
-  const files: TransactionsFile[] = [];
-  for await (const e of dir.values()) {
-    if (e.kind === "file" && /.*\.csv/.test(e.name)) {
-      const file = await e.getFile();
-      const contents = await file.text();
-      // TODO file.name or e.name
-      files.push(newFile(e.name, contents));
-    }
-  }
-  return files;
+  return await collectFilesFrom(dir, log, loadFile);
 };
 
 const AppContent = () => {
@@ -141,18 +158,14 @@ const AppContent = () => {
   const [
     localDirectoryHandle,
     dirPickerHandler,
-    clearDirectoryHandler,
     requestPermissions,
+    clearDirectoryHandler,
   ] = usePersistentLocalDirectory("spenno_local_5");
 
   const [localFiles, setLocalFiles] = useState<TransactionsFile[]>([]);
-  useEffect(() => {
-    console.log(
-      "useEffect on localDirectoryHandle:",
-      localDirectoryHandle,
-      requestPermissions
-    );
-    if (!localDirectoryHandle || requestPermissions) {
+
+  const asyncLoadAndSetFiles = useCallback(() => {
+    if (!localDirectoryHandle || requestPermissions.status !== "granted") {
       // console.log("localDirectoryHandle not set");
       setLocalFiles([]);
     } else {
@@ -160,7 +173,12 @@ const AppContent = () => {
         setLocalFiles(await loadFrom(localDirectoryHandle, consoleLogger));
       })();
     }
-  }, [localDirectoryHandle, requestPermissions]); // retrigger this effect on handle change and on permissions change
+  }, [localDirectoryHandle, requestPermissions]);
+
+  useEffect(() => {
+    asyncLoadAndSetFiles();
+    // retrigger this effect on handle change and on permissions change
+  }, [asyncLoadAndSetFiles, localDirectoryHandle, requestPermissions]);
 
   const [uploadedFiles, setUploadedFiles] = useState<TransactionsFile[]>([]);
 
@@ -287,17 +305,12 @@ const AppContent = () => {
     />
   );
 
-  // const dirPickerHandler = async () => {
-  //   const dirHandle: any = await window.showDirectoryPicker({startIn:'music'});
-  //   setLocaldirectoryHandle(dirHandle);
-  // };
-
   const fileDialog = (
     <React.Fragment>
       <Button onClick={dirPickerHandler}>Select Folder</Button>
       <Button onClick={clearDirectoryHandler}>Unselect</Button>
-      {requestPermissions && (
-        <Button onClick={requestPermissions}>perms</Button>
+      {requestPermissions.status !== "granted" && (
+        <Button onClick={requestPermissions.callback}>perms</Button>
       )}
       <hr />
       {/*<FileList files={fileDescs} toggleFile={toggleFile(setLocalFiles)} />*/}
@@ -339,11 +352,7 @@ const AppContent = () => {
   const reloadAll = () => {
     reFetchAccounts();
     reFetchRules();
-    if (localDirectoryHandle) {
-      (async () => {
-        setLocalFiles(await loadFrom(localDirectoryHandle, consoleLogger));
-      })();
-    }
+    asyncLoadAndSetFiles();
   };
 
   return (
@@ -363,9 +372,10 @@ const AppContent = () => {
           { icon: RefreshIcon, title: "Reload all", onClick: reloadAll },
           { icon: FilterListIcon, title: "Filters", content: filtersDialog },
           {
-            icon: requestPermissions
-              ? withWarning(UploadFileIcon)
-              : UploadFileIcon,
+            icon:
+              requestPermissions.status !== "granted"
+                ? withWarning(UploadFileIcon)
+                : UploadFileIcon,
             title: "Files",
             content: fileDialog,
             onDrop: addFile(setUploadedFiles),
