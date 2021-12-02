@@ -31,7 +31,7 @@ import {
 } from "../domain/file";
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
-import { ConsoleLogger, Logger, forwardLogs } from "../util/log";
+import { ConsoleLogger, forwardLogs } from "../util/log";
 import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
 import * as CalculatorWorker from "../worker/transaction-filter-worker";
@@ -53,6 +53,7 @@ import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { TransactionFilters } from "./TransactionFilters";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
+import { collectFilesFrom, FileTests } from "./util/file-system-util";
 import { useFetch } from "./util/hook-fetch";
 import { usePersistentLocalDirectory } from "./util/hook-file-system-access";
 
@@ -94,44 +95,9 @@ type FilesStateDispatcher = (
   value: (prevState: TransactionsFile[]) => TransactionsFile[]
 ) => void;
 
-const newFile = (filename: string, contents: string) => {
-  return new TransactionsFile(filename, "westpac.csv", contents);
-};
-
-async function loadFile(e: FileSystemFileHandle, file: File) {
-  return newFile(file.name, await file.text());
+async function loadFileFunction(e: FileSystemFileHandle, file: File) {
+  return new TransactionsFile(file.name, "westpac.csv", await file.text());
 }
-
-const collectFilesFrom = async <T,>(
-  dir: FileSystemDirectoryHandle,
-  log: Logger,
-  fileLoader: (handle: FileSystemFileHandle, file: File) => Promise<T>
-): Promise<T[]> => {
-  console.log("collectFilesFrom#dir:", dir);
-  const perm = await dir.queryPermission();
-  if (perm !== "granted") {
-    log.warn("Can't open load files from " + dir.name + ": " + perm);
-    return [];
-  }
-  const files: T[] = [];
-  for await (const e of dir.values()) {
-    if (e.kind === "file" && /.*\.csv/.test(e.name)) {
-      const file = await e.getFile();
-      files.push(await fileLoader(e, file));
-    }
-  }
-  return files;
-};
-
-const loadFrom: (
-  dir: FileSystemDirectoryHandle,
-  log: Logger
-) => Promise<TransactionsFile[]> = async (
-  dir: FileSystemDirectoryHandle,
-  log: Logger
-) => {
-  return await collectFilesFrom(dir, log, loadFile);
-};
 
 const AppContent = () => {
   const [calculating, setCalculating] = useState(true);
@@ -164,7 +130,13 @@ const AppContent = () => {
       setLocalFiles([]);
     } else {
       (async () => {
-        setLocalFiles(await loadFrom(localDirectoryHandle, logger));
+        const loadedFiles = await collectFilesFrom(
+          localDirectoryHandle,
+          logger,
+          loadFileFunction,
+          FileTests.CSV_SUFFIX
+        );
+        setLocalFiles(loadedFiles);
       })();
     }
   }, [localDirectoryHandle, requestPermissions]);
@@ -217,7 +189,7 @@ const AppContent = () => {
     (filesStateDispatcher: FilesStateDispatcher) =>
     (filename: string, contents: string) => {
       filesStateDispatcher((prevValue) => {
-        prevValue.push(newFile(filename, contents));
+        prevValue.push(new TransactionsFile(filename, "westpac.csv", contents));
         return prevValue.slice(); // i forgot why exactly but without this shit breaks
       });
     };
