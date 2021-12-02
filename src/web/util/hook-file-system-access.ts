@@ -53,6 +53,18 @@ const idbRemove = (key: string): Promise<void> => {
   });
 };
 
+const requestPermissionsCallback =
+  (
+    handle: FileSystemDirectoryHandle,
+    callbackWhenDone: (state: PermissionState) => void
+  ) =>
+  () => {
+    return async () => {
+      const reqPerm = await handle.requestPermission(READ_ONLY);
+      callbackWhenDone(reqPerm);
+    };
+  };
+
 /**
  * A hook that allows
  * - picking a directory from the local filesystem
@@ -121,28 +133,25 @@ export const usePersistentLocalDirectory: (
     (async () => {
       if (handle) {
         console.log("checking perms for handle");
-        // Check if permission was already granted. If so, return true. TODO return what?
         const queryPerm = await handle.queryPermission(READ_ONLY);
         console.log("queryPerm:", queryPerm);
         if (queryPerm === "granted") {
-          // TODO should we setRequestPermissions(undefined); ?
+          // TODO should we explicitly setRequestPermissions(undefined); ?
           console.log("was already granted");
-          return; //true;
-          // Request permission. If the user grants permission, return true. TODO return what? should we _unset_ if rejected?
-          // const reqPerm = await handle.requestPermission(READ_ONLY);
-          // console.log("reqPerm:", reqPerm);
-          // if (reqPerm === "granted") {
-          //   console.log("is now granted");
-          //   return//true;
-          // }
+          return;
         } else {
-          setRequestPermissions(() => {
-            return async () => {
-              const reqPerm = await handle.requestPermission(READ_ONLY);
-              console.log("reqPerm:", reqPerm);
+          const callbackWhenDone = (state: PermissionState) => {
+            if (state === "granted") {
               setRequestPermissions(undefined);
-            };
-          });
+            } else {
+              console.log(
+                `requested permissions for ${handle}, but got ${state}`
+              );
+            }
+          };
+          setRequestPermissions(
+            requestPermissionsCallback(handle, callbackWhenDone)
+          );
         }
         console.log("not granted ... oops!?");
       } else {

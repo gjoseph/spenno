@@ -5,7 +5,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
-import { Button, Theme, ThemeProvider } from "@mui/material";
+import { Badge, Button, Theme, ThemeProvider } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -24,7 +24,7 @@ import {
 } from "../domain/file";
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
-import { ConsoleLogger, LogEntry } from "../util/log";
+import { ConsoleLogger, LogEntry, Logger } from "../util/log";
 import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
 import * as CalculatorWorker from "../worker/transaction-filter-worker";
@@ -97,10 +97,21 @@ const newFile = (filename: string, contents: string) => {
   return new TransactionsFile(filename, "westpac.csv", contents);
 };
 
-const loadFrom = async (localDirectoryHandle: FileSystemDirectoryHandle) => {
+const loadFrom: (
+  dir: FileSystemDirectoryHandle,
+  log: Logger
+) => Promise<TransactionsFile[]> = async (
+  dir: FileSystemDirectoryHandle,
+  log: Logger
+) => {
+  console.log("loadFrom#dir:", dir);
+  const perm = await dir.queryPermission();
+  if (perm !== "granted") {
+    log.warn("Can't open load files from " + dir.name + ": " + perm);
+    return [];
+  }
   const files: TransactionsFile[] = [];
-  // console.log("loadFrom#localDirectoryHandle:", localDirectoryHandle);
-  for await (const e of localDirectoryHandle.values()) {
+  for await (const e of dir.values()) {
     if (e.kind === "file" && /.*\.csv/.test(e.name)) {
       const file = await e.getFile();
       const contents = await file.text();
@@ -127,37 +138,29 @@ const AppContent = () => {
   const allCategories = useMemo(() => Rules.extractCategories(rules), [rules]);
 
   // TODO: keep track of files as FileDesc instead?
-  // const [
-  //   localDirectoryHandle,
-  //   setLocaldirectoryHandle,
-  //   clearLocaldirectoryHandle,
-  // // ] = useLocalStorageState<FileSystemDirectoryHandle>("spenno.localdir");
-  // ] = useIndexedDBStoredState<FileSystemDirectoryHandle>("spenno.localdir");
-
   const [
     localDirectoryHandle,
     dirPickerHandler,
     clearDirectoryHandler,
     requestPermissions,
   ] = usePersistentLocalDirectory("spenno_local_5");
-  // not sure why this log is printed a million times...
-  console.log("requestPermissions:", requestPermissions);
 
   const [localFiles, setLocalFiles] = useState<TransactionsFile[]>([]);
   useEffect(() => {
-    (async () => {
-      if (!localDirectoryHandle || requestPermissions) {
-        // console.log("localDirectoryHandle not set");
-        setLocalFiles([]);
-      } else {
-        // console.log("useEffect on localDirectoryHandle:", localDirectoryHandle);
-        setLocalFiles(await loadFrom(localDirectoryHandle));
-      }
-    })();
-    return () => {
-      // console.log("this is the cleanup of useEffect#localDirectoryHandle");
-    };
-  }, [localDirectoryHandle, requestPermissions]); // also retrigger on permissions change...
+    console.log(
+      "useEffect on localDirectoryHandle:",
+      localDirectoryHandle,
+      requestPermissions
+    );
+    if (!localDirectoryHandle || requestPermissions) {
+      // console.log("localDirectoryHandle not set");
+      setLocalFiles([]);
+    } else {
+      (async () => {
+        setLocalFiles(await loadFrom(localDirectoryHandle, consoleLogger));
+      })();
+    }
+  }, [localDirectoryHandle, requestPermissions]); // retrigger this effect on handle change and on permissions change
 
   const [uploadedFiles, setUploadedFiles] = useState<TransactionsFile[]>([]);
 
@@ -337,7 +340,9 @@ const AppContent = () => {
     reFetchAccounts();
     reFetchRules();
     if (localDirectoryHandle) {
-      loadFrom(localDirectoryHandle);
+      (async () => {
+        setLocalFiles(await loadFrom(localDirectoryHandle, consoleLogger));
+      })();
     }
   };
 
@@ -358,7 +363,9 @@ const AppContent = () => {
           { icon: RefreshIcon, title: "Reload all", onClick: reloadAll },
           { icon: FilterListIcon, title: "Filters", content: filtersDialog },
           {
-            icon: UploadFileIcon,
+            icon: requestPermissions
+              ? withWarning(UploadFileIcon)
+              : UploadFileIcon,
             title: "Files",
             content: fileDialog,
             onDrop: addFile(setUploadedFiles),
@@ -400,3 +407,13 @@ const AppContent = () => {
     </Box>
   );
 };
+
+const withWarning =
+  <P,>(WrappedComponent: React.ComponentType<P>) =>
+  (props: P) => {
+    return (
+      <Badge color="warning" variant="dot">
+        <WrappedComponent {...props} />
+      </Badge>
+    );
+  };
