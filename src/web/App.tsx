@@ -46,7 +46,6 @@ import {
   transferrableDateRange,
   TransferrableMappings,
 } from "../worker/transfer";
-import { FileDrop } from "./filedrop/FileDrop";
 import { FileList } from "./FileList";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
@@ -92,10 +91,6 @@ export type FilterConfig = {
   splitBy: SplitBy;
 };
 
-type FilesStateDispatcher = (
-  value: (prevState: TransactionsFile[]) => TransactionsFile[]
-) => void;
-
 async function loadFileFunction(e: FileSystemFileHandle, file: File) {
   return new TransactionsFile(file.name, "westpac.csv", await file.text());
 }
@@ -123,12 +118,12 @@ const AppContent = () => {
     clearDirectoryHandler,
   ] = usePersistentLocalDirectory("spenno_local_5");
 
-  const [localFiles, setLocalFiles] = useState<TransactionsFile[]>([]);
+  const [files, setFiles] = useState<TransactionsFile[]>([]);
 
   const asyncLoadAndSetFiles = useCallback(() => {
     if (!localDirectoryHandle || requestPermissions.status !== "granted") {
       // console.log("localDirectoryHandle not set");
-      setLocalFiles([]);
+      setFiles([]);
     } else {
       (async () => {
         const loadedFiles = await collectFilesFrom(
@@ -137,7 +132,7 @@ const AppContent = () => {
           loadFileFunction,
           FileTests.CSV_SUFFIX
         );
-        setLocalFiles(loadedFiles);
+        setFiles(loadedFiles);
       })();
     }
   }, [localDirectoryHandle, requestPermissions]);
@@ -146,8 +141,6 @@ const AppContent = () => {
     asyncLoadAndSetFiles();
     // retrigger this effect on handle change and on permissions change
   }, [asyncLoadAndSetFiles, localDirectoryHandle, requestPermissions]);
-
-  const [uploadedFiles, setUploadedFiles] = useState<TransactionsFile[]>([]);
 
   const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => ({
     dateRange: MAX_DATE_RANGE,
@@ -186,32 +179,20 @@ const AppContent = () => {
       });
   }, [filesWithRawRecords]);
 
-  const addFile =
-    (filesStateDispatcher: FilesStateDispatcher) =>
-    (filename: string, contents: string) => {
-      filesStateDispatcher((prevValue) => {
-        prevValue.push(new TransactionsFile(filename, "westpac.csv", contents));
-        return prevValue.slice(); // i forgot why exactly but without this shit breaks
-      });
-    };
-
-  const toggleFile =
-    (filesStateDispatcher: FilesStateDispatcher) =>
-    (fileId: string, enabled: boolean) => {
-      filesStateDispatcher((prevValue) => {
-        const transactionsFile = prevValue.find((f) => f.id === fileId);
-        if (!transactionsFile) {
-          throw new Error("File with id " + fileId + " not found!?");
-        }
-        transactionsFile.enabled = enabled;
-        return prevValue.slice();
-      });
-    };
+  const toggleFile = (fileId: string, enabled: boolean) => {
+    setFiles((prevValue) => {
+      const transactionsFile = prevValue.find((f) => f.id === fileId);
+      if (!transactionsFile) {
+        throw new Error("File with id " + fileId + " not found!?");
+      }
+      transactionsFile.enabled = enabled;
+      return prevValue.slice();
+    });
+  };
 
   // TODO should we stagger these effects so it doesn't get executed 5 times on first load? And/or bypass it while there are no files, rules and accounts
   useEffect(() => {
     setCalculating((old) => true);
-    const files = localFiles.concat(uploadedFiles);
     calcWorker
       .reloadFiles(files, accounts.accounts)
       .then((res: FileLoadWorkResult) => {
@@ -229,7 +210,7 @@ const AppContent = () => {
         });
         setCalculating((old) => false);
       });
-  }, [localFiles, uploadedFiles, accounts]);
+  }, [files, accounts]);
   useEffect(() => {
     setCalculating((old) => true);
     const txDateRange = transferrableDateRange(filterConfig.dateRange);
@@ -279,12 +260,15 @@ const AppContent = () => {
       {requestPermissions.status !== "granted" && (
         <Button onClick={requestPermissions.callback}>perms</Button>
       )}
-      <hr />
-      {/*<FileList files={fileDescs} toggleFile={toggleFile(setLocalFiles)} />*/}
-      <hr />
-      <FileDrop addFile={addFile(setUploadedFiles)} minimal={false}>
-        <FileList files={fileDescs} toggleFile={toggleFile(setUploadedFiles)} />
-      </FileDrop>
+      {/*<FileDrop addFile={addFile(setUploadedFiles)} minimal={false}>*/}
+      {/*Currently not supporting uploads or drag'n'drop
+         If we wanted to, we could
+         * re-add support for drag'n'drop of folders,
+         * re-add support for actual uploads, which _can_ still work with FileSystemFileHandle APIs
+         See e.g https://web.dev/file-system-access/#drag-and-drop-integration and https://web.dev/file-system-access/#polyfilling
+      */}
+      <FileList files={fileDescs} toggleFile={toggleFile} />
+      {/*</FileDrop>*/}
     </React.Fragment>
   ); // TODO close on drop?
 
@@ -352,7 +336,7 @@ const AppContent = () => {
                 ? requestPermissions.callback
                 : undefined,
             content: fileDialog,
-            onDrop: addFile(setUploadedFiles),
+            // onDrop: addFile(setFiles),
           },
           { icon: SettingsIcon, title: "Settings", content: settingsDialog },
           { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
