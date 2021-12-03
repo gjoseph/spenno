@@ -62,7 +62,8 @@ export const usePersistentLocalDirectory: (
   const [loadedDbValue, setLoadedDbValue] = React.useState<boolean>(false);
   // Get initial value, if it exists set state
   React.useEffect(() => {
-    idbGet<FileSystemDirectoryHandle>(key)
+    idb
+      .get<FileSystemDirectoryHandle>(key)
       .then((h) =>
         setHandle((old) => {
           console.log("useEffect for initial value: old", old, "new:", h);
@@ -73,26 +74,15 @@ export const usePersistentLocalDirectory: (
   }, [key]);
 
   React.useEffect(() => {
-    // TODO unclear why this gets called so many times -- even if we disable the get effect above...
-    console.log(
-      "usePersistentLocalDirectory#useEffect: key:",
-      key,
-      "handle:",
-      handle,
-      "loadedDbValue:",
-      loadedDbValue
-    );
     if (!loadedDbValue) {
       // Only persist values if we've loaded the initial one from db (TODO this may lead to race conditions if we try to set it before it's loaded?)
       return;
     }
 
     if (handle === undefined) {
-      // Only delete if we're done reading the initial value from the db
-      //    tODo old comment This means we might get a spurious delete at startup, TODO particularly if we've not read it yet?
-      idbRemove(key);
+      idb.del(key);
     } else {
-      idbSet(key, handle);
+      idb.set(key, handle);
     }
   }, [key, handle, loadedDbValue]);
 
@@ -106,7 +96,6 @@ export const usePersistentLocalDirectory: (
         const queryPerm = await handle.queryPermission(READ_ONLY);
         console.log("queryPerm:", queryPerm);
         if (queryPerm === "granted") {
-          // TODO should we explicitly setRequestPermissions(undefined); ?
           console.log("was already granted");
           setRequestPermissions({ status: "granted" });
           return;
@@ -147,30 +136,4 @@ export const usePersistentLocalDirectory: (
   };
 
   return [handle, picker, requestPermissions, clearHandle];
-};
-
-// ==== IDB wrapper functions, really just vaguely useful for logging
-
-const idbGet = <T>(key: string): Promise<T | undefined> => {
-  console.log("Retrieving from indexeddb", key);
-  return idb.get<T>(key).then((v) => {
-    console.log("RETRIEVED FROM INDEXEDDB:", v);
-    return v;
-  });
-};
-
-const idbSet = <T>(key: string, value: T): Promise<void> => {
-  console.log("Setting to indexeddb", key, value);
-  return idb.set(key, value).then((v) => {
-    console.log("SETTED TO INDEXEDDB:", value);
-    return v;
-  });
-};
-
-const idbRemove = (key: string): Promise<void> => {
-  console.log("Removing from indexeddb", key);
-  return idb.del(key).then((v) => {
-    console.log("DELETED FROM INDEXEDDB:", v);
-    return v;
-  });
 };
