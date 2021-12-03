@@ -5,7 +5,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
-import { Badge, Button, Theme, ThemeProvider } from "@mui/material";
+import { Button, Theme, ThemeProvider } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -52,6 +52,7 @@ import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { TransactionFilters } from "./TransactionFilters";
+import { withDotBadge } from "./util-comps/decorators";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
 import { collectFilesFrom, FileTests } from "./util/file-system-util";
 import { useFetch } from "./util/hook-fetch";
@@ -340,7 +341,7 @@ const AppContent = () => {
           {
             icon:
               requestPermissions.status !== "granted"
-                ? withWarning(UploadFileIcon)
+                ? withDotBadge("warning")(UploadFileIcon)
                 : UploadFileIcon,
             title: "Files",
             content: fileDialog,
@@ -383,13 +384,3 @@ const AppContent = () => {
     </Box>
   );
 };
-
-const withWarning =
-  <P,>(WrappedComponent: React.ComponentType<P>) =>
-  (props: P) => {
-    return (
-      <Badge color="warning" variant="dot">
-        <WrappedComponent {...props} />
-      </Badge>
-    );
-  };
