@@ -11,7 +11,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { MouseEventHandler } from "react";
-import { AddFile, withDropZone } from "../filedrop/FileDrop";
 
 const IconButton: React.FC<{
   icon: React.JSXElementConstructor<any>;
@@ -27,13 +26,11 @@ const IconButton: React.FC<{
     <props.icon onClick={props.onClick} />
   </MuiIconButton>
 );
-const FileDropIcon = withDropZone(IconButton);
 
 type IconAndDialogContent = {
   icon: React.JSXElementConstructor<any>;
   title: React.ReactNode;
   content?: React.ReactNode;
-  onDrop?: AddFile;
   onClick?: (() => void) | (() => Promise<void>) | undefined;
 };
 
@@ -59,26 +56,13 @@ export const TopBar: React.FC<{
         </Typography>
         <ButtonGroup color="inherit">
           {props.iconAndDialogs.map((i, idx) => {
-            // Surely, there is a more React-like way of using an HoC like FileDropIcon without this if statement
-            if (i.onDrop) {
-              return (
-                <FileDropIcon
-                  minimal
-                  icon={i.icon}
-                  onClick={i.onClick || handleOpen(idx)}
-                  addFile={i.onDrop}
-                  key={idx}
-                />
-              );
-            } else {
-              return (
-                <IconButton
-                  icon={i.icon}
-                  onClick={i.onClick || handleOpen(idx)}
-                  key={idx}
-                />
-              );
-            }
+            return (
+              <IconButton
+                icon={i.icon}
+                onClick={i.onClick || handleOpen(idx)}
+                key={idx}
+              />
+            );
           })}
         </ButtonGroup>
 
