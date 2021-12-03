@@ -310,15 +310,8 @@ const AppContent = () => {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <TopBar
-        appTitle={
-          <>
-            Spenno{" "}
-            <DollarIcon
-              sx={{ position: "relative", bottom: -10 }}
-              fontSize="large"
-            />
-          </>
-        }
+        appTitle="Spenno"
+        appIcon={DollarIcon}
         iconAndDialogs={[
           { icon: RefreshIcon, title: "Reload all", onClick: reloadAll },
           { icon: FilterListIcon, title: "Filters", content: filtersDialog },
@@ -349,7 +342,7 @@ const AppContent = () => {
         sx={{
           backgroundColor: grayForTheme,
           flexGrow: 1,
-          height: "100vh",
+          // height: "100vh", TODO: leaving this here for a bit, just in case but it looks like this is the reason the scrollTrigger in Nav didn't work!
           overflow: "auto",
         }}
       >
