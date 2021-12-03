@@ -34,7 +34,7 @@ type IconAndDialogContent = {
   title: React.ReactNode;
   content?: React.ReactNode;
   onDrop?: AddFile;
-  onClick?: () => void;
+  onClick?: (() => void) | (() => Promise<void>) | undefined;
 };
 
 export const TopBar: React.FC<{
@@ -65,7 +65,7 @@ export const TopBar: React.FC<{
                 <FileDropIcon
                   minimal
                   icon={i.icon}
-                  onClick={handleOpen(idx)}
+                  onClick={i.onClick || handleOpen(idx)}
                   addFile={i.onDrop}
                   key={idx}
                 />

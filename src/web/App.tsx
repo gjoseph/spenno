@@ -342,8 +342,15 @@ const AppContent = () => {
             icon:
               requestPermissions.status !== "granted"
                 ? withDotBadge("warning")(UploadFileIcon)
+                : !localDirectoryHandle
+                ? withDotBadge("info")(UploadFileIcon)
                 : UploadFileIcon,
             title: "Files",
+            // we know onClick will take precedence over opening the dialog
+            onClick:
+              requestPermissions.status === "prompt"
+                ? requestPermissions.callback
+                : undefined,
             content: fileDialog,
             onDrop: addFile(setUploadedFiles),
           },
