@@ -32,8 +32,9 @@ const FileDropIcon = withDropZone(IconButton);
 type IconAndDialogContent = {
   icon: React.JSXElementConstructor<any>;
   title: React.ReactNode;
-  content: React.ReactNode;
+  content?: React.ReactNode;
   onDrop?: AddFile;
+  onClick?: (() => void) | (() => Promise<void>) | undefined;
 };
 
 export const TopBar: React.FC<{
@@ -64,14 +65,18 @@ export const TopBar: React.FC<{
                 <FileDropIcon
                   minimal
                   icon={i.icon}
-                  onClick={handleOpen(idx)}
+                  onClick={i.onClick || handleOpen(idx)}
                   addFile={i.onDrop}
                   key={idx}
                 />
               );
             } else {
               return (
-                <IconButton icon={i.icon} onClick={handleOpen(idx)} key={idx} />
+                <IconButton
+                  icon={i.icon}
+                  onClick={i.onClick || handleOpen(idx)}
+                  key={idx}
+                />
               );
             }
           })}

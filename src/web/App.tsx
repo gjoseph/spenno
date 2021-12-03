@@ -1,6 +1,7 @@
 import FilterListIcon from "@mui/icons-material/FilterList";
 import InfoIcon from "@mui/icons-material/Info";
 import DollarIcon from "@mui/icons-material/LocalAtmOutlined";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
@@ -11,7 +12,14 @@ import CssBaseline from "@mui/material/CssBaseline";
 import DialogContentText from "@mui/material/DialogContentText";
 import { createTheme } from "@mui/material/styles";
 import * as React from "react";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
@@ -23,7 +31,7 @@ import {
 } from "../domain/file";
 import { Rules } from "../domain/rules";
 import { Transaction } from "../domain/transaction";
-import { ConsoleLogger, LogEntry } from "../util/log";
+import { ConsoleLogger, forwardLogs } from "../util/log";
 import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
 import * as CalculatorWorker from "../worker/transaction-filter-worker";
@@ -38,14 +46,16 @@ import {
   transferrableDateRange,
   TransferrableMappings,
 } from "../worker/transfer";
-import { FileDrop } from "./filedrop/FileDrop";
 import { FileList } from "./FileList";
 import { Copyright } from "./layout/Copyright";
 import { TopBar } from "./layout/Nav";
 import { MainAppScreen } from "./MainAppScreen";
 import { TransactionFilters } from "./TransactionFilters";
+import { withDotBadge } from "./util-comps/decorators";
 import { ProgressIndicator } from "./util-comps/ProgressIndicator";
+import { collectFilesFrom, FileTests } from "./util/file-system-util";
 import { useFetch } from "./util/hook-fetch";
+import { usePersistentLocalDirectory } from "./util/hook-file-system-access";
 
 export default function App() {
   return (
@@ -61,15 +71,15 @@ const grayForTheme = (theme: Theme) =>
     ? theme.palette.grey[100]
     : theme.palette.grey[900];
 
-const consoleLogger = new ConsoleLogger();
+const logger = new ConsoleLogger();
 
 const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
 
 const readAccounts = (result: string) =>
-  new Bank.AccountsLoader(consoleLogger).loadYaml(result);
+  new Bank.AccountsLoader(logger).loadYaml(result);
 
 const readRules = (result: string) =>
-  new Rules.RulesLoader(consoleLogger).loadYaml(result);
+  new Rules.RulesLoader(logger).loadYaml(result);
 
 export type SetFilterConfig = Dispatch<SetStateAction<FilterConfig>>;
 export type FilterConfig = {
@@ -81,10 +91,8 @@ export type FilterConfig = {
   splitBy: SplitBy;
 };
 
-function unwrapJobResult(res: { log: LogEntry[] }) {
-  res.log.forEach((l) => {
-    consoleLogger[l.level]("[job result] " + l.message);
-  });
+async function loadFileFunction(e: FileSystemFileHandle, file: File) {
+  return new TransactionsFile(file.name, "westpac.csv", await file.text());
 }
 
 const AppContent = () => {
@@ -102,8 +110,37 @@ const AppContent = () => {
   >("/rules.yml", () => [], readRules);
   const allCategories = useMemo(() => Rules.extractCategories(rules), [rules]);
 
-  // TODO: FileDesc instead?
+  // TODO: keep track of files as FileDesc instead?
+  const [
+    localDirectoryHandle,
+    dirPickerHandler,
+    requestPermissions,
+    clearDirectoryHandler,
+  ] = usePersistentLocalDirectory("spenno_local_5");
+
   const [files, setFiles] = useState<TransactionsFile[]>([]);
+
+  const asyncLoadAndSetFiles = useCallback(() => {
+    if (!localDirectoryHandle || requestPermissions.status !== "granted") {
+      // console.log("localDirectoryHandle not set");
+      setFiles([]);
+    } else {
+      (async () => {
+        const loadedFiles = await collectFilesFrom(
+          localDirectoryHandle,
+          logger,
+          loadFileFunction,
+          FileTests.CSV_SUFFIX
+        );
+        setFiles(loadedFiles);
+      })();
+    }
+  }, [localDirectoryHandle, requestPermissions]);
+
+  useEffect(() => {
+    asyncLoadAndSetFiles();
+    // retrigger this effect on handle change and on permissions change
+  }, [asyncLoadAndSetFiles, localDirectoryHandle, requestPermissions]);
 
   const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => ({
     dateRange: MAX_DATE_RANGE,
@@ -142,13 +179,6 @@ const AppContent = () => {
       });
   }, [filesWithRawRecords]);
 
-  const addFile = (filename: string, contents: string) => {
-    setFiles((prevValue) => {
-      prevValue.push(new TransactionsFile(filename, "westpac.csv", contents));
-      return prevValue.slice(); // i forgot why exactly but without this shit breaks
-    });
-  };
-
   const toggleFile = (fileId: string, enabled: boolean) => {
     setFiles((prevValue) => {
       const transactionsFile = prevValue.find((f) => f.id === fileId);
@@ -166,10 +196,10 @@ const AppContent = () => {
     calcWorker
       .reloadFiles(files, accounts.accounts)
       .then((res: FileLoadWorkResult) => {
-        unwrapJobResult(res);
+        forwardLogs(res.log, logger);
         setFilesWithRawRecords((old) => {
           const newFiles = fromTransferrableFilesWithRawRecords(res.files);
-          consoleLogger.debug(
+          logger.debug(
             "Loaded",
             newFiles.length,
             "files with",
@@ -194,12 +224,12 @@ const AppContent = () => {
         filterConfig.amount
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
-        unwrapJobResult(res);
+        forwardLogs(res.log, logger);
         setTransactions((old) => {
           const newTxs = res.transactions.map(
             fromTransferrable(TransferrableMappings.Transaction)
           );
-          consoleLogger.debug("Loaded", newTxs.length, "transactions");
+          logger.debug("Loaded", newTxs.length, "transactions");
           return newTxs;
         });
         setCalculating((old) => false);
@@ -224,11 +254,23 @@ const AppContent = () => {
   );
 
   const fileDialog = (
-    <FileDrop addFile={addFile} minimal={false}>
+    <React.Fragment>
+      <Button onClick={dirPickerHandler}>Select Folder</Button>
+      <Button onClick={clearDirectoryHandler}>Unselect</Button>
+      {requestPermissions.status !== "granted" && (
+        <Button onClick={requestPermissions.callback}>perms</Button>
+      )}
+      {/*<FileDrop addFile={addFile(setUploadedFiles)} minimal={false}>*/}
+      {/*Currently not supporting uploads or drag'n'drop
+         If we wanted to, we could
+         * re-add support for drag'n'drop of folders,
+         * re-add support for actual uploads, which _can_ still work with FileSystemFileHandle APIs
+         See e.g https://web.dev/file-system-access/#drag-and-drop-integration and https://web.dev/file-system-access/#polyfilling
+      */}
       <FileList files={fileDescs} toggleFile={toggleFile} />
-    </FileDrop>
-    // TODO close on drop?
-  );
+      {/*</FileDrop>*/}
+    </React.Fragment>
+  ); // TODO close on drop?
 
   const settingsDialog = (
     <div>
@@ -258,6 +300,12 @@ const AppContent = () => {
     </div>
   );
 
+  const reloadAll = () => {
+    reFetchAccounts();
+    reFetchRules();
+    asyncLoadAndSetFiles();
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -272,12 +320,23 @@ const AppContent = () => {
           </>
         }
         iconAndDialogs={[
+          { icon: RefreshIcon, title: "Reload all", onClick: reloadAll },
           { icon: FilterListIcon, title: "Filters", content: filtersDialog },
           {
-            icon: UploadFileIcon,
+            icon:
+              requestPermissions.status !== "granted"
+                ? withDotBadge("warning")(UploadFileIcon)
+                : !localDirectoryHandle
+                ? withDotBadge("info")(UploadFileIcon)
+                : UploadFileIcon,
             title: "Files",
+            // we know onClick will take precedence over opening the dialog
+            onClick:
+              requestPermissions.status === "prompt"
+                ? requestPermissions.callback
+                : undefined,
             content: fileDialog,
-            onDrop: addFile,
+            // onDrop: addFile(setFiles),
           },
           { icon: SettingsIcon, title: "Settings", content: settingsDialog },
           { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
