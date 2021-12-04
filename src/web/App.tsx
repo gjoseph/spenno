@@ -306,34 +306,39 @@ const AppContent = () => {
     asyncLoadAndSetFiles();
   };
 
+  const iconAndDialogs = useMemo(
+    () => [
+      { icon: RefreshIcon, title: "Reload all", onClick: reloadAll },
+      { icon: FilterListIcon, title: "Filters", content: filtersDialog },
+      {
+        icon:
+          requestPermissions.status !== "granted"
+            ? withDotBadge("warning")(UploadFileIcon)
+            : !localDirectoryHandle
+            ? withDotBadge("info")(UploadFileIcon)
+            : UploadFileIcon,
+        title: "Files",
+        // we know onClick will take precedence over opening the dialog
+        onClick:
+          requestPermissions.status === "prompt"
+            ? requestPermissions.callback
+            : undefined,
+        content: fileDialog,
+        // onDrop: addFile(setFiles),
+      },
+      { icon: SettingsIcon, title: "Settings", content: settingsDialog },
+      { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
+    ],
+    [requestPermissions, localDirectoryHandle]
+  );
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <TopBar
         appTitle="Spenno"
         appIcon={DollarIcon}
-        iconAndDialogs={[
-          { icon: RefreshIcon, title: "Reload all", onClick: reloadAll },
-          { icon: FilterListIcon, title: "Filters", content: filtersDialog },
-          {
-            icon:
-              requestPermissions.status !== "granted"
-                ? withDotBadge("warning")(UploadFileIcon)
-                : !localDirectoryHandle
-                ? withDotBadge("info")(UploadFileIcon)
-                : UploadFileIcon,
-            title: "Files",
-            // we know onClick will take precedence over opening the dialog
-            onClick:
-              requestPermissions.status === "prompt"
-                ? requestPermissions.callback
-                : undefined,
-            content: fileDialog,
-            // onDrop: addFile(setFiles),
-          },
-          { icon: SettingsIcon, title: "Settings", content: settingsDialog },
-          { icon: InfoIcon, title: "Debugging Info", content: infoDialog },
-        ]}
+        iconAndDialogs={iconAndDialogs}
       >
         <ProgressIndicator inProgress={calculating} type="line" />
       </TopBar>
