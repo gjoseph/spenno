@@ -60,8 +60,9 @@ const IconButton: React.FC<{
     color="inherit"
     aria-label="menu"
     sx={{ ml: 0 }}
+    onClick={props.onClick}
   >
-    <props.icon onClick={props.onClick} />
+    <props.icon />
   </MuiIconButton>
 );
 
