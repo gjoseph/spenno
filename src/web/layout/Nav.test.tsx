@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { TopBar } from "./Nav";
+import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
 
 test("renders title", () => {
   render(
@@ -9,6 +10,7 @@ test("renders title", () => {
           this is the app <b>title</b>
         </>
       }
+      appIcon={LocalPizzaIcon}
       iconAndDialogs={[]}
     />
   );
