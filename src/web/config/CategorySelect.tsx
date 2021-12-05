@@ -7,7 +7,6 @@ import type {
   AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete/Autocomplete";
 import Checkbox from "@mui/material/Checkbox";
-import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import * as React from "react";
 import { Category } from "../../domain/category";
@@ -25,6 +24,7 @@ const renderInput = (params: AutocompleteRenderInputParams) => {
 };
 
 const getOptionLabel = (category: Category) => category;
+
 const renderOption = (
   props: React.HTMLAttributes<HTMLLIElement>,
   category: Category,
@@ -41,39 +41,52 @@ const renderOption = (
   </li>
 );
 
-// This is the default, but at least we have it at the ready
+// Don't render anything in the field, we just use it as a search input
 const renderTags = (
   categories: Category[],
   getTagProps: AutocompleteRenderGetTagProps
 ) => {
-  return categories.map((c, index) => (
-    <Chip
-      label={getOptionLabel(c)}
-      // size={}
-      {...getTagProps({ index })}
-    />
-  ));
+  return null;
 };
+
+const getLimitTagsText = (count: number) =>
+  `${count} categor${count === 1 ? "y" : "ies"} selected`;
 
 export interface CategorySelectProps {
   allCategories: Category[];
+  selectedCategories: Category[];
   setFilterConfig: SetFilterConfig;
 }
 
 export const CategorySelect: React.FC<CategorySelectProps> = (props) => {
+  const [value, setValue] = React.useState(props.selectedCategories);
   const onChange = (_: React.SyntheticEvent, newValue: Category[]) => {
     props.setFilterConfig((prev) => ({ ...prev, categories: newValue }));
+    setValue(newValue);
   };
+  // TODO need a button to select all
   return (
     <Autocomplete
       multiple
+      value={value}
       options={props.allCategories}
-      // disableCloseOnSelect
       getOptionLabel={getOptionLabel}
       renderOption={renderOption}
       renderInput={renderInput}
       renderTags={renderTags}
       onChange={onChange}
+      limitTags={0}
+      getLimitTagsText={getLimitTagsText}
+      disableCloseOnSelect
+      openOnFocus
+      handleHomeEndKeys
+      // Not sure I understand these 2 either, but recommended by https://mui.com/components/autocomplete/#creatable
+      selectOnFocus
+      clearOnBlur
+      // Not sure I understand the interaction between these 3 exactly, but it renders the focused option in search box while allowing to continue typing
+      freeSolo
+      autoComplete
+      autoSelect
     />
   );
 };

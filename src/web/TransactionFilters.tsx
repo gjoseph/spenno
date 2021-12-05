@@ -44,7 +44,10 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         dateRange={filterConfig.dateRange}
         {...{ setFilterConfig }}
       />
-      <CategorySelect {...{ allCategories, setFilterConfig }} />
+      <CategorySelect
+        selectedCategories={filterConfig.categories}
+        {...{ allCategories, setFilterConfig }}
+      />
       <AmountPicker
         amountFilter={filterConfig.amount}
         {...{ min, max, setFilterConfig }}

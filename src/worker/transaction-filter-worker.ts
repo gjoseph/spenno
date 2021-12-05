@@ -81,10 +81,9 @@ export const reloadTransactions = (
   const transactionsProcessor = new TransactionsProcessor(rules, log);
 
   // TODO it might be more efficient to apply the date filter on raw records instead
-  let txFilter = isBetween(transferredDateRange(dateRange));
-  if (categories.length > 0) {
-    txFilter = txFilter.and(isInCategories(categories));
-  }
+  let txFilter = isBetween(transferredDateRange(dateRange)).and(
+    isInCategories(categories)
+  );
   switch (amountFilter.type) {
     case null:
       break;
