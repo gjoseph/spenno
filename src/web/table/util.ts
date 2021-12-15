@@ -1,5 +1,6 @@
 import {
   GridCellParams,
+  GridColDef,
   GridValueFormatterParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
@@ -36,17 +37,17 @@ export namespace CellTypes {
       headerName: "Account",
       flex: 1,
       type: "singleSelect",
-      valueGetter: (p: GridValueGetterParams) => p.value.name,
+      valueGetter: (p: GridValueGetterParams) => p.row.account.name,
       valueOptions: accounts.accounts.map((a) => a.name),
-    };
+    } as GridColDef;
   };
-  export const date = {
+  export const date: GridColDef = {
     field: "date",
     headerName: "Date",
     flex: 1,
     valueFormatter: CellFormatters.momentFormatter,
   };
-  export const amount = {
+  export const amount: GridColDef = {
     field: "amount",
     headerName: "Amount",
     type: "number",
