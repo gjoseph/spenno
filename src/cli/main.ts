@@ -43,12 +43,21 @@ class StuffDoer {
 
   loadRules(): RuleDesc[] {
     return this.rulesFilePath.flatMap((f) =>
-      new Rules.RulesLoader(this.log).loadFile(f)
+      this.loadFile(f, new Rules.RulesLoader(this.log).loadYaml)
     );
   }
 
   loadAccounts(): Bank.Accounts {
-    return new Bank.AccountsLoader(this.log).loadFile(this.accountsFilePath);
+    return this.loadFile(
+      this.accountsFilePath,
+      new Bank.AccountsLoader(this.log).loadYaml
+    );
+  }
+
+  private loadFile<T>(filePath: string, transform: (yamlStr: string) => T): T {
+    this.log.info(`Loading ${filePath}`);
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    return transform(fileContents);
   }
 
   doStuff() {
