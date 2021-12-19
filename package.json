@@ -23,7 +23,7 @@
     "@emotion/styled": "11.6.0",
     "@mui/icons-material": "5.2.4",
     "@mui/material": "5.2.4",
-    "@mui/x-data-grid": "5.2.0",
+    "@mui/x-data-grid": "5.2.1",
     "big.js": "6.1.1",
     "chalk": "4.1.2",
     "csv-parse": "5.0.3",
