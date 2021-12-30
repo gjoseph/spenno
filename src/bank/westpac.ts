@@ -1,4 +1,4 @@
-import * as csv from "csv-parse/sync";
+import * as csv from "csv-parse/browser/esm/sync";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import { Bank } from "../domain/accounts";
