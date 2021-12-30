@@ -49,7 +49,7 @@ test("conversion methods are symmetric (to(from))", () => {
 });
 
 test("conversion methods are symmetric (from(to))", () => {
-  const result: Transaction = fromTransferrable(
+  const result: Transaction = fromTransferrable<Transaction>(
     TransferrableMappings.Transaction
   )(toTransferrable(typedTx));
   // this is another reason to ditch moment.js -- moment instances are never equal to each other
