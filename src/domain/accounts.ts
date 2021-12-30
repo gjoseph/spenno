@@ -1,5 +1,3 @@
-import * as fs from "fs";
-
 import * as yaml from "js-yaml";
 import { Logger } from "../util/log";
 
@@ -23,12 +21,6 @@ export namespace Bank {
 
   export class AccountsLoader {
     constructor(readonly log: Logger) {}
-
-    loadFile(filePath: string): Accounts {
-      this.log.info(`Loading ${filePath}`);
-      const fileContents = fs.readFileSync(filePath, "utf8");
-      return this.loadYaml(fileContents);
-    }
 
     loadYaml(yamlContent: string): Accounts {
       const doc = yaml.load(yamlContent);

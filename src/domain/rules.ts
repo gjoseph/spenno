@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import * as yaml from "js-yaml";
 import { evalAsFunction } from "../util/eval";
 import { Logger } from "../util/log";
@@ -67,12 +66,6 @@ export namespace Rules {
   export class RulesLoader {
     constructor(readonly log: Logger) {
       this.log = log;
-    }
-
-    loadFile(filePath: string): RuleDesc[] {
-      this.log.info(`Loading ${filePath}`);
-      const fileContents = fs.readFileSync(filePath, "utf8");
-      return this.loadYaml(fileContents);
     }
 
     loadYaml(yamlContent: string): RuleDesc[] {

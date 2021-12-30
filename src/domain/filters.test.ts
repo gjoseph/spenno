@@ -127,6 +127,7 @@ test("is debit with max&min value", () => {
 
 test("filters can be chained with AND", () => {
   const testTx: Transaction = {
+    id: "meh",
     account: { id: "1", name: "test account" },
     date: moment("2018-10-12"),
     desc: "test record",
@@ -152,6 +153,7 @@ test("filters can be chained with AND", () => {
 });
 test("filters can be chained with OR", () => {
   const testTx: Transaction = {
+    id: "meh",
     account: { id: "1", name: "test account" },
     date: moment("2018-10-12"),
     desc: "test record",
@@ -191,6 +193,7 @@ const desc = "test record";
 
 const withAmount = (n: number): RawRecord => {
   return {
+    id: "irrelevant for these tests",
     account,
     desc,
     date: moment(),
@@ -200,6 +203,7 @@ const withAmount = (n: number): RawRecord => {
 
 const withDate = (m: moment.Moment): RawRecord => {
   return {
+    id: "irrelevant for these tests",
     account,
     desc,
     date: m,

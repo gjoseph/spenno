@@ -22,6 +22,7 @@ expect.extend({ toEqualMoment });
 const { MessageChannel } = require("worker_threads");
 
 const typedTx: Transaction = {
+  id: "meh",
   account: { id: "b1", name: "b2" },
   date: moment(),
   desc: "d",
@@ -31,6 +32,7 @@ const typedTx: Transaction = {
 };
 
 const transferrableTx: Transferrable<Transaction> = {
+  id: "meh",
   account: { id: "b1", name: "b2" },
   date: moment().toISOString(),
   desc: "d",
@@ -47,7 +49,7 @@ test("conversion methods are symmetric (to(from))", () => {
 });
 
 test("conversion methods are symmetric (from(to))", () => {
-  const result: Transaction = fromTransferrable(
+  const result: Transaction = fromTransferrable<Transaction>(
     TransferrableMappings.Transaction
   )(toTransferrable(typedTx));
   // this is another reason to ditch moment.js -- moment instances are never equal to each other
@@ -63,6 +65,7 @@ test("conversion methods are symmetric (from(to))", () => {
 
 test("Transferrable<> remaps Big as string", () => {
   const test: Transferrable<Transaction> = {
+    id: "meh",
     amount: "123",
     date: "moment()",
     category: "",

@@ -8,11 +8,11 @@ import { RawRecord } from "./transaction";
 const account = { id: "1", name: "acc1" };
 test("simple matching without additional condition", () => {
   const ruleDesc: Rules.RuleDesc = {
-    name: "tax",
     regex: "^BPAY TAX OFFICE",
     category: "monies/tax",
   };
   const rawRx: RawRecord = {
+    id: "meh",
     account: account,
     date: moment("1977-07-01"),
     desc: "BPAY TAX OFFICE FY77",
@@ -35,13 +35,11 @@ test.todo(
 
 test("additionalCheck applies correctly, picks the right rule out of 2", () => {
   const ruleDesc: Rules.RuleDesc = {
-    name: "Shit Coffee",
     regex: ".*",
     category: "coffee/meh",
     additionalCheck: "isDebit({ max: 2.5 })",
   };
   const ruleDescWithAddCond: Rules.RuleDesc = {
-    name: "Fancy Coffee",
     regex: ".*",
     category: "coffee/hip",
     additionalCheck: "isDebit({ min: 4.0 })",
@@ -49,12 +47,14 @@ test("additionalCheck applies correctly, picks the right rule out of 2", () => {
 
   const rawRx: RawRecord[] = [
     {
+      id: "not relevant for these tests",
       account,
       date: moment("1977-07-01"),
       desc: "Cheap Shitty Coffee",
       amount: Big(-2),
     },
     {
+      id: "not relevant for these tests",
       account,
       date: moment("1977-07-01"),
       desc: "Fancy Hipster Coffee",
