@@ -13,6 +13,7 @@ test("simple matching without additional condition", () => {
     category: "monies/tax",
   };
   const rawRx: RawRecord = {
+    id: "meh",
     account: account,
     date: moment("1977-07-01"),
     desc: "BPAY TAX OFFICE FY77",
@@ -49,12 +50,14 @@ test("additionalCheck applies correctly, picks the right rule out of 2", () => {
 
   const rawRx: RawRecord[] = [
     {
+      id: "not relevant for these tests",
       account,
       date: moment("1977-07-01"),
       desc: "Cheap Shitty Coffee",
       amount: Big(-2),
     },
     {
+      id: "not relevant for these tests",
       account,
       date: moment("1977-07-01"),
       desc: "Fancy Hipster Coffee",
