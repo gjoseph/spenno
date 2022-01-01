@@ -141,7 +141,7 @@ async function wrap<T extends ExposedFunctions>(
     const response = message.data;
 
     const jobIndex = activeJobs.findIndex(
-      (job) => job.request.id == response.id
+      (job) => job.request.id === response.id
     );
 
     if (jobIndex < 0) {
@@ -150,7 +150,7 @@ async function wrap<T extends ExposedFunctions>(
       return;
     } else {
       const job = activeJobs.splice(jobIndex, 1)[0];
-      response.type == "success"
+      response.type === "success"
         ? job.resolve(response.payload)
         : job.reject(response.payload);
     }
