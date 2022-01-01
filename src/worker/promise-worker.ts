@@ -29,7 +29,7 @@ type response = {
   /** job id */
   id: number;
   /** :] */
-  type: 'success' | 'error';
+  type: "success" | "error";
   /** e.g. the execution result / caught error */
   payload: unknown;
 };
@@ -55,27 +55,27 @@ type PromiseWorker<T extends ExposedFunctions> = {
  */
 function expose(functions: ExposedFunctions): void {
   // Ensure we are running in a worker
-  if (typeof WorkerGlobalScope === 'undefined') {
-    console.error('Expose not called in worker thread');
+  if (typeof WorkerGlobalScope === "undefined") {
+    console.error("Expose not called in worker thread");
     return;
   }
 
   const onSuccess = function (request: request, result: unknown) {
     postMessage({
       id: request.id,
-      type: 'success',
+      type: "success",
       payload: result,
     } as response);
   };
 
   const onError = function (request: request, error: unknown) {
-    postMessage({ id: request.id, type: 'error', payload: error } as response);
+    postMessage({ id: request.id, type: "error", payload: error } as response);
   };
 
   /** Returns a list of names of all exposed functions */
   const getFunctionality = function () {
     const functionality = Object.keys(functions).filter(
-      (key) => typeof functions[key] === 'function'
+      (key) => typeof functions[key] === "function"
     );
     return functionality;
   };
@@ -99,7 +99,7 @@ function expose(functions: ExposedFunctions): void {
     // We must catch any errors so we can match them to a request
     try {
       let result: unknown;
-      if (request.action === 'getFunctionality') {
+      if (request.action === "getFunctionality") {
         result = getFunctionality();
       } else {
         result = await exec(request);
@@ -127,7 +127,7 @@ async function wrap<T extends ExposedFunctions>(
   const activeJobs: job[] = [];
 
   /** Creates and runs a new job, returns a promise for it's result */
-  const createJob = function (temp: Pick<request, 'action' | 'payload'>) {
+  const createJob = function (temp: Pick<request, "action" | "payload">) {
     const request = { ...temp, id: jobId++ };
     const jobResult = new Promise((resolve, reject) => {
       activeJobs.push({ request, resolve, reject });
@@ -145,12 +145,12 @@ async function wrap<T extends ExposedFunctions>(
     );
 
     if (jobIndex < 0) {
-      console.error('Worker responded to nonexistent job');
+      console.error("Worker responded to nonexistent job");
       console.warn("Worker's response:", response);
       return;
     } else {
       const job = activeJobs.splice(jobIndex, 1)[0];
-      response.type == 'success'
+      response.type == "success"
         ? job.resolve(response.payload)
         : job.reject(response.payload);
     }
@@ -159,7 +159,7 @@ async function wrap<T extends ExposedFunctions>(
   worker.onerror = function (error) {
     // We don't actually know what job the error occured in, so reject them all just to be safe.
     // This event should never fire since we have a try catch within the worker's onmessage
-    console.error('Uncaught error in worker:', error);
+    console.error("Uncaught error in worker:", error);
 
     const jobs = activeJobs.splice(0, activeJobs.length);
     jobs.forEach((job) => job.reject(error));
@@ -168,7 +168,7 @@ async function wrap<T extends ExposedFunctions>(
   /// Create the wrapper
   // Obtain a list of functions available in the worker
   const functionality = (await createJob({
-    action: 'getFunctionality',
+    action: "getFunctionality",
     payload: [],
   })) as string[];
 
