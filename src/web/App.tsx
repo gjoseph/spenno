@@ -86,7 +86,7 @@ const readRules = (result: string) =>
 export type SetFilterConfig = Dispatch<SetStateAction<FilterConfig>>;
 export type FilterConfig = {
   dateRange: DateRange;
-  categories: Category[]; // currently, empty array == no filter == all categories, but we may want to have a truly "no categories" filter
+  categories: Category[];
   amount: AmountFilter;
 
   groupBy: GroupBy;
@@ -98,7 +98,6 @@ async function loadFileFunction(e: FileSystemFileHandle, file: File) {
 }
 
 const AppContent = () => {
-
   const [calculating, setCalculating] = useState(true);
 
   const [accounts, accountsLoaded, accountsError, reFetchAccounts] =
@@ -145,16 +144,22 @@ const AppContent = () => {
     // retrigger this effect on handle change and on permissions change
   }, [asyncLoadAndSetFiles, localDirectoryHandle, requestPermissions]);
 
-  const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => ({
-    dateRange: MAX_DATE_RANGE,
-    categories: [],
-    amount: {
-      type: null,
-      range: null,
-    },
-    groupBy: "category",
-    splitBy: "amount",
-  }));
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => {
+    return {
+      dateRange: MAX_DATE_RANGE,
+      categories: [], // at this stage, allCategories aren't loaded yet, they'll be loaded when rules are loaded
+      amount: {
+        type: null,
+        range: null,
+      },
+      groupBy: "category",
+      splitBy: "amount",
+    };
+  });
+  // set FilterConfig with all categories once they're loaded
+  useEffect(() => {
+    setFilterConfig((prev) => ({ ...prev, categories: allCategories }));
+  }, [allCategories]);
 
   // The parsed files with raw records
   const [filesWithRawRecords, setFilesWithRawRecords] = useState<
