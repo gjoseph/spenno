@@ -62,8 +62,8 @@ export namespace Westpac {
         .replace("DEBIT CARD PURCHASE ", "")
         .replace("DEBIT CARD REFUND ", "")
         .replace(/\s+/g, " ");
-      this.log.debug("Full description:", narrative);
-      this.log.debug("Simplified to:", cleanedNarrative);
+      this.log.trace("Full description:", narrative);
+      this.log.trace("Simplified to:", cleanedNarrative);
       return cleanedNarrative;
     }
   }

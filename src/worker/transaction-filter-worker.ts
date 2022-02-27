@@ -22,7 +22,7 @@ import {
   Transaction,
   TransactionsLoader,
 } from "../domain/transaction";
-import { ArrayLogger, LogEntry } from "../util/log";
+import { ArrayLogger, LogEntry, MinLevel } from "../util/log";
 import { AmountFilter } from "../util/util";
 import {
   fromTransferrableFilesWithRawRecords,
@@ -45,7 +45,7 @@ const reloadFiles = (
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[]
 ): FileLoadWorkResult => {
-  const log = new ArrayLogger(false);
+  const log = new ArrayLogger(MinLevel.info);
   const transactionsLoader = new TransactionsLoader(
     new Bank.Accounts(accounts),
     log
@@ -79,7 +79,7 @@ const reloadTransactions = (
   categories: Category[],
   amountFilter: AmountFilter
 ): TransactionProcessWorkResult => {
-  const log = new ArrayLogger(false);
+  const log = new ArrayLogger(MinLevel.info);
   const rules = ruleDescs.map(Rules.toRule);
   const transactionsProcessor = new TransactionsProcessor(rules, log);
 

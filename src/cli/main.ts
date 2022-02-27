@@ -17,7 +17,7 @@ import {
   Transaction,
   TransactionsLoader,
 } from "../domain/transaction";
-import { Logger, TermLogger } from "../util/log";
+import { Logger, MinLevel, TermLogger } from "../util/log";
 import { countBy, groupBy } from "../util/reducers";
 import { percentOf, zer0 } from "../util/util";
 import RuleDesc = Rules.RuleDesc;
@@ -34,7 +34,7 @@ class StuffDoer {
   private txFilePaths: ReadonlyArray<string>;
 
   constructor(args: Args) {
-    this.log = new TermLogger(args.debug);
+    this.log = new TermLogger(args.debug ? MinLevel.debug : MinLevel.info);
     this.log.debug("Starting with args", args);
     this.rulesFilePath = args.rules;
     this.accountsFilePath = args.accounts;
