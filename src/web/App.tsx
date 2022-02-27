@@ -74,6 +74,9 @@ const grayForTheme = (theme: Theme) =>
 
 const logger = new ConsoleLogger();
 
+const calcWorker = /* await */ wrap<WorkerFunctions>(new TransactionsWorker());
+// // TODO Terminate the worker :  calcWorker.terminate();
+
 const readAccounts = (result: string) =>
   new Bank.AccountsLoader(logger).loadYaml(result);
 
@@ -95,11 +98,6 @@ async function loadFileFunction(e: FileSystemFileHandle, file: File) {
 }
 
 const AppContent = () => {
-  const calcWorker = /* await */ wrap<WorkerFunctions>(
-    new TransactionsWorker()
-  );
-  // TODO Terminate the worker :  calcWorker.terminate();
-  console.log("calcWorker:", calcWorker);
 
   const [calculating, setCalculating] = useState(true);
 
@@ -121,7 +119,7 @@ const AppContent = () => {
     dirPickerHandler,
     requestPermissions,
     clearDirectoryHandler,
-  ] = usePersistentLocalDirectory("spenno_local_5");
+  ] = usePersistentLocalDirectory("spenno_local_7");
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
