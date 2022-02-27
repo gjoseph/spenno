@@ -3,7 +3,6 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
-import FormHelperText from "@mui/material/FormHelperText";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { FileDescriptor } from "../domain/file";
@@ -71,9 +70,10 @@ export const FileList: React.FC<{
             />
           ))}
         </FormGroup>
-        <FormHelperText>
-          Drop {props.files.length > 0 ? "more" : ""} files here
-        </FormHelperText>
+        {/* Removed drag'n'drop, see commit ae5beb4 */}
+        {/*<FormHelperText>*/}
+        {/*  Drop {props.files.length > 0 ? "more" : ""} files here*/}
+        {/*</FormHelperText>*/}
       </FormControl>
     </Box>
   );
