@@ -282,15 +282,7 @@ const AppContent = () => {
     </React.Fragment>
   ); // TODO close on drop?
 
-  const settingsDialog = (
-    <div>
-      <img
-        src="logo192.png"
-        alt="random <img> tag just to prove i could use any element here, not just text or <DialogContentText>"
-      />
-      <DialogContentText>lorem ipsum</DialogContentText>
-    </div>
-  );
+  const settingsDialog = <DialogContentText>lorem ipsum</DialogContentText>;
 
   const infoDialog = (
     <div>
