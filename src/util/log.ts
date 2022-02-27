@@ -1,6 +1,8 @@
 import * as chalk from "chalk";
 
 export interface Logger {
+  trace(message: string, ...stuff: any[]): void; // TODO not actually intended as console.trace, find other name? verbose?
+
   debug(message: string, ...stuff: any[]): void;
 
   info(message: string): void;
@@ -8,7 +10,13 @@ export interface Logger {
   warn(message: string): void;
 }
 
-type LogLevel = "debug" | "info" | "warn";
+type LogLevel = "trace" | "debug" | "info" | "warn";
+export enum MinLevel {
+  trace,
+  debug,
+  info,
+  warn,
+}
 
 export interface LogEntry {
   level: LogLevel;
@@ -18,10 +26,16 @@ export interface LogEntry {
 export class ArrayLogger implements Logger {
   readonly logEntries: LogEntry[] = [];
 
-  constructor(readonly debugMode: boolean) {}
+  constructor(readonly minLevel: MinLevel) {}
+
+  trace(message: string, ...stuff: any[]): void {
+    if (this.minLevel <= MinLevel.trace) {
+      this.add("trace", [message, ...stuff].join(" "));
+    }
+  }
 
   debug(message: string, ...stuff: any[]): void {
-    if (this.debugMode) {
+    if (this.minLevel <= MinLevel.debug) {
       this.add("debug", [message, ...stuff].join(" "));
     }
   }
@@ -40,6 +54,10 @@ export class ArrayLogger implements Logger {
 }
 
 export class ConsoleLogger implements Logger {
+  trace(message: string, ...stuff: any[]): void {
+    console.debug("[trace]" + message, ...stuff);
+  }
+
   debug(message: string, ...stuff: any[]): void {
     console.debug(message, ...stuff);
   }
@@ -54,10 +72,16 @@ export class ConsoleLogger implements Logger {
 }
 
 export class TermLogger implements Logger {
-  constructor(readonly debugMode: boolean) {}
+  constructor(readonly minLevel: MinLevel) {}
+
+  trace(message: string, ...stuff: any[]) {
+    if (this.minLevel <= MinLevel.trace) {
+      console.debug(chalk.yellow(message), ...stuff);
+    }
+  }
 
   debug(message: string, ...stuff: any[]) {
-    if (this.debugMode) {
+    if (this.minLevel <= MinLevel.debug) {
       console.debug(chalk.cyan(message), ...stuff);
     }
   }
@@ -87,6 +111,8 @@ export class TermLogger implements Logger {
 }
 
 export class SilentLogger implements Logger {
+  trace(message: string, ...stuff: any[]): void {}
+
   debug(message: string, ...stuff: any[]): void {}
 
   info(message: string): void {}

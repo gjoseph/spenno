@@ -20,7 +20,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import createCalculatorWorker from "workerize-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
+import TransactionsWorker from "worker-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
+import type { WorkerFunctions } from "../worker/transaction-filter-worker";
+import { wrap } from "../worker/promise-worker";
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
 import { GroupBy, SplitBy } from "../domain/charting";
@@ -34,7 +36,6 @@ import { Transaction } from "../domain/transaction";
 import { ConsoleLogger, forwardLogs } from "../util/log";
 import { DateRange, MAX_DATE_RANGE } from "../util/time-util";
 import { addUniquenessSuffixToThings, AmountFilter } from "../util/util";
-import * as CalculatorWorker from "../worker/transaction-filter-worker";
 import {
   FileLoadWorkResult,
   TransactionProcessWorkResult,
@@ -73,7 +74,8 @@ const grayForTheme = (theme: Theme) =>
 
 const logger = new ConsoleLogger();
 
-const calcWorker = createCalculatorWorker<typeof CalculatorWorker>();
+const calcWorker = /* await */ wrap<WorkerFunctions>(new TransactionsWorker());
+// // TODO Terminate the worker :  calcWorker.terminate();
 
 const readAccounts = (result: string) =>
   new Bank.AccountsLoader(logger).loadYaml(result);
@@ -84,7 +86,7 @@ const readRules = (result: string) =>
 export type SetFilterConfig = Dispatch<SetStateAction<FilterConfig>>;
 export type FilterConfig = {
   dateRange: DateRange;
-  categories: Category[]; // currently, empty array == no filter == all categories, but we may want to have a truly "no categories" filter
+  categories: Category[];
   amount: AmountFilter;
 
   groupBy: GroupBy;
@@ -116,7 +118,7 @@ const AppContent = () => {
     dirPickerHandler,
     requestPermissions,
     clearDirectoryHandler,
-  ] = usePersistentLocalDirectory("spenno_local_5");
+  ] = usePersistentLocalDirectory("spenno_local_7");
 
   const [files, setFiles] = useState<TransactionsFile[]>([]);
 
@@ -142,16 +144,22 @@ const AppContent = () => {
     // retrigger this effect on handle change and on permissions change
   }, [asyncLoadAndSetFiles, localDirectoryHandle, requestPermissions]);
 
-  const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => ({
-    dateRange: MAX_DATE_RANGE,
-    categories: [],
-    amount: {
-      type: null,
-      range: null,
-    },
-    groupBy: "category",
-    splitBy: "amount",
-  }));
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>(() => {
+    return {
+      dateRange: MAX_DATE_RANGE,
+      categories: [], // at this stage, allCategories aren't loaded yet, they'll be loaded when rules are loaded
+      amount: {
+        type: null,
+        range: null,
+      },
+      groupBy: "category",
+      splitBy: "amount",
+    };
+  });
+  // set FilterConfig with all categories once they're loaded
+  useEffect(() => {
+    setFilterConfig((prev) => ({ ...prev, categories: allCategories }));
+  }, [allCategories]);
 
   // The parsed files with raw records
   const [filesWithRawRecords, setFilesWithRawRecords] = useState<
@@ -194,7 +202,7 @@ const AppContent = () => {
   useEffect(() => {
     setCalculating((old) => true);
     calcWorker
-      .reloadFiles(files, accounts.accounts)
+      .then((w) => w.reloadFiles(files, accounts.accounts))
       .then((res: FileLoadWorkResult) => {
         forwardLogs(res.log, logger);
         setFilesWithRawRecords((old) => {
@@ -215,13 +223,15 @@ const AppContent = () => {
     setCalculating((old) => true);
     const txDateRange = transferrableDateRange(filterConfig.dateRange);
     calcWorker
-      .reloadTransactions(
-        toTransferrableFilesWithRawRecords(filesWithRawRecords),
-        rules,
-        accounts.accounts,
-        txDateRange,
-        filterConfig.categories,
-        filterConfig.amount
+      .then((w) =>
+        w.reloadTransactions(
+          toTransferrableFilesWithRawRecords(filesWithRawRecords),
+          rules,
+          accounts.accounts,
+          txDateRange,
+          filterConfig.categories,
+          filterConfig.amount
+        )
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
         forwardLogs(res.log, logger);

@@ -29,7 +29,7 @@ export class TransactionsProcessor {
       const storeRegex = rule.regex;
       const regexResult = storeRegex.test(raw.desc);
       if (!regexResult) {
-        this.log.debug("Not matching", storeRegex);
+        this.log.trace("Not matching", storeRegex);
         return regexResult;
       }
       const addCheckResult = !rule.additionalCheck || rule.additionalCheck(raw);

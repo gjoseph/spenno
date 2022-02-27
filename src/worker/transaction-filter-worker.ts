@@ -5,7 +5,10 @@
 // and last but not least https://github.com/developit/workerize-loader/issues/3
 // particularly this comment https://github.com/developit/workerize-loader/issues/3#issuecomment-538730979
 // This isn't exactly a complex function, but needs to be isolated for workerize-loader to do its thing.
+// ... now, since workerize-loader doesn't work with webpack 5 (https://github.com/developit/workerize-loader/issues/77),
+// we're using https://gist.github.com/RedstoneWizard22/d07b326a438dd0449758c263cebd0e82 instead
 
+import { expose } from "./promise-worker";
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";
 import { FileWithRawRecords, TransactionsFile } from "../domain/file";
@@ -19,7 +22,7 @@ import {
   Transaction,
   TransactionsLoader,
 } from "../domain/transaction";
-import { ArrayLogger, LogEntry } from "../util/log";
+import { ArrayLogger, LogEntry, MinLevel } from "../util/log";
 import { AmountFilter } from "../util/util";
 import {
   fromTransferrableFilesWithRawRecords,
@@ -36,13 +39,13 @@ export interface FileLoadWorkResult {
   log: LogEntry[];
 }
 
-export const reloadFiles = (
+const reloadFiles = (
   // we're passing the whole files (File#fileContents) as string between threads, I'm not sure how efficient this is
   files: TransactionsFile[],
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
   accounts: Bank.Account[]
 ): FileLoadWorkResult => {
-  const log = new ArrayLogger(false);
+  const log = new ArrayLogger(MinLevel.info);
   const transactionsLoader = new TransactionsLoader(
     new Bank.Accounts(accounts),
     log
@@ -66,7 +69,7 @@ export interface TransactionProcessWorkResult {
   log: LogEntry[];
 }
 
-export const reloadTransactions = (
+const reloadTransactions = (
   // we're passing the whole files (File#fileContents) as string between threads, I'm not sure how efficient this is
   files: TransferrableFileWithRawRecords[],
   ruleDescs: Rules.RuleDesc[],
@@ -76,7 +79,7 @@ export const reloadTransactions = (
   categories: Category[],
   amountFilter: AmountFilter
 ): TransactionProcessWorkResult => {
-  const log = new ArrayLogger(false);
+  const log = new ArrayLogger(MinLevel.info);
   const rules = ruleDescs.map(Rules.toRule);
   const transactionsProcessor = new TransactionsProcessor(rules, log);
 
@@ -113,3 +116,8 @@ export const reloadTransactions = (
     log: log.logEntries,
   };
 };
+
+const workerFunctions = { reloadFiles, reloadTransactions };
+type WorkerFunctions = typeof workerFunctions;
+export type { WorkerFunctions };
+expose(workerFunctions);
