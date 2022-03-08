@@ -106,7 +106,7 @@ const getChartsFor = (
   whatToSplitBy: SplitBy,
   whatToGroupBy: GroupBy,
   transactions: Transaction[]
-) => {
+): ChartDesc[] => {
   const chartMaker = SplitByFunctions[whatToSplitBy]();
   return chartMaker(whatToGroupBy, transactions);
 };

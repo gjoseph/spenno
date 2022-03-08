@@ -10,7 +10,6 @@ import { Category } from "../domain/category";
 import { FilterConfig, SetFilterConfig } from "./App";
 import { AmountPicker } from "./config/AmountPicker";
 import { CategorySelect } from "./config/CategorySelect";
-import { GroupByToggle } from "./config/GroupByToggle";
 import { PresetTimeframePicker } from "./config/PresetTimeframePicker";
 
 export type TransactionFiltersProps = {
@@ -76,28 +75,6 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         <AmountPicker
           amountFilter={filterConfig.amount}
           {...{ min, max, setFilterConfig }}
-        />
-      </FormControl>
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Group by</FormLabel>
-        <GroupByToggle
-          value={filterConfig.groupBy}
-          updateFilterConfig={(newValue) =>
-            setFilterConfig((prev) => ({ ...prev, groupBy: newValue }))
-          }
-        />
-      </FormControl>
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Split by</FormLabel>
-        <p>
-          Split by: (when splitting by year, a pie chart will make no sense of
-          positive _and_ negative numbers
-        </p>
-        <GroupByToggle
-          value={filterConfig.splitBy}
-          updateFilterConfig={(newValue) =>
-            setFilterConfig((prev) => ({ ...prev, splitBy: newValue }))
-          }
         />
       </FormControl>
     </React.Fragment>

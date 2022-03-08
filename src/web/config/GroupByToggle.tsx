@@ -4,12 +4,12 @@ import * as React from "react";
 type GroupByToggleProps<T> = {
   value: T;
   // TODO pass possible values as prop?
-  updateFilterConfig: (newValue: T) => void;
+  updateConfig: (newValue: T) => void;
 };
 export const GroupByToggle = <T extends any>(props: GroupByToggleProps<T>) => {
   const handleToggleChange = (event: any, newValue: T | null) => {
     if (newValue !== null) {
-      props.updateFilterConfig(newValue);
+      props.updateConfig(newValue);
     }
   };
   return (

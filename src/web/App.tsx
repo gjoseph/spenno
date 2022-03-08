@@ -88,7 +88,9 @@ export type FilterConfig = {
   dateRange: DateRange;
   categories: Category[];
   amount: AmountFilter;
-
+};
+export type SetGraphConfig = Dispatch<SetStateAction<GraphConfig>>;
+export type GraphConfig = {
   groupBy: GroupBy;
   splitBy: SplitBy;
 };

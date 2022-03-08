@@ -2,11 +2,10 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { Bank } from "../domain/accounts";
-import { getChartsFor } from "../domain/charting";
 import { FileDescriptor, FileWithRawRecords } from "../domain/file";
 import { Transaction } from "../domain/transaction";
 import { uncategorisedStats } from "../domain/uncategorised-stats";
-import { ChartWrapper } from "./ChartWrapper";
+import { Charts } from "./Charts";
 import { TabbedPanels, TabPanel } from "./layout/TabbedPanels";
 import { DataGridWrapper } from "./table/DataGridWrapper";
 import { RawRecordsTable } from "./table/RawRecordsTable";
@@ -14,20 +13,13 @@ import { mostCommonDescriptionsColumns } from "./table/StatsGridColumns";
 import { TransactionsTable } from "./table/TransactionsTable";
 import { TransactionFiltersProps } from "./TransactionFilters";
 
-export const MainAppScreen: React.FC<
-  {
-    files: FileDescriptor[];
-    transactions: Transaction[];
-    filesWithRawRecords: FileWithRawRecords[];
-    accounts: Bank.Accounts;
-  } & TransactionFiltersProps
-> = (props) => {
-  // TODO should these be useEffect()?
-  const charts = getChartsFor(
-    props.filterConfig.splitBy,
-    props.filterConfig.groupBy,
-    props.transactions
-  );
+type MainAppScreenProps = {
+  files: FileDescriptor[];
+  transactions: Transaction[];
+  filesWithRawRecords: FileWithRawRecords[];
+  accounts: Bank.Accounts;
+} & TransactionFiltersProps;
+export const MainAppScreen: React.FC<MainAppScreenProps> = (props) => {
   const uncategorised = uncategorisedStats(props.transactions, 100);
 
   return (
@@ -40,17 +32,7 @@ export const MainAppScreen: React.FC<
               initialTabIdx={0}
               panels={[
                 <TabPanel label="Graphs">
-                  <Grid container spacing={0}>
-                    {charts.map((chart, idx) => (
-                      <Grid item xs={12} md={6} xl={4} key={idx}>
-                        <ChartWrapper
-                          type="bar"
-                          chart={chart}
-                          containerHeight={500 - 70}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
+                  <Charts transactions={props.transactions} />
                 </TabPanel>,
                 <TabPanel label="Transactions">
                   <TransactionsTable
