@@ -1,3 +1,10 @@
+import {
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+} from "@mui/material";
 import * as React from "react";
 import { Category } from "../domain/category";
 import { FilterConfig, SetFilterConfig } from "./App";
@@ -40,35 +47,59 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
 }) => {
   return (
     <React.Fragment>
-      <PresetTimeframePicker
-        dateRange={filterConfig.dateRange}
-        {...{ setFilterConfig }}
-      />
-      <CategorySelect
-        selectedCategories={filterConfig.categories}
-        {...{ allCategories, setFilterConfig }}
-      />
-      <AmountPicker
-        amountFilter={filterConfig.amount}
-        {...{ min, max, setFilterConfig }}
-      />
-      <p>Group by:</p>
-      <GroupByToggle
-        value={filterConfig.groupBy}
-        updateFilterConfig={(newValue) =>
-          setFilterConfig((prev) => ({ ...prev, groupBy: newValue }))
-        }
-      />
-      <p>
-        Split by: (when splitting by year, a pie chart will make no sense of
-        positive _and_ negative numbers
-      </p>
-      <GroupByToggle
-        value={filterConfig.splitBy}
-        updateFilterConfig={(newValue) =>
-          setFilterConfig((prev) => ({ ...prev, splitBy: newValue }))
-        }
-      />
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Time frame</FormLabel>
+        <PresetTimeframePicker
+          dateRange={filterConfig.dateRange}
+          {...{ setFilterConfig }}
+        />
+        [all]
+      </FormControl>
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Categories</FormLabel>
+        <FormLabel htmlFor="depth-select">Depth</FormLabel>
+        {/* or a Slider or a ToggleButtonGroup...*/}
+        <RadioGroup row name="depth-select">
+          <FormControlLabel value="1" control={<Radio />} label="1" />
+          <FormControlLabel value="2" control={<Radio />} label="2" />
+          <FormControlLabel value="3" control={<Radio />} label="3" />
+        </RadioGroup>
+        depth should then influence the list displayed here:
+        <CategorySelect
+          selectedCategories={filterConfig.categories}
+          {...{ allCategories, setFilterConfig }}
+        />
+        [select all], [deselect all]
+      </FormControl>
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Amount filter</FormLabel>
+        <AmountPicker
+          amountFilter={filterConfig.amount}
+          {...{ min, max, setFilterConfig }}
+        />
+      </FormControl>
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Group by</FormLabel>
+        <GroupByToggle
+          value={filterConfig.groupBy}
+          updateFilterConfig={(newValue) =>
+            setFilterConfig((prev) => ({ ...prev, groupBy: newValue }))
+          }
+        />
+      </FormControl>
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Split by</FormLabel>
+        <p>
+          Split by: (when splitting by year, a pie chart will make no sense of
+          positive _and_ negative numbers
+        </p>
+        <GroupByToggle
+          value={filterConfig.splitBy}
+          updateFilterConfig={(newValue) =>
+            setFilterConfig((prev) => ({ ...prev, splitBy: newValue }))
+          }
+        />
+      </FormControl>
     </React.Fragment>
   );
 };
