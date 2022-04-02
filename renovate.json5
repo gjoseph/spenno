@@ -26,5 +26,14 @@
       updateTypes: ["patch"],
       automerge: true,
     },
+    {
+      matchPackageNames: [
+        "@types/react",
+        "@types/react-dom",
+        "react",
+        "react-dom",
+      ],
+      groupName: "react",
+    },
   ],
 }
