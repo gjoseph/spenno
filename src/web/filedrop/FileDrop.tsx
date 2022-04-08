@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { ProgressIndicator } from "../util-comps/ProgressIndicator";
 
@@ -75,7 +75,11 @@ export const withDropZone =
       </FileDrop>
     );
 
-type FileDropProps = { addFile: AddFile; minimal: boolean };
+type FileDropProps = {
+  addFile: AddFile;
+  minimal: boolean;
+  children: ReactNode;
+};
 export const FileDrop: React.FC<FileDropProps> = (props) => {
   const onDrop = useMemo(
     () =>
