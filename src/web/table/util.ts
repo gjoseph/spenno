@@ -53,7 +53,7 @@ export namespace CellTypes {
     type: "number",
     flex: 1,
     cellClassName: (p: GridCellParams<Big>) =>
-      p.value.lt(0) ? "amount-debit" : "amount-credit",
+      p.value ? (p.value.lt(0) ? "amount-debit" : "amount-credit") : "",
     valueFormatter: CellFormatters.bigFormatter,
   };
 }
