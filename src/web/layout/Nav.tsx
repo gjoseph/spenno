@@ -15,7 +15,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { MouseEventHandler, useMemo } from "react";
+import { MouseEventHandler, ReactNode, useMemo } from "react";
 
 type IconAndDialogContent = {
   icon: React.JSXElementConstructor<any>;
@@ -30,9 +30,10 @@ type IconAndOnClick = {
   onClick: () => void | Promise<void>;
 };
 
-const AppTitle: React.FC<{ icon: React.JSXElementConstructor<any> }> = (
-  props
-) => (
+const AppTitle: React.FC<{
+  icon: React.JSXElementConstructor<any>;
+  children?: ReactNode;
+}> = (props) => (
   <React.Fragment>
     <props.icon
       sx={{ position: "relative", padding: 0, mr: "13px" }}
@@ -106,6 +107,7 @@ export const TopBar: React.FC<{
   appTitle: React.ReactNode;
   appIcon: React.JSXElementConstructor<any>;
   iconAndDialogs: IconAndDialogContent[];
+  children?: ReactNode;
 }> = (props) => {
   const [open, setOpen] = React.useState<number>(-1);
   const handleOpen = (idx: number) => () => setOpen(idx);
