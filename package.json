@@ -19,7 +19,7 @@
     "prettier-fix-all": "prettier --write ."
   },
   "dependencies": {
-    "@emotion/react": "11.9.0",
+    "@emotion/react": "11.9.3",
     "@emotion/styled": "11.8.1",
     "@mui/icons-material": "5.6.0",
     "@mui/material": "5.6.0",
