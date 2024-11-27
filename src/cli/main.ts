@@ -43,14 +43,14 @@ class StuffDoer {
 
   loadRules(): RuleDesc[] {
     return this.rulesFilePath.flatMap((f) =>
-      this.loadFile(f, new Rules.RulesLoader(this.log).loadYaml)
+      this.loadFile(f, new Rules.RulesLoader(this.log).loadYaml),
     );
   }
 
   loadAccounts(): Bank.Accounts {
     return this.loadFile(
       this.accountsFilePath,
-      new Bank.AccountsLoader(this.log).loadYaml
+      new Bank.AccountsLoader(this.log).loadYaml,
     );
   }
 
@@ -70,13 +70,13 @@ class StuffDoer {
     const transactionsLoader = new TransactionsLoader(accounts, this.log);
     const transactionsProcessor = new TransactionsProcessor(
       rules.map(Rules.toRule),
-      this.log
+      this.log,
     );
     const processed = this.txFilePaths.flatMap((f) =>
-      this.loadTransactions(f, transactionsLoader, transactionsProcessor)
+      this.loadTransactions(f, transactionsLoader, transactionsProcessor),
     );
     this.log.info(
-      `Total: processed ${processed.length} records from ${this.txFilePaths.length} files`
+      `Total: processed ${processed.length} records from ${this.txFilePaths.length} files`,
     );
 
     const { isDebit, isCredit, inTime, between } = RawRecordFilters;
@@ -98,7 +98,7 @@ class StuffDoer {
     this.log.info("");
     const pc = percentOf(uncategorisedRecords.length, processed.length);
     this.log.warn(
-      `Missing category for ${uncategorisedRecords.length} records (${pc})`
+      `Missing category for ${uncategorisedRecords.length} records (${pc})`,
     );
 
     this.log.info("");
@@ -112,7 +112,7 @@ class StuffDoer {
     this.log.info("");
     this.log.warn("Incoming unrecognised records:");
     this.log.info(
-      "Total: " + uncategorisedRecords.filter(isCredit()).reduce(sum, zer0)
+      "Total: " + uncategorisedRecords.filter(isCredit()).reduce(sum, zer0),
     );
 
     this.log.info(
@@ -120,7 +120,7 @@ class StuffDoer {
         .filter(isCredit())
         .sort(byAmountDesc)
         .map((r) => `${r.desc} ($${r.amount})`)
-        .join("\n")
+        .join("\n"),
     );
 
     const bankStuff = processed.filter((r) => r.category === "bank");
@@ -157,14 +157,14 @@ class StuffDoer {
   private loadTransactions(
     filePath: string,
     transactionsLoader: TransactionsLoader,
-    transactionsProcessor: TransactionsProcessor
+    transactionsProcessor: TransactionsProcessor,
   ): Transaction[] {
     this.log.info(`Loading ${filePath}`);
     const fileContents = fs.readFileSync(filePath, "utf8");
     const transactionsFile = new TransactionsFile(
       filePath,
       "westpac.csv",
-      fileContents
+      fileContents,
     );
     const loaded: RawRecord[] =
       transactionsLoader.loadRawRecords(transactionsFile);

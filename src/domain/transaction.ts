@@ -9,7 +9,10 @@ import { Category, UNCATEGORISED } from "./category";
 import { TransactionsFile } from "./file";
 
 export class TransactionsLoader {
-  constructor(readonly accounts: Bank.Accounts, readonly log: Logger) {}
+  constructor(
+    readonly accounts: Bank.Accounts,
+    readonly log: Logger,
+  ) {}
 
   loadRawRecords(transactionsFile: TransactionsFile): RawRecord[] {
     const bankfileHandler = this.getHandler(transactionsFile);

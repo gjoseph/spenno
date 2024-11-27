@@ -22,7 +22,7 @@ test("between", () => {
 test("between has strict format requirements", () => {
   const r = withDate(moment("2020-11-21 20:16:30"));
   expect(() => between("2001-13-01", "2222-12-12")(r)).toThrow(
-    "not a valid date"
+    "not a valid date",
   );
   expect(() => between("2018", "2021-12-12")(r)).toThrow("not a valid date");
   expect(() => between("2020-11", "2020-12-12")(r)).toThrow("not a valid date");
@@ -31,7 +31,7 @@ test("between has strict format requirements", () => {
 });
 
 test.todo(
-  "instead, between shouuld support YYYY and YYYY-MM at least, and detect the value to pass to as granularity"
+  "instead, between shouuld support YYYY and YYYY-MM at least, and detect the value to pass to as granularity",
 );
 
 test.skip("between should fail when invalid boundaries", () => {
@@ -39,15 +39,15 @@ test.skip("between should fail when invalid boundaries", () => {
   expect(() => between("2021", "2009")(withDate(moment()))).toThrow();
   expect(() => between("2020-10", "2020-08")(withDate(moment()))).toThrow();
   expect(() =>
-    between("2009-10-10", "2009-09-10")(withDate(moment()))
+    between("2009-10-10", "2009-09-10")(withDate(moment())),
   ).toThrow();
   // date is plain wrong
   expect(() =>
-    between("2009-13-10", "2009-14-10")(withDate(moment()))
+    between("2009-13-10", "2009-14-10")(withDate(moment())),
   ).toThrow();
   // date is not yyyy-mm-dd
   expect(() =>
-    between("2009/10/10", "2009-09-10")(withDate(moment()))
+    between("2009/10/10", "2009-09-10")(withDate(moment())),
   ).toThrow();
 });
 
@@ -136,19 +136,19 @@ test("filters can be chained with AND", () => {
     category: "some/cat",
   };
   expect(isDebit({ min: 20, max: 100 }).and(inTime(2018, "year"))(testTx)).toBe(
-    true
+    true,
   );
   expect(isDebit({ min: 20, max: 50 }).and(inTime(2018, "year"))(testTx)).toBe(
-    false
+    false,
   );
   expect(isDebit({ min: 20, max: 100 }).and(inTime(2020, "year"))(testTx)).toBe(
-    false
+    false,
   );
   expect(inTime(2018, "year").and(isDebit({ min: 20, max: 100 }))(testTx)).toBe(
-    true
+    true,
   );
   expect(inTime(2018, "year").and(isDebit({ min: 20, max: 50 }))(testTx)).toBe(
-    false
+    false,
   );
 });
 test("filters can be chained with OR", () => {
@@ -162,29 +162,29 @@ test("filters can be chained with OR", () => {
     category: "some/cat",
   };
   expect(isDebit({ min: 20, max: 100 }).or(inTime(2018, "year"))(testTx)).toBe(
-    true // both true
+    true, // both true
   );
   expect(isDebit({ min: 20, max: 50 }).or(inTime(2018, "year"))(testTx)).toBe(
-    true // by time
+    true, // by time
   );
   expect(isDebit({ min: 20, max: 100 }).or(inTime(2020, "year"))(testTx)).toBe(
-    true // by amount
+    true, // by amount
   );
   expect(inTime(2018, "year").or(isDebit({ min: 20, max: 100 }))(testTx)).toBe(
-    true // both true, inverted order
+    true, // both true, inverted order
   );
   expect(inTime(2017, "year").or(isDebit({ min: 20, max: 50 }))(testTx)).toBe(
-    false // both false
+    false, // both false
   );
   expect(inTime(2017, "year").or(inTime(2016, "year"))(testTx)).toBe(
-    false // both time, both false
+    false, // both time, both false
   );
   expect(
     isDebit({ min: 20, max: 50 })
       .or(isDebit({ eq: 70 }))
-      .or(isCredit())(testTx)
+      .or(isCredit())(testTx),
   ).toBe(
-    false // both amount, both false
+    false, // both amount, both false
   );
 });
 

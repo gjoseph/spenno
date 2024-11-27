@@ -28,7 +28,7 @@ const getOptionLabel = (category: Category) => category;
 const renderOption = (
   props: React.HTMLAttributes<HTMLLIElement>,
   category: Category,
-  { selected }: AutocompleteRenderOptionState
+  { selected }: AutocompleteRenderOptionState,
 ) => (
   <li {...props}>
     <Checkbox
@@ -44,7 +44,7 @@ const renderOption = (
 // Don't render anything in the field, we just use it as a search input
 const renderTags = (
   categories: Category[],
-  getTagProps: AutocompleteRenderGetTagProps
+  getTagProps: AutocompleteRenderGetTagProps,
 ) => {
   return null;
 };

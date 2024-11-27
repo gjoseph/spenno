@@ -9,7 +9,7 @@ type AmountCompareArgs = { min?: number; max?: number; eq?: number };
 
 const isDebit = (args?: AmountCompareArgs) => {
   return chainable<RawRecord>((t) =>
-    isPositiveAndCompare(t.amount.times(-1), args)
+    isPositiveAndCompare(t.amount.times(-1), args),
   );
 };
 
@@ -19,7 +19,7 @@ const isCredit = (args?: AmountCompareArgs) => {
 
 const isPositiveAndCompare = (
   amount: Big,
-  args: AmountCompareArgs | undefined
+  args: AmountCompareArgs | undefined,
 ) => {
   return (
     amount.gt(0) &&

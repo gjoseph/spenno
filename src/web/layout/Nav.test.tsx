@@ -12,7 +12,7 @@ test("renders title", () => {
       }
       appIcon={LocalPizzaIcon}
       iconAndDialogs={[]}
-    />
+    />,
   );
   // Unable to find an element with the text: /this is the app title/i.
   // This could be because the text is broken up by multiple elements. In this case,

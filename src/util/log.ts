@@ -98,7 +98,7 @@ export class TermLogger implements Logger {
     console.warn(
       Array.from(message)
         .map((c) => this.rndChlk()(c))
-        .join("")
+        .join(""),
     );
   }
 

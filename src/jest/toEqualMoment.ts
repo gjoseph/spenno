@@ -15,7 +15,7 @@ function formatMoment(received: any): string {
 export function toEqualMoment(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   received: any,
-  expected: Moment
+  expected: Moment,
 ): jest.CustomMatcherResult {
   const pass =
     received?.isSame && typeof received.isSame === "function"
@@ -26,7 +26,7 @@ export function toEqualMoment(
     return {
       message: (): string =>
         `Received moment (${formatMoment(
-          received
+          received,
         )}) is the same as expected (${formatMoment(expected)})`,
       pass: true,
     };
@@ -34,7 +34,7 @@ export function toEqualMoment(
   return {
     message: (): string =>
       `Received moment (${formatMoment(
-        received
+        received,
       )}) is not the same as expected (${formatMoment(expected)})`,
     pass: false,
   };

@@ -30,7 +30,7 @@ test("simple matching without additional condition", () => {
 test.todo(
   "decide if multiple rules mean fallback, or if we truly enforce 1-rule-per-tx, " +
     "or somewhere in between (some rules _can_ be fallback, not others" +
-    "... maybe same regex but no addCheck... or if there's only 1 rule that matches without an addCheck that's ok...)"
+    "... maybe same regex but no addCheck... or if there's only 1 rule that matches without an addCheck that's ok...)",
 );
 
 test("additionalCheck applies correctly, picks the right rule out of 2", () => {
@@ -79,6 +79,6 @@ test("additionalCheck applies correctly, picks the right rule out of 2", () => {
 function applyTestRules(ruleDescs: Rules.RuleDesc[], rawRx: RawRecord[]) {
   return new TransactionsProcessor(
     ruleDescs.map(Rules.toRule),
-    new SilentLogger()
+    new SilentLogger(),
   ).applyRules(rawRx);
 }

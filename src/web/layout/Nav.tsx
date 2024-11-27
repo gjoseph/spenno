@@ -119,7 +119,7 @@ export const TopBar: React.FC<{
         ...i,
         onClick: i.onClick || handleOpen(idx),
       })),
-    [props.iconAndDialogs]
+    [props.iconAndDialogs],
   );
 
   const scrollTrigger = useScrollTrigger({

@@ -28,7 +28,7 @@ export const evalAsFunction = <I, O>(code: string): Fun<I, O> => {
     // console.log("typeof e", typeof e)
     // console.log("Object.keys(e): ", Object.keys(e))
     throw new Error(
-      `Could not evaluate rule additionalCheck \`${code}\`: ${e.message}`
+      `Could not evaluate rule additionalCheck \`${code}\`: ${e.message}`,
     );
   }
 };

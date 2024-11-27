@@ -43,14 +43,14 @@ const transferrableTx: Transferrable<Transaction> = {
 
 test("conversion methods are symmetric (to(from))", () => {
   const result: any = toTransferrable(
-    fromTransferrable(TransferrableMappings.TransactionTM)(transferrableTx)
+    fromTransferrable(TransferrableMappings.TransactionTM)(transferrableTx),
   );
   expect(result).toEqual(transferrableTx);
 });
 
 test("conversion methods are symmetric (from(to))", () => {
   const result: Transaction = fromTransferrable<Transaction>(
-    TransferrableMappings.TransactionTM
+    TransferrableMappings.TransactionTM,
   )(toTransferrable(typedTx));
   // this is another reason to ditch moment.js -- moment instances are never equal to each other
   // expect(result).toEqual(tx);
@@ -81,7 +81,7 @@ test("Transferrable<> remaps Big as string", () => {
 
 test("TransferrableTransaction is really transferrable", () => {
   return expect(structuredClone(transferrableTx)).resolves.toEqual(
-    transferrableTx
+    transferrableTx,
   );
 });
 

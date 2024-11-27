@@ -24,7 +24,7 @@ test("groupBy reducer - returns an arrayable map", () => {
       { key: 3, value: ["dog", "cat", "hop", "hip"] },
       { key: 4, value: ["chat", "hund"] },
       { key: 5, value: ["chien"] },
-    ])
+    ]),
   );
 });
 
@@ -49,6 +49,6 @@ test("countBy reducer - returns an arrayable map", () => {
       { key: "c", value: 4 },
       { key: "d", value: 1 },
       { key: "h", value: 3 },
-    ])
+    ]),
   );
 });

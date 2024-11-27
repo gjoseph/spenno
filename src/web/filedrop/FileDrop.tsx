@@ -9,7 +9,7 @@ const onDropDelegateToAddFile =
     onStart();
     console.debug(
       "onDrop#acceptedFiles:",
-      acceptedFiles.map((f) => f.name)
+      acceptedFiles.map((f) => f.name),
     );
     acceptedFiles.forEach((file: File) => {
       const reader = new FileReader();
@@ -66,14 +66,13 @@ const baseStyle = {
 // for some reason I can't spell WrappedComponent as wrappedComponent or isn't happy
 export const withDropZone =
   <P extends object>(
-    WrappedComponent: React.ComponentType<P>
+    WrappedComponent: React.ComponentType<P>,
   ): React.FC<P & FileDropProps> =>
-  ({ addFile, minimal, ...props }: FileDropProps) =>
-    (
-      <FileDrop addFile={addFile} minimal={minimal}>
-        <WrappedComponent {...(props as P)} />
-      </FileDrop>
-    );
+  ({ addFile, minimal, ...props }: FileDropProps) => (
+    <FileDrop addFile={addFile} minimal={minimal}>
+      <WrappedComponent {...(props as P)} />
+    </FileDrop>
+  );
 
 type FileDropProps = {
   addFile: AddFile;
@@ -86,9 +85,9 @@ export const FileDrop: React.FC<FileDropProps> = (props) => {
       onDropDelegateToAddFile(
         props.addFile,
         () => setInProgress(() => true),
-        () => setInProgress(() => false)
+        () => setInProgress(() => false),
       ),
-    [props.addFile]
+    [props.addFile],
   );
   // COPIED FROM https://react-dropzone.js.org/#section-styling-dropzone
   const {
@@ -110,7 +109,7 @@ export const FileDrop: React.FC<FileDropProps> = (props) => {
       ...(isDragAccept ? acceptStyle : {}),
       ...(isDragReject ? rejectStyle : {}),
     }),
-    [props.minimal, isDragActive, isDragReject, isDragAccept]
+    [props.minimal, isDragActive, isDragReject, isDragAccept],
   );
 
   // if we set to false, 2 parallel uploads might cancel each other?

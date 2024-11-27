@@ -4,7 +4,10 @@ import { Rules } from "./rules";
 import { RawRecord, Transaction } from "./transaction";
 
 export class TransactionsProcessor {
-  constructor(readonly rules: Rules.Rule[], readonly log: Logger) {}
+  constructor(
+    readonly rules: Rules.Rule[],
+    readonly log: Logger,
+  ) {}
 
   applyRules(rawRecords: RawRecord[]) {
     const processed: Transaction[] = rawRecords.map((raw) => {
@@ -38,7 +41,7 @@ export class TransactionsProcessor {
         storeRegex,
         rule.additionalCheck
           ? "additional check " + (addCheckResult ? "passed" : "failed")
-          : "no additional check"
+          : "no additional check",
       );
       return regexResult && addCheckResult;
     });
@@ -56,7 +59,7 @@ export class TransactionsProcessor {
     // TODO or merely just return another special category?
     // ... and/or include error in Transaction object
     this.log.warn(
-      `${JSON.stringify(raw)} matches more than 1 rule: ${matches}`
+      `${JSON.stringify(raw)} matches more than 1 rule: ${matches}`,
     );
     return null;
   }

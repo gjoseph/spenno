@@ -8,7 +8,7 @@ export const collectFilesFrom = async <T>(
   dir: FileSystemDirectoryHandle,
   log: Logger,
   fileLoader: (handle: FileSystemFileHandle, file: File) => Promise<T>,
-  testFile: (e: FileSystemFileHandle) => boolean
+  testFile: (e: FileSystemFileHandle) => boolean,
 ): Promise<T[]> => {
   console.log("collectFilesFrom#dir:", dir);
   const perm = await dir.queryPermission();

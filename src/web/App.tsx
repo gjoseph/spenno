@@ -104,7 +104,7 @@ const AppContent = () => {
     useFetch<Bank.Accounts>(
       "/accounts.yml",
       () => new Bank.Accounts([]),
-      readAccounts
+      readAccounts,
     );
 
   const [rules, rulesLoaded, rulesError, reFetchRules] = useFetch<
@@ -132,7 +132,7 @@ const AppContent = () => {
           localDirectoryHandle,
           logger,
           loadFileFunction,
-          FileTests.CSV_SUFFIX
+          FileTests.CSV_SUFFIX,
         );
         setFiles(loadedFiles);
       })();
@@ -174,8 +174,8 @@ const AppContent = () => {
       .map(
         addUniquenessSuffixToThings(
           (f: FileWithRawRecords) => f.filePath,
-          (f, suffixedName) => ({ ...f, label: suffixedName })
-        )
+          (f, suffixedName) => ({ ...f, label: suffixedName }),
+        ),
       )
       .map((f, idx) => {
         // remove rawRecords, fileContents, and inject recordCount property
@@ -212,7 +212,7 @@ const AppContent = () => {
             newFiles.length,
             "files with",
             newFiles.map((f) => f.rawRecords.length),
-            "raw records"
+            "raw records",
           );
           return newFiles;
         });
@@ -230,14 +230,14 @@ const AppContent = () => {
           accounts.accounts,
           txDateRange,
           filterConfig.categories,
-          filterConfig.amount
-        )
+          filterConfig.amount,
+        ),
       ) // TODO why does intellij think the "dateRange" param is called "files" !?
       .then((res: TransactionProcessWorkResult) => {
         forwardLogs(res.log, logger);
         setTransactions((old) => {
           const newTxs = res.transactions.map(
-            fromTransferrable(TransferrableMappings.TransactionTM)
+            fromTransferrable(TransferrableMappings.TransactionTM),
           );
           logger.debug("Loaded", newTxs.length, "transactions");
           return newTxs;
@@ -316,8 +316,8 @@ const AppContent = () => {
         requestPermissions.status !== "granted"
           ? withDotBadge("warning")(UploadFileIcon)
           : !localDirectoryHandle
-          ? withDotBadge("info")(UploadFileIcon)
-          : UploadFileIcon,
+            ? withDotBadge("info")(UploadFileIcon)
+            : UploadFileIcon,
       title: "Files",
       // we know onClick will take precedence over opening the dialog
       onClick:
