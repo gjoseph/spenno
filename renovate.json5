@@ -1,15 +1,14 @@
 {
-  extends: ["config:base"],
+  extends: ["config:recommended"],
   dependencyDashboard: true,
   separateMinorPatch: true,
   separateMultipleMajor: true,
   automerge: false,
   automergeType: "pr",
-  automergeStrategy: "merge-commit", // This is not actually supported by Renovate on GitHub, so we need to disallow other merge types in the repo config
-  platformAutomerge: true, // Let GitHub do the actual merging
+  automergeStrategy: "merge-commit",
+  platformAutomerge: true,
   rebaseWhen: "behind-base-branch",
-  // Wait 2 days after a release to create PR/branches
-  stabilityDays: 2,
+  minimumReleaseAge: "2 days",
   prCreation: "not-pending",
   // default is documented to be 0, but empirically it seems to be ~30 ?
   prConcurrentLimit: 0,
@@ -23,17 +22,49 @@
   packageRules: [
     // Auto-merge patch updates
     {
-      updateTypes: ["patch"],
+      matchUpdateTypes: ["patch"],
       automerge: true,
     },
+    // Node & npm - both in package.json and .tool-versions
     {
+      groupName: "Node and npm platform",
+      matchPackageNames: ["node", "npm"],
+      matchManagers: ["asdf", "npm"],
+    },
+    // Node packages
+    {
+      groupName: "Material UI packages",
+      matchPackageNames: ["/^@material-ui//", "/^@mui//"],
+    },
+    // Generated @types rules
+    {
+      groupName: "fs-extra",
+      matchPackageNames: ["@types/fs-extra", "fs-extra"],
+    },
+    {
+      groupName: "node",
+      matchPackageNames: ["@types/node", "node"],
+    },
+    {
+      groupName: "ws",
+      matchPackageNames: ["@types/ws", "ws"],
+    },
+    {
+      groupName: "inquirer",
+      matchPackageNames: ["@types/inquirer", "inquirer"],
+    },
+    {
+      groupName: "jest",
+      matchPackageNames: ["@types/jest", "jest"],
+    },
+    {
+      groupName: "react",
       matchPackageNames: [
         "@types/react",
         "@types/react-dom",
         "react",
         "react-dom",
       ],
-      groupName: "react",
     },
   ],
 }
