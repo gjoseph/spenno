@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # continue other jobs if one in matrix fails
+      matrix:
+        npm-command: ["build", "test", "prettier-check-all"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,6 +22,5 @@ jobs:
           cache-dependency-path: "./package-lock.json"
       # Override npm installed above with version specified in package.json
       - run: ./npm-setup.sh
-      - run: npm install && npm run build
-      - run: npm test
-      - run: npm run prettier-check-all
+      - run: npm install
+      - run: npm run ${{ matrix.npm-command }}
