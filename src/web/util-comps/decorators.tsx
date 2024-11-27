@@ -1,13 +1,13 @@
 import { Badge } from "@mui/material";
-import * as React from "react";
+import { ComponentType } from "react";
 
 // subset of Badge#color
 type Level = "error" | "info" | "success" | "warning";
 
 export const withDotBadge =
   (level: Level) =>
-  <P,>(WrappedComponent: React.ComponentType<P>) =>
-  (props: P) => {
+  <P,>(WrappedComponent: ComponentType<P>) =>
+  (props: P & JSX.IntrinsicAttributes) => {
     return (
       <Badge color={level} variant="dot">
         <WrappedComponent {...props} />
