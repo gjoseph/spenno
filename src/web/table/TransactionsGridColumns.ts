@@ -4,7 +4,7 @@ import { Category, UNCATEGORISED } from "../../domain/category";
 import { CellTypes } from "./util";
 
 export const transactionsGridColumns = (
-  accounts: Bank.Accounts
+  accounts: Bank.Accounts,
 ): GridColDef[] => {
   return [
     CellTypes.account(accounts),

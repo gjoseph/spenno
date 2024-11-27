@@ -27,7 +27,7 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
   }); // TODO yikes
 
   const [radioValue, setRadioValue] = React.useState<AmountFilterType | null>(
-    null
+    null,
   );
   const [sliderEnabled, setSliderEnabled] = React.useState<boolean>(false);
 
@@ -39,7 +39,7 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
   // Commit to config when slider handle is released
   const handleSliderCommit = (
     event: React.SyntheticEvent | Event,
-    newValue: number | number[]
+    newValue: number | number[],
   ) => {
     // TODO enforce array-of-2? and/or have a different state for slider
     props.setFilterConfig((prev) => {
@@ -52,7 +52,7 @@ export const AmountPicker: React.FC<AmountPickerProps> = (props) => {
 
   const handleToggleChange = (
     event: React.MouseEvent<HTMLElement>,
-    newValue: string | null
+    newValue: string | null,
   ) => {
     setRadioValue(newValue as AmountFilterType);
     if (newValue === "slider") {

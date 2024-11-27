@@ -18,7 +18,7 @@ export type PresetTimeframePickerProps = {
   setFilterConfig: SetFilterConfig;
 };
 export const PresetTimeframePicker: React.FC<PresetTimeframePickerProps> = (
-  props
+  props,
 ) => {
   // array if non-exclusive, string if exclusive
   const [value, setValue] = React.useState<number[]>(() => {
@@ -32,7 +32,7 @@ export const PresetTimeframePicker: React.FC<PresetTimeframePickerProps> = (
 
   const selectYear = (
     event: React.MouseEvent<HTMLElement>,
-    selectedYears: number[]
+    selectedYears: number[],
   ) => {
     selectedYears = selectedYears.sort();
     setValue(selectedYears);

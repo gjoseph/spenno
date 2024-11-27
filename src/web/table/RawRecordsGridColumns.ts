@@ -3,7 +3,7 @@ import { Bank } from "../../domain/accounts";
 import { CellTypes } from "./util";
 
 export const rawRecordsGridColumns = (
-  accounts: Bank.Accounts
+  accounts: Bank.Accounts,
 ): GridColDef[] => {
   return [
     {

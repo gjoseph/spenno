@@ -18,7 +18,7 @@ export interface UncategorisedStats {
 
 export const uncategorisedStats = (
   transactions: Transaction[],
-  top: number
+  top: number,
 ): UncategorisedStats => {
   const uncategorisedTransactions = transactions.filter(isUncategorised());
 
@@ -35,7 +35,7 @@ export const uncategorisedStats = (
 
   const percentageOfTotal = percentOf(
     uncategorisedTransactions.length,
-    transactions.length
+    transactions.length,
   );
 
   const totalCredit = uncategorisedTransactions

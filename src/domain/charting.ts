@@ -22,7 +22,7 @@ export const GroupByFunctions: Record<GroupBy, (t: Transaction) => string> = {
 
 const chartDataGroupedBy = (
   transactions: Transaction[],
-  whatToGroupBy: GroupBy
+  whatToGroupBy: GroupBy,
 ): ChartDataItem[] => {
   const groupByFunction = GroupByFunctions[whatToGroupBy];
   return transactions
@@ -44,7 +44,7 @@ const makeChart = (
   title: string,
   predicate: TransactionFilter,
   whatToGroupBy: GroupBy,
-  transactions: Transaction[]
+  transactions: Transaction[],
 ): ChartDesc => ({
   title,
   data: chartDataGroupedBy(transactions.filter(predicate), whatToGroupBy),
@@ -53,7 +53,7 @@ const makeChart = (
 type ChartMakerSauce = { title: string; predicate: TransactionFilter };
 
 const makeCharts: (sauce: ChartMakerSauce[]) => ChartMaker = (
-  sauce: ChartMakerSauce[]
+  sauce: ChartMakerSauce[],
 ) => {
   return (whatToGroupBy: GroupBy, transactions: Transaction[]) =>
     sauce.map((x) => {
@@ -63,7 +63,7 @@ const makeCharts: (sauce: ChartMakerSauce[]) => ChartMaker = (
 
 type ChartMaker = (
   whatToGroupBy: GroupBy,
-  transactions: Transaction[]
+  transactions: Transaction[],
 ) => ChartDesc[];
 
 export type SplitBy = GroupBy;
@@ -82,7 +82,7 @@ export const SplitByFunctions: Record<SplitBy, () => ChartMaker> = {
       ALL_YEARS.map((y) => ({
         title: y.toString(),
         predicate: (t) => t.date.year() === y,
-      }))
+      })),
     ),
   category: () => {
     throw new Error("Split by category is not implemented yet!");
@@ -102,7 +102,7 @@ export const SplitByFunctions: Record<SplitBy, () => ChartMaker> = {
 export const getChartsFor = (
   whatToSplitBy: SplitBy,
   whatToGroupBy: GroupBy,
-  transactions: Transaction[]
+  transactions: Transaction[],
 ) => {
   const chartMaker = SplitByFunctions[whatToSplitBy]();
   return chartMaker(whatToGroupBy, transactions);

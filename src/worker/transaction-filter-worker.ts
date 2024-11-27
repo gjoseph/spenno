@@ -43,12 +43,12 @@ const reloadFiles = (
   // we're passing the whole files (File#fileContents) as string between threads, I'm not sure how efficient this is
   files: TransactionsFile[],
   // Bank.Accounts can't be cloned () so unwrapping it here and rewrapping below
-  accounts: Bank.Account[]
+  accounts: Bank.Account[],
 ): FileLoadWorkResult => {
   const log = new ArrayLogger(MinLevel.info);
   const transactionsLoader = new TransactionsLoader(
     new Bank.Accounts(accounts),
-    log
+    log,
   );
   const filesWithRawRecords = files.map((file) => {
     // we're reparsing the CSV everytime... how not useful
@@ -77,7 +77,7 @@ const reloadTransactions = (
   accounts: Bank.Account[],
   dateRange: TransferrableDateRange,
   categories: Category[],
-  amountFilter: AmountFilter
+  amountFilter: AmountFilter,
 ): TransactionProcessWorkResult => {
   const log = new ArrayLogger(MinLevel.info);
   const rules = ruleDescs.map(Rules.toRule);
@@ -85,7 +85,7 @@ const reloadTransactions = (
 
   // TODO it might be more efficient to apply the date filter on raw records instead
   let txFilter = isBetween(transferredDateRange(dateRange)).and(
-    isInCategories(categories)
+    isInCategories(categories),
   );
   switch (amountFilter.type) {
     case null:
@@ -109,7 +109,7 @@ const reloadTransactions = (
     .filter(txFilter)
     .map(toTransferrable);
   log.info(
-    `Total: processed ${filteredTransactions.length} records from ${files.length} files`
+    `Total: processed ${filteredTransactions.length} records from ${files.length} files`,
   );
   return {
     transactions: filteredTransactions,

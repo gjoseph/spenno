@@ -43,9 +43,9 @@ test("list of things added suffix as a mapping function on list", () => {
       addUniquenessSuffixToThings(
         (t) => t.name,
         (t, s) => ({ ...t, name: s }),
-        (s, i) => `#${i} for ${s}`
-      )
-    )
+        (s, i) => `#${i} for ${s}`,
+      ),
+    ),
   ).toEqual([
     { name: "#1 for a", blah: "foo", count: 123 },
     { name: "#1 for b", blah: "bar", count: 123 },
@@ -60,8 +60,8 @@ test("list of things added suffix as a mapping function on list", () => {
 test("list of things added suffix as a mapping function on list with property", () => {
   expect(
     things.map(
-      addUniquenessSuffixToProperty("name", (s, i) => `#${i} for ${s}`)
-    )
+      addUniquenessSuffixToProperty("name", (s, i) => `#${i} for ${s}`),
+    ),
   ).toEqual([
     { name: "#1 for a", blah: "foo", count: 123 },
     { name: "#1 for b", blah: "bar", count: 123 },

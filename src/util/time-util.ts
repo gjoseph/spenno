@@ -16,7 +16,7 @@ export const MAX_DATE_RANGE: DateRange = [
 
 export const isInRange = (
   date: moment.Moment,
-  dateRange: [moment.Moment, moment.Moment]
+  dateRange: [moment.Moment, moment.Moment],
 ) => {
   return date.isBetween(dateRange[0], dateRange[1], "day", "[]");
 };

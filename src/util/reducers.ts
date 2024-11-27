@@ -34,23 +34,23 @@ type KeyExtractor<T, K> = (current: T) => K;
 
 type GroupByToMapReducer<T, K, V> = (
   accumulator: ArrayableMap<K, V>,
-  current: T
+  current: T,
 ) => ArrayableMap<K, V>;
 
 type GroupByToMapReduceArgs<T, K, V> = [
   GroupByToMapReducer<T, K, V>,
-  ArrayableMap<K, V>
+  ArrayableMap<K, V>,
 ];
 
 type ValueAdder<T, K, V> = (
   acc: ArrayableMap<K, V>,
   key: K,
-  current: T
+  current: T,
 ) => void;
 
 const reducerFactory = <T, K, V>(
   extractKey: KeyExtractor<T, K>,
-  addValue: ValueAdder<T, K, V>
+  addValue: ValueAdder<T, K, V>,
 ): GroupByToMapReducer<T, K, V> => {
   return (acc: ArrayableMap<K, V>, current: T): ArrayableMap<K, V> => {
     const key = extractKey(current);
@@ -81,7 +81,7 @@ namespace GroupBy {
    * @param by a function to extract the group-by key from the given objects
    */
   export const groupBy: <T, K>(
-    by: KeyExtractor<T, K>
+    by: KeyExtractor<T, K>,
   ) => GroupByToMapReduceArgs<T, K, T[]> = <T, K>(by: KeyExtractor<T, K>) => {
     return [reducerFactory<T, K, T[]>(by, addToArray), initialValue<K, T[]>()];
   };
@@ -104,9 +104,9 @@ namespace CountBy {
    * @param by a function to extract the group-by key from the given objects
    */
   export const countBy: <T, K>(
-    by: KeyExtractor<T, K>
+    by: KeyExtractor<T, K>,
   ) => GroupByToMapReduceArgs<T, K, number> = <T, K>(
-    by: KeyExtractor<T, K>
+    by: KeyExtractor<T, K>,
   ) => {
     return [reducerFactory<T, K, number>(by, count), initialValue<K, number>()];
   };

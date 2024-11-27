@@ -10,7 +10,7 @@ export class TransactionsFile {
   constructor(
     readonly filePath: string,
     readonly type: FileType = "westpac.csv",
-    readonly fileContents: string
+    readonly fileContents: string,
   ) {
     // Generate a random id for each file
     this.id = uuidv4();

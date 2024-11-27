@@ -55,23 +55,23 @@ test("regexp slashes and flags is taking flags into account", () => {
 
 test("regexp slashes needs at least both slashes or throws exception", () => {
   expect(() => Rules.toRule(withRegexpString("/^foo"))).toThrow(
-    "Invalid regular expression"
+    "Invalid regular expression",
   );
 });
 
 // Not actually super keen to make this work
 test.skip("regex only last slash throws exception", () => {
   expect(() => Rules.toRule(withRegexpString("^foo/"))).toThrow(
-    "Invalid regular expression"
+    "Invalid regular expression",
   );
   expect(() => Rules.toRule(withRegexpString("^foo/i"))).toThrow(
-    "Invalid regular expression"
+    "Invalid regular expression",
   );
 });
 
 test("regexp slashes and invalid flag throws exception", () => {
   expect(() => Rules.toRule(withRegexpString("/^foo/z"))).toThrow(
-    /invalid flags/i
+    /invalid flags/i,
   );
 });
 

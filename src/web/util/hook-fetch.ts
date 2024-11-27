@@ -3,7 +3,7 @@ import React from "react";
 export function useFetch<T>(
   path: string,
   initialStateFactory: () => T,
-  responseTransformer: (fetchResult: string) => T
+  responseTransformer: (fetchResult: string) => T,
 ): [state: T, loaded: boolean, error: boolean, reload: () => void] {
   const [value, setValue] = React.useState<T>(initialStateFactory);
   const [loaded, setLoaded] = React.useState<boolean>(false);
@@ -26,7 +26,7 @@ export function useFetch<T>(
           console.log("fetch error:", typeof error, error);
           setError((old) => error);
           setLoaded((old) => true);
-        }
+        },
       );
   };
   React.useEffect(doTheFetch, [responseTransformer, path]);

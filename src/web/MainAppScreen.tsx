@@ -26,7 +26,7 @@ export const MainAppScreen: React.FC<
   const charts = getChartsFor(
     props.filterConfig.splitBy,
     props.filterConfig.groupBy,
-    props.transactions
+    props.transactions,
   );
   const uncategorised = uncategorisedStats(props.transactions, 100);
 

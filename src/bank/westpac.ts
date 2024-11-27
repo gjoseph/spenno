@@ -16,7 +16,10 @@ interface BankFileHandler {
 
 export namespace Westpac {
   export class WestpacHandler implements BankFileHandler {
-    constructor(readonly accounts: Bank.Accounts, readonly log: Logger) {}
+    constructor(
+      readonly accounts: Bank.Accounts,
+      readonly log: Logger,
+    ) {}
 
     /**
      * Bank Account,Date,Narrative,Debit Amount,Credit Amount,Balance,Categories,Serial
@@ -37,18 +40,18 @@ export namespace Westpac {
           amount: signedAmount(
             Number.parseFloat(a["Debit Amount"]),
             Number.parseFloat(a["Credit Amount"]),
-            () => `for this line: ${a.toString()}`
+            () => `for this line: ${a.toString()}`,
           ),
         };
       });
 
       const westpacCategories = Array.from(
-        new Set(records.map((a) => a.Categories))
+        new Set(records.map((a) => a.Categories)),
       );
       this.log.warn(
         westpacCategories.length +
           " unique Westpac categories: " +
-          westpacCategories
+          westpacCategories,
       );
 
       this.log.info(`Loaded ${westpac.length} records from Westpac file`);

@@ -28,7 +28,7 @@ type PersistentDirectoryReturn = [
   FileSystemDirectoryHandle | undefined,
   OpenPickerCallback,
   RequestPermissionsCallbackStatus,
-  ClearStateAndStoreCallback
+  ClearStateAndStoreCallback,
 ];
 
 /**
@@ -50,10 +50,10 @@ type PersistentDirectoryReturn = [
  */
 export const usePersistentLocalDirectory: (
   key: string,
-  startIn?: WellKnownDirectories
+  startIn?: WellKnownDirectories,
 ) => PersistentDirectoryReturn = (
   key: string,
-  startIn?: WellKnownDirectories
+  startIn?: WellKnownDirectories,
 ) => {
   // initially set to undefined, so we can use useEffect with an async function for initial value
   const [handle, setHandle] = React.useState<
@@ -68,7 +68,7 @@ export const usePersistentLocalDirectory: (
         setHandle((old) => {
           console.log("useEffect for initial value: old", old, "new:", h);
           return h;
-        })
+        }),
       )
       .then(() => setLoadedDbValue(true));
   }, [key]);
@@ -109,7 +109,7 @@ export const usePersistentLocalDirectory: (
               } else {
                 setRequestPermissions({ status: reqPerm });
                 console.log(
-                  `requested permissions for ${handle}, but got ${reqPerm}`
+                  `requested permissions for ${handle}, but got ${reqPerm}`,
                 );
               }
             },

@@ -10,7 +10,7 @@ export type AmountFilter = {
 export const signedAmount = (
   debit: number,
   credit: number,
-  logDetail: () => string = () => "hello"
+  logDetail: () => string = () => "hello",
 ): Big => {
   if (debit > 0 && credit > 0) {
     throw new Error("Both debit and credit are >0 " + logDetail());
@@ -53,7 +53,7 @@ const defaultSuffixFormat = (s: string, c: number) => {
 };
 
 const formatStringsWithCounter = (
-  formatter: StringOccurenceFormatter = defaultSuffixFormat
+  formatter: StringOccurenceFormatter = defaultSuffixFormat,
 ) => {
   const counts: StringOccurenceCounter = {};
   return (s: string) => {
@@ -67,7 +67,7 @@ const formatStringsWithCounter = (
 };
 
 export const addUniquenessSuffix = (
-  formatter: StringOccurenceFormatter = defaultSuffixFormat
+  formatter: StringOccurenceFormatter = defaultSuffixFormat,
 ) => {
   return formatStringsWithCounter(formatter);
 };
@@ -75,7 +75,7 @@ export const addUniquenessSuffix = (
 export const addUniquenessSuffixToThings = <T, U>(
   extractor: (item: T) => string,
   replacer: (item: T, suffixedString: string) => U,
-  formatter: StringOccurenceFormatter = defaultSuffixFormat
+  formatter: StringOccurenceFormatter = defaultSuffixFormat,
 ) => {
   const formatStrings = formatStringsWithCounter(formatter);
   return (t: T) => {
@@ -95,11 +95,11 @@ type PickStringProps<T> = {
  */
 export const addUniquenessSuffixToProperty = <T extends PickStringProps<T>>(
   property: keyof PickStringProps<T>,
-  formatter: StringOccurenceFormatter = defaultSuffixFormat
+  formatter: StringOccurenceFormatter = defaultSuffixFormat,
 ) => {
   return addUniquenessSuffixToThings(
     (t: T) => t[property],
     (t, formattedString) => ({ ...t, [property]: formattedString }),
-    formatter
+    formatter,
   );
 };

@@ -86,12 +86,12 @@ export const fromTransferrable =
 // TODO get rid of moment
 export type TransferrableDateRange = [string, string];
 export const transferrableDateRange: (
-  dateRange: DateRange
+  dateRange: DateRange,
 ) => TransferrableDateRange = (dateRange: DateRange) => {
   return [dateRange[0]?.toISOString(), dateRange[1]?.toISOString()];
 };
 export const transferredDateRange: (
-  dateRange: TransferrableDateRange
+  dateRange: TransferrableDateRange,
 ) => DateRange = (dateRange: TransferrableDateRange) => {
   return [moment(dateRange[0]), moment(dateRange[1])];
 };
@@ -101,18 +101,18 @@ export interface TransferrableFileWithRawRecords extends TransactionsFile {
 }
 
 export const fromTransferrableFilesWithRawRecords = (
-  files: TransferrableFileWithRawRecords[]
+  files: TransferrableFileWithRawRecords[],
 ) =>
   files.map((f) => {
     return {
       ...f,
       rawRecords: f.rawRecords.map(
-        fromTransferrable(TransferrableMappings.RawRecordTM)
+        fromTransferrable(TransferrableMappings.RawRecordTM),
       ),
     };
   });
 export const toTransferrableFilesWithRawRecords = (
-  files: FileWithRawRecords[]
+  files: FileWithRawRecords[],
 ) =>
   files.map((f) => {
     return { ...f, rawRecords: f.rawRecords.map(toTransferrable) };

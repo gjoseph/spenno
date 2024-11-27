@@ -10,7 +10,7 @@ import { FileDescriptor } from "../domain/file";
 export type FileToggleCallback = (filePath: string, checked: boolean) => void;
 type CheckboxEventHandler = (
   event: React.SyntheticEvent<Element, Event>,
-  checked: boolean
+  checked: boolean,
 ) => void;
 
 const FileLabel: React.FC<{ file: FileDescriptor }> = ({ file }) => {
@@ -46,7 +46,7 @@ export const FileList: React.FC<{
 }> = (props) => {
   const handleChange = (
     event: React.SyntheticEvent<Element, Event>,
-    checked: boolean
+    checked: boolean,
   ) => {
     const target: any = event.target; // TODO YIKES TYPES
     // The element's name property is set to fileId
