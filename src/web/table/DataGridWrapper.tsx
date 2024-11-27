@@ -51,13 +51,13 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
             rows={rows}
             getRowId={(row) => row.id} // Just for clarity, since this is the default behaviour if getRowId is not specified
             pageSize={100}
-            rowsPerPageOptions={[100]} // single value disables rowsPerPage selector
+            pageSizeOptions={[100]}
             autoHeight
             density="compact"
-            disableSelectionOnClick
+            disableRowSelectionOnClick
             disableColumnMenu // we always want all our columns
-            components={{ Toolbar: QuickSearchToolbar }}
-            componentsProps={{
+            slots={{ toolbar: QuickSearchToolbar }}
+            slotProps={{
               toolbar: {
                 value: searchText,
                 onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
