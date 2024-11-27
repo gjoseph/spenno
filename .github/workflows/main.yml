@@ -14,7 +14,7 @@ jobs:
         # Some of the commands below need this shell setup -- https://github.com/actions/virtual-environments/issues/4#issuecomment-600025775
         shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: nvm install && echo "$NVM_BIN" >> $GITHUB_PATH
       - run: ./npm-setup.sh
       - run: npm install && npm run build
