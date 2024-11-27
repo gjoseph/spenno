@@ -1,6 +1,7 @@
+import { GridColDef } from "@mui/x-data-grid";
 import { CellTypes } from "./util";
 
-export const mostCommonDescriptionsColumns = [
+export const mostCommonDescriptionsColumns: GridColDef[] = [
   {
     field: "desc",
     headerName: "Description",
