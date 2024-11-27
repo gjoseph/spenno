@@ -2,16 +2,18 @@ import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import * as React from "react";
 import { v4 as uuidv4 } from "uuid";
 
-const escapeRegExp = (value: string): string => {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-};
-
-const genericRowFilter = (searchValue: string) => (row: any) => {
-  const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
-  return Object.keys(row).some((field: any) => {
-    return searchRegex.test(row[field]?.toString());
-  });
-};
+// All this code was sorta meaningful with our custom quicksearch.
+// TODO assess if default quicksearch does this like we want -- not sure i remember wtf this was about
+// const escapeRegExp = (value: string): string => {
+//   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+// };
+//
+// const genericRowFilter = (searchValue: string) => (row: any) => {
+//   const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
+//   return Object.keys(row).some((field: any) => {
+//     return searchRegex.test(row[field]?.toString());
+//   });
+// };
 
 const rowsWithIdField = <T,>(rows: T[], addIdField: boolean = false) =>
   addIdField ? rows.map((e, idx) => ({ ...e, id: uuidv4() })) : rows;
@@ -29,13 +31,15 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
     return rowsWithIdField(props.rows, props.addIdField);
   });
 
-  const [searchText, setSearchText] = React.useState("");
-  const requestSearch = (searchValue: string) => {
-    setSearchText(searchValue);
-    const rowFilter = props.rowFilter || genericRowFilter(searchValue);
-    const filteredRows = props.rows.filter(rowFilter);
-    setRows(rowsWithIdField(filteredRows, props.addIdField));
-  };
+  // All this code was sorta meaningful with our custom quicksearch.
+  // TODO assess if default quicksearch does this like we want -- not sure i remember wtf this was about
+  // const [searchText, setSearchText] = React.useState("");
+  // const requestSearch = (searchValue: string) => {
+  //   setSearchText(searchValue);
+  //   const rowFilter = props.rowFilter || genericRowFilter(searchValue);
+  //   const filteredRows = props.rows.filter(rowFilter);
+  //   setRows(rowsWithIdField(filteredRows, props.addIdField));
+  // };
 
   React.useEffect(() => {
     setRows(rowsWithIdField(props.rows, props.addIdField));
