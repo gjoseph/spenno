@@ -1,7 +1,6 @@
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import * as React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { QuickSearchToolbar } from "./QuickSearchToolbar";
 
 const escapeRegExp = (value: string): string => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -50,19 +49,16 @@ export const DataGridWrapper = <T,>(props: DataGridWrapperProps<T>) => {
             columns={props.columns}
             rows={rows}
             getRowId={(row) => row.id} // Just for clarity, since this is the default behaviour if getRowId is not specified
-            pageSize={100}
+            paginationModel={{ page: 0, pageSize: 100 }}
             pageSizeOptions={[100]}
             autoHeight
             density="compact"
             disableRowSelectionOnClick
             disableColumnMenu // we always want all our columns
-            slots={{ toolbar: QuickSearchToolbar }}
+            slots={{ toolbar: GridToolbar }}
             slotProps={{
               toolbar: {
-                value: searchText,
-                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
-                  requestSearch(event.target.value),
-                clearSearch: () => requestSearch(""),
+                showQuickFilter: true,
               },
             }}
             // TODO https://mui.com/components/data-grid/components/#cell has an example that allows a popover to show the full value

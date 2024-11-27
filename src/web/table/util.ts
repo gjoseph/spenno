@@ -1,9 +1,4 @@
-import {
-  GridCellParams,
-  GridColDef,
-  GridValueFormatterParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
+import { GridCellParams, GridColDef } from "@mui/x-data-grid";
 import Big from "big.js";
 import { Moment } from "moment";
 
@@ -12,9 +7,7 @@ import "moment/locale/en-au";
 import { Bank } from "../../domain/accounts";
 
 export namespace CellFormatters {
-  export const momentFormatter = (p: GridValueFormatterParams) => {
-    // assuming p.value is a Moment
-    const value = p.value as Moment | undefined;
+  export const momentFormatter = (value: Moment | undefined) => {
     // obviously not the right place to change locale, but fuck those default us date formats
     return value?.format("L");
     // It seems like importing the locale was enough (it's possibly picked up by browser)
@@ -22,10 +15,9 @@ export namespace CellFormatters {
   };
 
   // valueFormatter isn't generic, so no guarantee p.value is actually a Big!?
-  export const bigFormatter = (p: GridValueFormatterParams) => {
-    if (p.value) {
-      const b = p.value as Big;
-      return "$" + b.abs().toString() + (b.gte(0) ? "+" : "-");
+  export const bigFormatter = (p: Big | undefined) => {
+    if (p) {
+      return "$" + p.abs().toFixed(2) + (p.gte(0) ? "+" : "-");
     }
     return "";
   };
@@ -37,7 +29,7 @@ export namespace CellTypes {
       headerName: "Account",
       flex: 1,
       type: "singleSelect",
-      valueGetter: (p: GridValueGetterParams) => p.row.account.name,
+      valueGetter: (value, row) => row.account.name,
       valueOptions: accounts.accounts.map((a) => a.name),
     } as GridColDef;
   };
@@ -52,8 +44,10 @@ export namespace CellTypes {
     headerName: "Amount",
     type: "number",
     flex: 1,
-    cellClassName: (p: GridCellParams<Big>) =>
-      p.value ? (p.value.lt(0) ? "amount-debit" : "amount-credit") : "",
+    cellClassName: (p: GridCellParams<[amount: Big]>) => {
+      const value: Big = p.value as Big;
+      return value ? (value.lt(0) ? "amount-debit" : "amount-credit") : "";
+    },
     valueFormatter: CellFormatters.bigFormatter,
   };
 }
