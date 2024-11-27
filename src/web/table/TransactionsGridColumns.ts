@@ -25,10 +25,10 @@ export const transactionsGridColumns = (
       field: "category",
       headerName: "Category",
       flex: 3,
-      // renderCell: (p: GridRenderCellParams<Category>) => (
+      // renderCell: (p: GridRenderCellParams<[category:Category]>) => (
       //   <CategoryView category={p.value} />
       // ),
-      cellClassName: (p: GridCellParams<Category>) =>
+      cellClassName: (p: GridCellParams<[category: Category]>) =>
         p.value === UNCATEGORISED ? "category-uncategorised" : "category",
     },
   ];

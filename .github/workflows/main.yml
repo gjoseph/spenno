@@ -9,13 +9,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        # Some of the commands below need this shell setup -- https://github.com/actions/virtual-environments/issues/4#issuecomment-600025775
-        shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v3
-      - run: nvm install && echo "$NVM_BIN" >> $GITHUB_PATH
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: "./.tool-versions"
+          cache: "npm"
+          cache-dependency-path: "./package-lock.json"
+      # Override npm installed above with version specified in package.json
       - run: ./npm-setup.sh
       - run: npm install && npm run build
       - run: npm test
