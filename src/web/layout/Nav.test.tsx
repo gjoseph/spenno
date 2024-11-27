@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { TopBar } from "./Nav";
 import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
 
 test("renders title", () => {
-  render(
+  const { getByText } = render(
     <TopBar
       appTitle={
         <>
@@ -19,6 +19,5 @@ test("renders title", () => {
   // you can provide a function for your text matcher to make your matcher more flexible.
   //  const text = screen.getByText(/this is the app title/i);
   // ... and I can't be arsed figuring out how to do that for the above, yet I want to keep appTitle as a node, so
-  const text = screen.getByText(/this is the app/i);
-  expect(text).toBeInTheDocument();
+  expect(getByText(/this is the app/i)).toBeInTheDocument();
 });
