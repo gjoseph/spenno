@@ -20,7 +20,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import TransactionsWorker from "worker-loader!../worker/transaction-filter-worker"; // eslint-disable-line import/no-webpack-loader-syntax
+import TransactionsWorker from "../worker/transaction-filter-worker?worker";
 import type { WorkerFunctions } from "../worker/transaction-filter-worker";
 import { wrap } from "../worker/promise-worker";
 import { Bank } from "../domain/accounts";
