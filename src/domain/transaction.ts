@@ -45,33 +45,29 @@ export interface Transaction extends RawRecord {
 }
 
 // === Sorters
-export { byAmountAsc, byAmountDesc };
-const byAmountAsc = (a: RawRecord, b: RawRecord) => {
+export const byAmountAsc = (a: RawRecord, b: RawRecord) => {
   return a.amount.minus(b.amount).toNumber();
 };
-const byAmountDesc = (a: RawRecord, b: RawRecord) => -byAmountAsc(a, b);
+export const byAmountDesc = (a: RawRecord, b: RawRecord) => -byAmountAsc(a, b);
 
 // === Reducers
-export { sum };
-
-const sum = (acc: Big, curr: Transaction) => acc.plus(curr.amount);
+export const sum = (acc: Big, curr: Transaction) => acc.plus(curr.amount);
 
 // === Transactions Filters
-export { isUncategorised, isInCategories, isBetween };
-const isUncategorised = () => {
+export const isUncategorised = () => {
   return chainable<Transaction>((t) => {
     return t.category === UNCATEGORISED;
   });
 };
 
-const isInCategories = (categories: Category[]) => {
+export const isInCategories = (categories: Category[]) => {
   return chainable<Transaction>((t) => {
     return categories.includes(t.category);
   });
 };
 
 // redundant with between filter which applies to RawRecords and is more targetted at the rules
-const isBetween = (dateRange: DateRange) => {
+export const isBetween = (dateRange: DateRange) => {
   return chainable<Transaction>((t) => {
     return isInRange(t.date, dateRange);
   });

@@ -4,19 +4,16 @@ import { zer0 } from "../util/util";
 import { RawRecordFilters } from "./filters";
 import { sum, Transaction } from "./transaction";
 
-export type { ChartDesc, ChartDataItem, GroupBy, SplitBy };
-export { GroupByFunctions, SplitByFunctions, getChartsFor };
+export type ChartDesc = { title: string; data: ChartDataItem[] };
+export type ChartDataItem = { name: string; value: number };
 
-type ChartDesc = { title: string; data: ChartDataItem[] };
-type ChartDataItem = { name: string; value: number };
-
-type GroupBy =
+export type GroupBy =
   | "year" // TODO or use a subset or moment's TimeUnit // should we split up GroupBy "type" and "parameter"
   | "category" // the default TODO introduce depths
   | "amount" // not great name - this could just be credit vs debit, or some other amount criteria?
   | "account";
 
-const GroupByFunctions: Record<GroupBy, (t: Transaction) => string> = {
+export const GroupByFunctions: Record<GroupBy, (t: Transaction) => string> = {
   year: (t) => t.date.year().toString(),
   category: (t) => t.category,
   amount: (t) => (t.amount.gt(0) ? "credit" : "debit"),
@@ -69,8 +66,8 @@ type ChartMaker = (
   transactions: Transaction[]
 ) => ChartDesc[];
 
-type SplitBy = GroupBy;
-const SplitByFunctions: Record<SplitBy, () => ChartMaker> = {
+export type SplitBy = GroupBy;
+export const SplitByFunctions: Record<SplitBy, () => ChartMaker> = {
   amount: () =>
     makeCharts([
       { title: "Credits", predicate: RawRecordFilters.isCredit() },
@@ -102,7 +99,7 @@ const SplitByFunctions: Record<SplitBy, () => ChartMaker> = {
 };
 
 // TODO we should do this in the webworker
-const getChartsFor = (
+export const getChartsFor = (
   whatToSplitBy: SplitBy,
   whatToGroupBy: GroupBy,
   transactions: Transaction[]

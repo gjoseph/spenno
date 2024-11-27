@@ -4,8 +4,6 @@ import { chainable } from "../util/chainable";
 import { mustBe, positive } from "../util/util";
 import type { RawRecord } from "./transaction";
 
-export { RawRecordFilters };
-
 // ======= RawRecord Filters
 type AmountCompareArgs = { min?: number; max?: number; eq?: number };
 
@@ -59,4 +57,4 @@ const mustBeValid = (s: string) => {
   return m;
 };
 
-const RawRecordFilters = { isDebit, isCredit, inTime, between };
+export const RawRecordFilters = { isDebit, isCredit, inTime, between };
