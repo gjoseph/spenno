@@ -58,6 +58,10 @@
       matchPackageNames: ["@types/jest", "jest"],
     },
     {
+      groupName: "uuid",
+      matchPackageNames: ["@types/uuid", "uuid"],
+    },
+    {
       groupName: "react",
       matchPackageNames: [
         "@types/react",
