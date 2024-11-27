@@ -11,8 +11,9 @@ export function useFetch<T>(
   const [error, setError] = React.useState<boolean>(false);
 
   const doTheFetch = () => {
-    console.log("Loading", path);
-    fetch(process.env.PUBLIC_URL + path)
+    console.log("Loading", path, "at", import.meta.env.PUBLIC_URL + path);
+    // TODO: Guessing the below won't work with Vite ⤵️
+    fetch(import.meta.env.PUBLIC_URL + path)
       .then((res) => res.text())
       .then(
         (result) => {
