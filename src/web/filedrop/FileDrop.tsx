@@ -97,7 +97,7 @@ export const FileDrop: React.FC<FileDropProps> = (props) => {
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: ["text/csv"],
+    accept: { "text/csv": [".txt", ".csv", ".tsv"] },
     noClick: true,
     onDropAccepted: onDrop,
   });
