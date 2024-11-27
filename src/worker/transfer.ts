@@ -1,7 +1,7 @@
 import Big from "big.js";
 import moment from "moment";
 import { FileWithRawRecords, TransactionsFile } from "../domain/file";
-import { RawRecord } from "../domain/transaction";
+import { RawRecord, Transaction } from "../domain/transaction";
 import { DateRange } from "../util/time-util";
 
 /**
@@ -28,26 +28,28 @@ export type Transferrable<T> = {
 // type OnlyBigs<T> = Pick<T, ProblematicProperties<T>>;
 // type OnlyNonBigs<T> = Omit<T, ProblematicProperties<T>>;
 
-type TransferrableMapping = {
+// <T> here is "useful" to indicate what the TransferrableMapping applies to, and somehow useful for compiler to know which Object.entries method to call
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type TransferrableMapping<T> = {
   big: string[];
   moment: string[];
 };
-export const TransferrableMappings = {
-  RawRecord: {
+export namespace TransferrableMappings {
+  export const RawRecordTM = {
     big: ["amount"],
     moment: ["date"],
-  },
-  Transaction: {
+  };
+  export const TransactionTM: TransferrableMapping<Transaction> = {
     big: ["amount"],
     moment: ["date"],
-  },
-  DateRange: {
+  };
+  export const DateRangeTM: TransferrableMapping<DateRange> = {
     big: [],
     moment: [],
-  },
-};
+  };
+}
 
-export const toTransferrable = <T>(t: T): Transferrable<T> => {
+export const toTransferrable = <T extends {}>(t: T): Transferrable<T> => {
   const map = Object.entries(t).map((e: [string, any]) => {
     const k = e[0];
     const v = e[1];
@@ -64,7 +66,7 @@ export const toTransferrable = <T>(t: T): Transferrable<T> => {
 
 // Returns a function for the given mapping which can then be used in [].map() calls
 export const fromTransferrable =
-  <T>(mapping: TransferrableMapping) =>
+  <T>(mapping: TransferrableMapping<T>) =>
   (t: Transferrable<T>): T => {
     const map: [string, any][] = Object.entries(t).map((e: [string, any]) => {
       const k = e[0];
@@ -105,7 +107,7 @@ export const fromTransferrableFilesWithRawRecords = (
     return {
       ...f,
       rawRecords: f.rawRecords.map(
-        fromTransferrable(TransferrableMappings.RawRecord)
+        fromTransferrable(TransferrableMappings.RawRecordTM)
       ),
     };
   });

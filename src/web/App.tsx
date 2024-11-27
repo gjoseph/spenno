@@ -237,7 +237,7 @@ const AppContent = () => {
         forwardLogs(res.log, logger);
         setTransactions((old) => {
           const newTxs = res.transactions.map(
-            fromTransferrable(TransferrableMappings.Transaction)
+            fromTransferrable(TransferrableMappings.TransactionTM)
           );
           logger.debug("Loaded", newTxs.length, "transactions");
           return newTxs;
