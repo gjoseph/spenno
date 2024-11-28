@@ -14,8 +14,12 @@ export default defineConfig({
     svgrPlugin({
       svgrOptions: {
         icon: true,
-        // ...svgr options (https://react-svgr.com/docs/options/)
       },
     }),
   ],
+  test: {
+    environment: "jsdom",
+    globals: true, // this enables default imports for test, expect functions
+    setupFiles: "./src/test/setup.js",
+  },
 });

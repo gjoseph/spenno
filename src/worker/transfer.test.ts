@@ -8,7 +8,7 @@
 import Big from "big.js";
 import moment from "moment";
 import { Transaction } from "../domain/transaction";
-import { toEqualMoment } from "../jest/toEqualMoment";
+import { toEqualMoment } from "../test/toEqualMoment";
 import {
   fromTransferrable,
   toTransferrable,
