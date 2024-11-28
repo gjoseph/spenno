@@ -1,4 +1,5 @@
 import Big from "big.js";
+import { test, expect } from "vitest";
 
 test.skip("WTF javascript", () => {
   expect(0.1 + 0.2).toEqual(0.3);

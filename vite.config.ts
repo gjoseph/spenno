@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import reactRefresh from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
 
@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   test: {
     environment: "jsdom",
-    globals: true, // this enables default imports for test, expect functions
+    globals: false, // this is the default and I agree -- let's use explicit imports instead
     setupFiles: "./src/test/setup.js",
   },
 });
