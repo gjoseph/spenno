@@ -1,5 +1,14 @@
 import React from "react";
 
+function makePath(path: string) {
+  const baseurl = import.meta.env.BASE_URL;
+  if (baseurl.endsWith("/")) {
+    return baseurl.slice(0, -1) + path;
+  } else {
+    return baseurl + path;
+  }
+}
+
 export function useFetch<T>(
   path: string,
   initialStateFactory: () => T,
@@ -11,8 +20,8 @@ export function useFetch<T>(
   const [error, setError] = React.useState<boolean>(false);
 
   const doTheFetch = () => {
-    console.log("Loading", path);
-    fetch(process.env.PUBLIC_URL + path)
+    console.log("Loading", path, "at", makePath(path));
+    fetch(makePath(path))
       .then((res) => res.text())
       .then(
         (result) => {

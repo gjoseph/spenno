@@ -4,6 +4,7 @@ import { SilentLogger } from "../util/log";
 import { TransactionsProcessor } from "./processor";
 import { Rules } from "./rules";
 import { RawRecord } from "./transaction";
+import { test, expect } from "vitest";
 
 const account = { id: "1", name: "acc1" };
 test("simple matching without additional condition", () => {

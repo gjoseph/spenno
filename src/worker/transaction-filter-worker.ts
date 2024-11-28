@@ -8,6 +8,8 @@
 // ... now, since workerize-loader doesn't work with webpack 5 (https://github.com/developit/workerize-loader/issues/77),
 // we're using https://gist.github.com/RedstoneWizard22/d07b326a438dd0449758c263cebd0e82 instead
 
+// ... and then simplified for vite: https://vite.dev/guide/features.html#web-workers
+
 import { expose } from "./promise-worker";
 import { Bank } from "../domain/accounts";
 import { Category } from "../domain/category";

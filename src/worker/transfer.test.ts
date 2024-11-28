@@ -8,16 +8,14 @@
 import Big from "big.js";
 import moment from "moment";
 import { Transaction } from "../domain/transaction";
-import { toEqualMoment } from "../jest/toEqualMoment";
+import { toEqualMoment } from "../test/toEqualMoment";
 import {
   fromTransferrable,
   toTransferrable,
   Transferrable,
   TransferrableMappings,
 } from "./transfer";
-
-// Copied from https://gist.github.com/robwise/1b36656e6ed7645ae33716dfb19fb60a
-expect.extend({ toEqualMoment });
+import { test, expect } from "vitest";
 
 const { MessageChannel } = require("worker_threads");
 

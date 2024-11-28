@@ -2,6 +2,7 @@ import Big from "big.js";
 import moment from "moment";
 import { Rules } from "./rules";
 import { RawRecord } from "./transaction";
+import { test, expect } from "vitest";
 
 test("Transforms a RuleDesc such that additionalCondition can be eval'd", () => {
   const ruleDesc: Rules.RuleDesc = {

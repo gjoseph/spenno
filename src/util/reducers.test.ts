@@ -1,4 +1,5 @@
 import { countBy, groupBy } from "./reducers";
+import { test, expect } from "vitest";
 
 test("groupBy reducer - by word length", () => {
   const words = ["dog", "cat", "chat", "hop", "hip", "hund", "chien"];

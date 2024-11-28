@@ -1,6 +1,8 @@
 import { render } from "@testing-library/react";
 import { TopBar } from "./Nav";
 import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
+import "@testing-library/jest-dom/vitest";
+import { test, expect } from "vitest";
 
 test("renders title", () => {
   const { getByText } = render(
