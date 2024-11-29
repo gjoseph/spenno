@@ -15,6 +15,7 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "test": "vitest",
+    "lint": "eslint src/",
     "prettier-check-all": "prettier --check .",
     "prettier-fix-all": "prettier --write ."
   },
@@ -50,14 +51,24 @@
     "@types/wicg-file-system-access": "2023.10.5",
     "@types/yargs": "17.0.33",
     "@vitejs/plugin-react": "4.3.4",
+    "eslint": "8.57.1",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-config-react-app": "7.0.1",
+    "eslint-plugin-react-compiler": "19.0.0-beta-df7b47d-20241124",
     "husky": "9.1.7",
     "jsdom": "25.0.1",
     "prettier": "3.4.0",
     "pretty-quick": "4.0.0",
     "typescript": "5.7.2",
     "vite": "6.0.1",
+    "vite-plugin-eslint": "1.8.1",
     "vite-plugin-svgr": "4.3.0",
     "vitest": "2.1.6"
+  },
+  "/*": "these overrides only exist because we still unfortunately indirectly depend on CRA for eslint-config-react-app",
+  "overrides": {
+    "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-react-hooks": "5.0.0"
   },
   "//": "Also see .prettierignore -- https://github.com/prettier/prettier/issues/4708",
   "prettier": {
@@ -65,8 +76,11 @@
   },
   "eslintConfig": {
     "extends": [
+      "eslint:recommended",
       "react-app",
-      "react-app/jest"
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended",
+      "prettier"
     ]
   },
   "browserslist": {
