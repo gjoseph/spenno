@@ -59,10 +59,6 @@
     "vite-plugin-svgr": "4.3.0",
     "vitest": "2.1.6"
   },
-  "overrides": {
-    "react-refresh": "0.14.2",
-    "typescript": "5.7.2"
-  },
   "//": "Also see .prettierignore -- https://github.com/prettier/prettier/issues/4708",
   "prettier": {
     "useTabs": false
