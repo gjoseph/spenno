@@ -79,12 +79,15 @@ const AppBarButtons = ({
   </ButtonGroup>
 );
 
-const AppSpeedDial: React.FC<{
+type AppSpeedDiaProps = {
   icon: React.JSXElementConstructor<any>;
   iconAndOnClicks: IconAndOnClick[];
-}> =
+};
+
+const AppSpeedDial: React.FC<AppSpeedDiaProps> =
   // Need to use forwardRef so we can use this component in <Slide> below
-  React.forwardRef((props, ref) => (
+  // eslint-disable-next-line react/display-name
+  React.forwardRef((props: AppSpeedDiaProps, ref) => (
     <SpeedDial
       ref={ref}
       ariaLabel="Quick access menu"

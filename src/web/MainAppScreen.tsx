@@ -39,7 +39,7 @@ export const MainAppScreen: React.FC<
             <TabbedPanels
               initialTabIdx={0}
               panels={[
-                <TabPanel label="Graphs">
+                <TabPanel label="Graphs" key="Graphs_tab">
                   <Grid container spacing={0}>
                     {charts.map((chart, idx) => (
                       <Grid item xs={12} md={6} xl={4} key={idx}>
@@ -52,7 +52,7 @@ export const MainAppScreen: React.FC<
                     ))}
                   </Grid>
                 </TabPanel>,
-                <TabPanel label="Transactions">
+                <TabPanel label="Transactions" key="Transactions_tab">
                   <TransactionsTable
                     accounts={props.accounts}
                     transactions={props.transactions}
@@ -60,6 +60,7 @@ export const MainAppScreen: React.FC<
                 </TabPanel>,
                 <TabPanel
                   label="Uncategorised"
+                  key="Uncategorised_tab"
                   warning={
                     uncategorised.uncategorisedTransactions.length &&
                     `There are ${uncategorised.uncategorisedTransactions.length} uncategorised records`
@@ -68,13 +69,13 @@ export const MainAppScreen: React.FC<
                   <TabbedPanels
                     initialTabIdx={0}
                     panels={[
-                      <TabPanel label="All">
+                      <TabPanel label="All" key="All_tab">
                         <TransactionsTable
                           accounts={props.accounts}
                           transactions={uncategorised.uncategorisedTransactions}
                         />
                       </TabPanel>,
-                      <TabPanel label="Most common">
+                      <TabPanel label="Most common" key="Most_common_tab">
                         <DataGridWrapper
                           columns={mostCommonDescriptionsColumns}
                           rows={uncategorised.mostCommonDescriptions}
@@ -84,7 +85,7 @@ export const MainAppScreen: React.FC<
                     ]}
                   />
                 </TabPanel>,
-                <TabPanel label="Raw records">
+                <TabPanel label="Raw records" key="Raw_records_tab">
                   <RawRecordsTable
                     filesWithRawRecords={props.filesWithRawRecords}
                     accounts={props.accounts}
@@ -92,6 +93,7 @@ export const MainAppScreen: React.FC<
                 </TabPanel>,
                 <TabPanel
                   label="Duplicates"
+                  key="Duplicates_tab"
                   tooltip={
                     "(TODO)Use this tab to find overlapping/duplicate records in CSV files"
                     // TODO also highlight this when there _are_ duplicate records

@@ -3,6 +3,7 @@ import { TopBar } from "./Nav";
 import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
 import "@testing-library/jest-dom/vitest";
 import { test, expect } from "vitest";
+import React from "react";
 
 test("renders title", () => {
   const { getByText } = render(

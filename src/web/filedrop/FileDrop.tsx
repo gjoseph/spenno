@@ -68,6 +68,7 @@ export const withDropZone =
   <P extends object>(
     WrappedComponent: React.ComponentType<P>,
   ): React.FC<P & FileDropProps> =>
+  // eslint-disable-next-line react/display-name
   ({ addFile, minimal, ...props }: FileDropProps) => (
     <FileDrop addFile={addFile} minimal={minimal}>
       <WrappedComponent {...(props as P)} />
