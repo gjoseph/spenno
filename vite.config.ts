@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import reactRefresh from "@vitejs/plugin-react";
+import eslint from "vite-plugin-eslint";
 import svgrPlugin from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
@@ -11,6 +12,7 @@ export default defineConfig({
   },
   plugins: [
     reactRefresh(),
+    eslint(),
     svgrPlugin({
       svgrOptions: {
         icon: true,

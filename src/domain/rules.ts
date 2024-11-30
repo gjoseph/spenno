@@ -45,7 +45,7 @@ export namespace Rules {
     };
   };
 
-  function parseRegex(regexStr: string): RegExp {
+  const parseRegex = (regexStr: string): RegExp => {
     if (regexStr[0] === "/") {
       const lastIndexOf = regexStr.lastIndexOf("/");
       if (lastIndexOf < 1) {
@@ -57,11 +57,10 @@ export namespace Rules {
     } else {
       return new RegExp(regexStr);
     }
-  }
-
-  function evalRule(additionalCheck: AdditionalCheckTS): AdditionalCheck {
+  };
+  const evalRule = (additionalCheck: AdditionalCheckTS): AdditionalCheck => {
     return evalAsFunction<RawRecord, boolean>(additionalCheck);
-  }
+  };
 
   export class RulesLoader {
     constructor(readonly log: Logger) {
