@@ -56,7 +56,7 @@
     "eslint-config-react-app": "7.0.1",
     "eslint-plugin-react-compiler": "19.0.0-beta-e1e972c-20250221",
     "husky": "9.1.7",
-    "jsdom": "25.0.1",
+    "jsdom": "26.0.0",
     "prettier": "3.4.0",
     "pretty-quick": "4.0.0",
     "typescript": "5.7.2",
