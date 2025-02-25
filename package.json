@@ -54,7 +54,7 @@
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-config-react-app": "7.0.1",
-    "eslint-plugin-react-compiler": "19.0.0-beta-df7b47d-20241124",
+    "eslint-plugin-react-compiler": "19.0.0-beta-e1e972c-20250221",
     "husky": "9.1.7",
     "jsdom": "25.0.1",
     "prettier": "3.4.0",
