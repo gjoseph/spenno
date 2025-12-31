@@ -48,7 +48,7 @@
     "@types/node": "22.10.1",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
-    "@types/wicg-file-system-access": "2023.10.5",
+    "@types/wicg-file-system-access": "2023.10.7",
     "@types/yargs": "17.0.33",
     "@vitejs/plugin-react": "4.3.4",
     "eslint": "8.57.1",
