@@ -37,7 +37,7 @@
     "recharts": "2.13.3",
     "uuid": "11.0.5",
     "web-vitals": "4.2.4",
-    "yargs": "17.7.2"
+    "yargs": "18.0.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.6.4",
