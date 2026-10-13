@@ -62,7 +62,7 @@
     "typescript": "5.7.3",
     "vite": "6.0.15",
     "vite-plugin-eslint": "1.8.1",
-    "vite-plugin-svgr": "4.3.0",
+    "vite-plugin-svgr": "4.5.0",
     "vitest": "2.1.9"
   },
   "/*": "these overrides only exist because we still unfortunately indirectly depend on CRA for eslint-config-react-app",
