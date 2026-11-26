@@ -15,7 +15,7 @@ jobs:
         npm-command: ["lint", "build", "test", "prettier-check-all"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: "./.tool-versions"
           cache: "npm"
