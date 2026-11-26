@@ -68,7 +68,7 @@
   "/*": "these overrides only exist because we still unfortunately indirectly depend on CRA for eslint-config-react-app",
   "overrides": {
     "eslint-plugin-react": "7.37.5",
-    "eslint-plugin-react-hooks": "5.0.0"
+    "eslint-plugin-react-hooks": "5.2.0"
   },
   "//": "Also see .prettierignore -- https://github.com/prettier/prettier/issues/4708",
   "prettier": {
